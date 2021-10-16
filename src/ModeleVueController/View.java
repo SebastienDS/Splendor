@@ -1,7 +1,5 @@
 package ModeleVueController;
 
-import java.lang.reflect.Modifier;
-
 public class View {
     public static void printStartingMenu() {
         System.out.println("Choississez un menu:");
@@ -33,5 +31,13 @@ public class View {
 
     public static void printNotEnoughPlayer() {
         System.out.println("Le nombre minimum de joueur est de 2 !");
+    }
+
+    public static void printChoiceDoNotExist(int n) {
+        System.out.println("Le choix :" + n + " n'existe pas");
+    }
+
+    public static void printNeedNumber() {
+        System.out.println("Vous devez écrire un nombre !");
     }
 }

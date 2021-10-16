@@ -10,7 +10,7 @@ abstract class AbstractCard implements Card {
 
     public AbstractCard(Map<Token, Integer> map, String image) {
         cost = new HashMap<>(Objects.requireNonNull(map));
-        this.image = image;
+        this.image = Objects.requireNonNull(image);
     }
 
     public int getCost(Token token) {

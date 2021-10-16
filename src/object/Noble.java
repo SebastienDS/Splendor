@@ -1,6 +1,7 @@
 package object;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class Noble extends AbstractCard {
 
@@ -8,6 +9,6 @@ public class Noble extends AbstractCard {
 
     public Noble(Map<Token, Integer> cost, String name, String image) {
         super(cost, image);
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 }
