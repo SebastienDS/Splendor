@@ -1,6 +1,8 @@
 package object;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Stack;
 
 public class Deck<T> {
@@ -13,6 +15,14 @@ public class Deck<T> {
 
     public void add(T t){
         deck.add(t);
+    }
+
+    public List<T> drawMultiple(int number){
+        var list = new ArrayList<T>();
+        for (int i = 0; i < number; i++) {
+            list.add(draw());
+        }
+        return list;
     }
 
     public void shuffle(){

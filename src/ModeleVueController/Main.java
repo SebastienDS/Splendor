@@ -12,6 +12,7 @@ public class Main {
         var gameData = new Model(initPlayer(), new HashMap<>(), new HashMap<>());
         var scanner = new Scanner(System.in);
         Controller.startingMenu(scanner, gameData);
+        scanner.close();
     }
 
     private static List<Player> initPlayer() {

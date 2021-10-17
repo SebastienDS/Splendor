@@ -1,15 +1,8 @@
 package ModeleVueController;
 
-import object.Deck;
-import object.DeckName;
-import object.Decks;
-import object.Player;
+import object.*;
 
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Controller {
 
@@ -32,20 +25,123 @@ public class Controller {
             switch (input_menu){
                 case(0): playerMenu(scanner, gameData); break;
                 case(1): gameModeMenu(scanner, gameData); break;
-                case(2): return;
+                case(2): startGame(scanner, gameData); return;
                 default: View.printChoiceDoNotExist(input_menu);
             }
         }
     }
 
+    private static void startGame(Scanner scanner, Model gameData) {
+        gameData.startGame();
+        while(!gameData.getLastRound() || !gameData.startNewRound()) {
+            View.printPlayerPlaying(gameData.getPlayerPlaying());
+            View.printPlayerResource(gameData.getPlayerPlaying());
+            firstChoice(scanner, gameData);
+            gameData.endTurn();
+        }
+    }
+
+    private static void firstChoice(Scanner scanner, Model gameData) {
+        while(true){
+            View.printFirstChoicePlayer();
+            var input_choice = getInteger(scanner);
+            switch (input_choice){
+                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 2), 2);return;
+                case(2): Controller.chooseTokens(scanner, gameData);return;
+                case(3): Controller.reserveCard(scanner, gameData);return;
+                case(4): Controller.buyCard(scanner, gameData);return;
+                default: View.printChoiceDoNotExist(input_choice);
+            }
+        }
+    }
+
+    private static void buyCard(Scanner scanner, Model gameData) {
+    }
+
+    private static void reserveCard(Scanner scanner, Model gameData) {
+    }
+
+    private static Token chooseToken(Scanner scanner, Model gameData, int number) {
+        var tokens = Token.values();
+        while(true){
+            View.printTokens(gameData);
+            var input_choice = getInteger(scanner) - 1;
+            if(input_choice >= tokens.length - 1 || input_choice < 0){
+                View.printChoiceDoNotExist(input_choice);
+                continue;
+            }
+            var token = tokens[input_choice];
+            if(gameData.getGameTokens().get(token) >= number){
+                return token;
+            }
+            View.printNotEnoughToken();
+        }
+    }
+
+    private static void chooseTokens(Scanner scanner, Model gameData) {
+        List<Token> tokenChosen = new ArrayList<>();
+        while(true){
+            View.printTokenChosen(tokenChosen);
+            View.printMenuChooseToken();
+            var input_choice = getInteger(scanner);
+            switch (input_choice){
+                case(1): manageAddToken(scanner, tokenChosen, gameData);break;
+                case(2): manageRemoveToken(scanner, tokenChosen);break;
+                case(3): {
+                    if(tokenChosen.size() == 3){
+                        tokenChosen.stream().forEach(token -> gameData.takeToken(token, 1));
+                        return;
+                    }
+                    View.printNotEnoughTokenChosen(tokenChosen.size());
+                    break;
+                }
+                default:View.printChoiceDoNotExist(input_choice);
+            }
+        }
+    }
+
+    private static void manageRemoveToken(Scanner scanner, List<Token> tokenChosen) {
+        if(tokenChosen.size() == 0){
+            View.printNoTokenChosen();
+            return;
+        }
+        while (true) {
+            View.printTokenChosenWithIndex(tokenChosen);
+            var input_choice = getInteger(scanner);
+            if(input_choice < 1 || input_choice > tokenChosen.size() + 1){
+                View.printChoiceDoNotExist(input_choice);
+                continue;
+            }
+            if(input_choice == tokenChosen.size() + 1){
+                return;
+            }
+            tokenChosen.remove(input_choice - 1);
+            return;
+        }
+    }
+
+    private static void manageAddToken(Scanner scanner, List<Token> tokenChosen, Model gameData) {
+        if(tokenChosen.size() >= 3){
+            View.printTooMuchToken();
+            return;
+        }
+        var token = chooseToken(scanner, gameData, 1);
+        if(tokenChosen.contains(token)){
+            View.printTokenAlreadyChosen(token.name());
+            return;
+        }
+        tokenChosen.add(token);
+    }
+
     private static void gameModeMenu(Scanner scanner, Model gameData) {
-        View.printGameModeMenu();
         while (true){
+            View.printGameModeMenu();
             var input_choice = Controller.getInteger(scanner);
             var decks = gameData.getDecks();
             switch (input_choice) {
-                case(1): firstPhaseDeck(decks);  return;
-                case(2): secondPhaseDeck(decks); return;
+                case(1): firstPhaseDeck(decks); gameData.setGameMode(1); return;
+                case(2): secondPhaseDeck(decks); gameData.setGameMode(2); return;
+                default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
@@ -57,6 +153,7 @@ public class Controller {
 
     private static void secondPhaseDeck(Map<DeckName, Deck> decks){
         decks.clear();
+        decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
         decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());
         decks.put(DeckName.SECOND_DEV_DECK, Decks.secondDevelopmentDeck());
         decks.put(DeckName.THIRD_DEV_DECK, Decks.thirdDevelopmentDeck());
@@ -71,6 +168,7 @@ public class Controller {
                 case(0): changeName(scanner, gameData);break;
                 case(1): addPlayer(players, scanner); break;
                 case(2): removePlayer(players, scanner);break;
+                case(3): return;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
@@ -113,6 +211,7 @@ public class Controller {
 
     private static String getName(Scanner scanner) {
         View.printChooseName();
-        return ""; //to do
+        String firstToken = scanner.next();
+        return firstToken + scanner.nextLine();
     }
 }

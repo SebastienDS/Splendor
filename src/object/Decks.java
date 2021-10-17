@@ -1,25 +1,31 @@
 package object;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Decks {
 
     private static final int NUMBER_BASIC_CARD = 8;
 
     public static Deck<Noble> basicDeck(){
-        var basicDeck = new Deck<Noble>();
-        var tokenManager = new TokenManager();
-        for(Token token: Token.values()){
-            if(token.equals(Token.GOLD)){
-                continue;
-            }
-            tokenManager.addToken(token, 3);
-            addBasicCard(tokenManager, NUMBER_BASIC_CARD, basicDeck);
-            tokenManager.clear();
-        }
-        return basicDeck;
+        var deck = new Deck<Noble>();
+        createBasicDeck(deck);
+        return deck;
     }
 
-    private static void addBasicCard(TokenManager tokenManager, int number, Deck<Noble> deck){
-        for (int i = 0; i < number; i++) {
+    private static void createBasicDeck(Deck<Noble> deck) {
+        var tokenManager = new TokenManager();
+        for (var token: Token.cardValues()) {
+            tokenManager.addToken(token, 3);
+            addCardMultipleTime(deck, tokenManager, 8);
+            tokenManager.clear();
+        }
+    }
+
+    private static void addCardMultipleTime(Deck<Noble> deck, TokenManager tokenManager, int i) {
+        for (int j = 0; j < i; j++) {
             deck.add(new Noble(tokenManager.tokenNotEmpty(), "", "", 1));
         }
     }
