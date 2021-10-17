@@ -77,11 +77,11 @@ public class View {
 
     public static void printTokens(Model gameData) {
         var text = new StringBuilder();
-        text.append("Quelle jeton?\n");
+        text.append("Quelle jeton?");
         var gameTokens = gameData.getGameTokens();
         var iteration = 1;
         for(var token: Token.cardValues()){
-            text.append(iteration).append(": ").append(token).append("(quantity:").append(gameTokens.get(token)).append(")\n");
+            text.append("\n").append(iteration).append(": ").append(token).append("(quantity:").append(gameTokens.get(token)).append(")");
             iteration++;
         }
         System.out.println(text);

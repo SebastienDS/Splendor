@@ -2,7 +2,7 @@ package object;
 
 import java.util.*;
 
-public record TokenManager(LinkedHashMap<Token, Integer> tokenManager) {
+public record TokenManager(Map<Token, Integer> tokenManager) {
     public TokenManager {
         Objects.requireNonNull(tokenManager);
     }
@@ -11,13 +11,13 @@ public record TokenManager(LinkedHashMap<Token, Integer> tokenManager) {
         this(emptyTokens());
     }
 
-    private static LinkedHashMap<Token, Integer> emptyTokens() {
+    private static Map<Token, Integer> emptyTokens() {
         var tokenManager = new LinkedHashMap<Token, Integer>();
         initToken(tokenManager);
         return tokenManager;
     }
 
-    private static void initToken(LinkedHashMap<Token, Integer> tokenManager){
+    private static void initToken(Map<Token, Integer> tokenManager){
         tokenManager.put(Token.EMERALD, 0);
         tokenManager.put(Token.SAPPHIRE, 0);
         tokenManager.put(Token.RUBY, 0);

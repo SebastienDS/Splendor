@@ -11,27 +11,23 @@ public class Model {
     private final List<Player> players;
     private boolean lastRound = false;
     private int playerPlaying;
-    private int gameMode;
     private final Map<DeckName, Deck> decks;
     private final Map<DeckName, List<Card>> grounds;
     private final TokenManager gameTokens;
 
     public Model(List<Player> players, Map<DeckName, Deck> decks, Map<DeckName, List<Card>> grounds) {
         this.players = players;
-        playerPlaying = 0;
         this.decks = decks;
         this.grounds = grounds;
-        gameTokens = initGameTokens(players.size());
+        gameTokens = new TokenManager();
     }
 
-    private TokenManager initGameTokens(int size) {
+    private void initGameTokens(int size) {
         var numberOfTokens = size + 2 + size / 4;
-        var tokenManager = new TokenManager();
         for (var token: Token.cardValues()){
-            tokenManager.addToken(token, numberOfTokens);
+            gameTokens.addToken(token, numberOfTokens);
         }
-        tokenManager.addToken(Token.GOLD, 5);
-        return tokenManager;
+        gameTokens.addToken(Token.GOLD, 5);
     }
 
     public List<Player> getPlayers() {
@@ -48,6 +44,7 @@ public class Model {
 
     public void startGame() {
         initGrounds();
+        initGameTokens(players.size());
     }
 
     public void endTurn() {
@@ -69,10 +66,6 @@ public class Model {
 
     public Player getPlayerPlaying() {
         return players.get(playerPlaying);
-    }
-
-    public void setGameMode(int gameMode) {
-        this.gameMode = gameMode;
     }
 
     public boolean startNewRound() {

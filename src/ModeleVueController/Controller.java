@@ -2,6 +2,7 @@ package ModeleVueController;
 
 import object.*;
 
+import javax.lang.model.type.ArrayType;
 import java.util.*;
 
 public class Controller {
@@ -46,7 +47,7 @@ public class Controller {
             View.printFirstChoicePlayer();
             var input_choice = getInteger(scanner);
             switch (input_choice){
-                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 2), 2);return;
+                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 4), 2);return;
                 case(2): Controller.chooseTokens(scanner, gameData);return;
                 case(3): Controller.reserveCard(scanner, gameData);return;
                 case(4): Controller.buyCard(scanner, gameData);return;
@@ -79,7 +80,7 @@ public class Controller {
     }
 
     private static void chooseTokens(Scanner scanner, Model gameData) {
-        List<Token> tokenChosen = new ArrayList<>();
+        var tokenChosen = new ArrayList<Token>();
         while(true){
             View.printTokenChosen(tokenChosen);
             View.printMenuChooseToken();
@@ -87,17 +88,19 @@ public class Controller {
             switch (input_choice){
                 case(1): manageAddToken(scanner, tokenChosen, gameData);break;
                 case(2): manageRemoveToken(scanner, tokenChosen);break;
-                case(3): {
-                    if(tokenChosen.size() == 3){
-                        tokenChosen.stream().forEach(token -> gameData.takeToken(token, 1));
-                        return;
-                    }
-                    View.printNotEnoughTokenChosen(tokenChosen.size());
-                    break;
-                }
+                case(3): if(manageConfirmTokens(scanner, tokenChosen, gameData)) return; break;
                 default:View.printChoiceDoNotExist(input_choice);
             }
         }
+    }
+
+    private static boolean manageConfirmTokens(Scanner scanner, ArrayList<Token> tokenChosen, Model gameData){
+        if(tokenChosen.size() == 3){
+            tokenChosen.stream().forEach(token -> gameData.takeToken(token, 1));
+            return true;
+        }
+        View.printNotEnoughTokenChosen(tokenChosen.size());
+        return false;
     }
 
     private static void manageRemoveToken(Scanner scanner, List<Token> tokenChosen) {
