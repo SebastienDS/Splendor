@@ -28,4 +28,16 @@ public record TokenManager(Map<Token, Integer> tokenManager) {
         Objects.requireNonNull(token);
         tokenManager.replace(token, tokenManager.get(token) + value);
     }
+
+    public Map<Token, Integer> tokenNotEmpty(){
+        var tokenNotEmpty = new HashMap<Token, Integer>();
+        tokenManager.keySet().forEach(token -> {
+            if (tokenManager.get(token) > 0) tokenNotEmpty.put(token, tokenManager.get(token));
+        });
+        return tokenNotEmpty();
+    }
+
+    public void clear() {
+        tokenManager.clear();
+    }
 }

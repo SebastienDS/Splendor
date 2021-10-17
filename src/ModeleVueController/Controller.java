@@ -9,6 +9,7 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -19,7 +20,7 @@ public class Controller {
                 return input_integer;
             } catch (InputMismatchException e) {
                 View.printNeedNumber();
-                scanner.next();
+                scanner.nextLine();
             }
         }
     }
@@ -32,6 +33,7 @@ public class Controller {
                 case(0): playerMenu(scanner, gameData); break;
                 case(1): gameModeMenu(scanner, gameData); break;
                 case(2): return;
+                default: View.printChoiceDoNotExist(input_menu);
             }
         }
     }
@@ -50,14 +52,14 @@ public class Controller {
 
     private static void firstPhaseDeck(Map<DeckName, Deck> decks){
         decks.clear();
-        decks.put(DeckName.BASIC_DECK, Decks.BasicDeck());
+        decks.put(DeckName.BASIC_DECK, Decks.basicDeck());
     }
 
     private static void secondPhaseDeck(Map<DeckName, Deck> decks){
         decks.clear();
-        decks.put(DeckName.FIRST_DEV_DECK, Decks.FirstDevelopmentDeck());
-        decks.put(DeckName.SECOND_DEV_DECK, Decks.SecondDevelopmentDeck());
-        decks.put(DeckName.THIRD_DEV_DECK, Decks.ThirdDevelopmentDeck());
+        decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());
+        decks.put(DeckName.SECOND_DEV_DECK, Decks.secondDevelopmentDeck());
+        decks.put(DeckName.THIRD_DEV_DECK, Decks.thirdDevelopmentDeck());
     }
 
     private static void playerMenu(Scanner scanner, Model gameData) {
@@ -67,40 +69,50 @@ public class Controller {
             var players = gameData.getPlayers();
             switch (input_choice){
                 case(0): changeName(scanner, gameData);break;
-                case(1): addPlayer(players); break;
-                case(2): removePlayer(players);break;
+                case(1): addPlayer(players, scanner); break;
+                case(2): removePlayer(players, scanner);break;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
 
-    private static void removePlayer(List<Player> players) {
+    private static void removePlayer(List<Player> players, Scanner scanner) {
         if(players.size() == 2) {
             View.printNotEnoughPlayer();
             return;
         }
-       players.remove(getPlayerToRemove());
+       players.remove(choosePlayer(players, scanner));
     }
 
-    private static void addPlayer(List<Player> players) {
+    private static void addPlayer(List<Player> players, Scanner scanner) {
         if(players.size() == 4) {
             View.printTooMuchPlayer();
             return;
         }
-        players.add(new Player(Controller.getName()));
+        players.add(new Player(Controller.getName(scanner)));
     }
 
-    private static Player getPlayerToRemove() {
-        //toDO
-        return new Player("cc");
+    private static int choosePlayer(List<Player> players, Scanner scanner) {
+        while(true){
+            View.printChoosePlayer(players);
+            var i = getInteger(scanner);
+            if(i < 0 || i >= players.size()){
+                View.printChoiceDoNotExist(i);
+                continue;
+            }
+            return i;
+        }
     }
 
     private static void changeName(Scanner scanner, Model gameData) {
-        //toDO
+        var players = gameData.getPlayers();
+        var indexPlayer = choosePlayer(players, scanner);
+        var name = getName(scanner);
+        players.set(indexPlayer, new Player(name));
     }
 
-    private static String getName() {
-        //toDO
-        return "";
+    private static String getName(Scanner scanner) {
+        View.printChooseName();
+        return ""; //to do
     }
 }

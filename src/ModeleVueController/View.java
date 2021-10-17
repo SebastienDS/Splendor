@@ -1,5 +1,9 @@
 package ModeleVueController;
 
+import object.Player;
+
+import java.util.List;
+
 public class View {
     public static void printStartingMenu() {
         System.out.println("Choississez un menu:");
@@ -34,10 +38,23 @@ public class View {
     }
 
     public static void printChoiceDoNotExist(int n) {
-        System.out.println("Le choix :" + n + " n'existe pas");
+        System.out.println("Le choix: \"" + n + "\" n'existe pas");
     }
 
     public static void printNeedNumber() {
         System.out.println("Vous devez écrire un nombre !");
+    }
+
+    public static void printChoosePlayer(List<Player> players) {
+        StringBuilder text = new StringBuilder();
+        text.append("Qui choisissez vous?");
+        for (int i = 0; i < players.size(); i++) {
+            text.append("\n").append(i).append(": ").append(players.get(i).getName());
+        }
+        System.out.println(text.toString());
+    }
+
+    public static void printChooseName() {
+        System.out.println("Choisissez un nom :");
     }
 }
