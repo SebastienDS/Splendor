@@ -142,8 +142,8 @@ public class Controller {
             var input_choice = Controller.getInteger(scanner);
             var decks = gameData.getDecks();
             switch (input_choice) {
-                case(1): firstPhaseDeck(decks); gameData.setGameMode(1); return;
-                case(2): secondPhaseDeck(decks); gameData.setGameMode(2); return;
+                case(1): firstPhaseDeck(decks); return;
+                case(2): secondPhaseDeck(decks); return;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }

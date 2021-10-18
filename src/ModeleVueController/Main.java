@@ -2,14 +2,11 @@ package ModeleVueController;
 
 import object.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        var gameData = new Model(initPlayer(), new HashMap<>(), new HashMap<>());
+        var gameData = new Model(initPlayer(), new HashMap<>(), new LinkedHashMap<>());
         var scanner = new Scanner(System.in);
         Controller.startingMenu(scanner, gameData);
         scanner.close();
