@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 
 abstract class AbstractCard implements Card {
-    private final HashMap<Token, Integer> cost;
+    private final Map<Token, Integer> cost;
     private final String image;
     private final int prestige;
 

@@ -7,27 +7,32 @@ import java.util.List;
 
 public class View {
     public static void printStartingMenu() {
-        System.out.println("Choississez un menu:");
-        System.out.println("0: Menu des Joueurs");
-        System.out.println("1: Choix du jeu");
-        System.out.println("2: Lancer la partie");
+        var string = "Choississez un menu:\n" +
+                "0: Menu des Joueurs\n" +
+                "1: Choix du jeu\n" +
+                "2: Lancer la partie";
+        System.out.println(string);
     }
 
     public static void printGameModeMenu() {
-        System.out.println("Choississez le mode de jeu:");
-        System.out.println("1: Mode de jeu partie 1");
-        System.out.println("2: Mode de jeu partie 2 / 3");
+        var string = "Choississez le mode de jeu:\n" +
+                "1: Mode de jeu partie 1\n" +
+                "2: Mode de jeu partie 2 / 3";
+        System.out.println(string);
     }
 
     public static void printPlayerMenu(Model gameData) {
-        System.out.println("Joueur Actuelle:");
-        gameData.getPlayers().forEach(player -> System.out.println(player.getName()));
-        System.out.println("Que voulez vous faire?");
-        System.out.println("0: Modifier un nom");
-        System.out.println("1: Ajouter un joueur");
-        System.out.println("2: Supprimer un joueur");
-        System.out.println("3: Quitter le menu joueur");
+        var sb = new StringBuilder();
+        sb.append("Joueur Actuelle:\n");
+        gameData.getPlayers().forEach(player -> sb.append(player.getName()).append('\n'));
 
+        sb.append("Que voulez vous faire?\n")
+            .append("0: Modifier un nom\n")
+            .append("1: Ajouter un joueur\n")
+            .append("2: Supprimer un joueur\n")
+            .append("3: Quitter le menu joueur");
+
+        System.out.println(sb);
     }
 
     public static void printTooMuchPlayer() {
@@ -50,7 +55,7 @@ public class View {
         var text = new StringBuilder();
         text.append("Qui choisissez vous?");
         for (int i = 0; i < players.size(); i++) {
-            text.append("\n").append(i).append(": ").append(players.get(i).getName());
+            text.append('\n').append(i).append(": ").append(players.get(i).getName());
         }
         System.out.println(text.toString());
     }
@@ -64,24 +69,26 @@ public class View {
     }
 
     public static void printPlayerResource(Player playerPlaying) {
-        System.out.println(playerPlaying.getName() + " " + playerPlaying.getWallet());
+        System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet());
     }
 
     public static void printFirstChoicePlayer() {
         var text = new StringBuilder();
-        text.append("Que voulez vous faire ?\n").append("1: Prendre 2 jetons de la même couleur\n");
-        text.append("2: Prendre 3 jetons de couleurs différentes\n").append("3: Réserver 1 carte développement et prendre 1 or\n");
-        text.append("4: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.");
+        text.append("Que voulez vous faire ?\n")
+            .append("1: Prendre 2 jetons de la même couleur\n")
+            .append("2: Prendre 3 jetons de couleurs différentes\n")
+            .append("3: Réserver 1 carte développement et prendre 1 or\n")
+            .append("4: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.");
         System.out.println(text);
     }
 
     public static void printTokens(Model gameData) {
         var text = new StringBuilder();
-        text.append("Quelle jeton?");
+        text.append("Quel jeton ?");
         var gameTokens = gameData.getGameTokens();
         var iteration = 1;
-        for(var token: Token.cardValues()){
-            text.append("\n").append(iteration).append(": ").append(token).append("(quantity:").append(gameTokens.get(token)).append(")");
+        for (var token: Token.cardValues()) {
+            text.append('\n').append(iteration).append(": ").append(token).append("(quantity:").append(gameTokens.get(token)).append(")");
             iteration++;
         }
         System.out.println(text);
@@ -89,8 +96,10 @@ public class View {
 
     public static void printMenuChooseToken() {
         var text = new StringBuilder();
-        text.append("Que voulez vous faire?\n").append("1: Choisir un jeton\n").append("2: Retirer un jeton choisis\n")
-                .append("3: Confirmer le choix");
+        text.append("Que voulez vous faire?\n")
+            .append("1: Choisir un jeton\n")
+            .append("2: Retirer un jeton choisis\n")
+            .append("3: Confirmer le choix");
         System.out.println(text);
     }
 
@@ -135,6 +144,4 @@ public class View {
     public static void printNoTokenChosen() {
         System.out.println("Vous n'avez pas encore choisis de jeton !");
     }
-
-
 }
