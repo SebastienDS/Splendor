@@ -13,8 +13,7 @@ public class Player {
     private int prestige;
 
     public Player(String name) {
-        Objects.requireNonNull(name);
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
         wallet = new TokenManager();
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();

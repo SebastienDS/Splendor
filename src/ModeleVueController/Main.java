@@ -7,9 +7,10 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         var gameData = new Model(initPlayer(), new HashMap<>(), new LinkedHashMap<>());
-        var scanner = new Scanner(System.in);
-        Controller.startingMenu(scanner, gameData);
-        scanner.close();
+
+        try (var scanner = new Scanner(System.in)) {
+            Controller.startingMenu(scanner, gameData);
+        }
     }
 
     private static List<Player> initPlayer() {

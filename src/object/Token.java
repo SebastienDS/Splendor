@@ -11,9 +11,7 @@ public enum Token {
     ONYX,
     GOLD;
 
-
-    public static Token[] cardValues(){
-        return new Token[]{EMERALD, SAPPHIRE, RUBY, DIAMOND, ONYX};
+    public static Token[] cardValues() {
+        return new Token[] { EMERALD, SAPPHIRE, RUBY, DIAMOND, ONYX };
     }
-
 }
