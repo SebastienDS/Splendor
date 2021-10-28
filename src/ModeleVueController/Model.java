@@ -43,8 +43,13 @@ public class Model {
     }
 
     public void startGame() {
+        shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
+    }
+
+    private void shuffleDecks() {
+        decks.values().forEach(deck -> deck.shuffle());
     }
 
     public void endTurn() {

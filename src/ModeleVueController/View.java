@@ -1,9 +1,9 @@
 package ModeleVueController;
 
-import object.Player;
-import object.Token;
+import object.*;
 
 import java.util.List;
+import java.util.Map;
 
 public class View {
     public static void printStartingMenu() {
@@ -136,5 +136,16 @@ public class View {
         System.out.println("Vous n'avez pas encore choisis de jeton !");
     }
 
-
+    public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck> decks){
+        var print = new StringBuilder();
+        for (var deck: grounds.keySet()) {
+            for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
+                for (var card : grounds.get(deck)) {
+                    print.append(card.getDisplay(i));
+                }
+                print.append("\n");
+            }
+        }
+        System.out.println(print);
+    }
 }

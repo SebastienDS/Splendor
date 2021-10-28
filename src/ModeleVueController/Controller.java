@@ -20,6 +20,7 @@ public class Controller {
     }
 
     public static void startingMenu(Scanner scanner, Model gameData) {
+        firstPhaseDeck(gameData.getDecks());
         while(true){
             View.printStartingMenu();
             var input_menu = Controller.getInteger(scanner);
@@ -35,6 +36,8 @@ public class Controller {
     private static void startGame(Scanner scanner, Model gameData) {
         gameData.startGame();
         while(!gameData.getLastRound() || !gameData.startNewRound()) {
+
+            View.printGround(gameData.getGrounds(), gameData.getDecks());
             View.printPlayerPlaying(gameData.getPlayerPlaying());
             View.printPlayerResource(gameData.getPlayerPlaying());
             firstChoice(scanner, gameData);
