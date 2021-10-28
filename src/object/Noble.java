@@ -3,6 +3,8 @@ package object;
 import java.util.Map;
 import java.util.Objects;
 
+import static object.Utils.space;
+
 public class Noble extends AbstractCard {
 
     private final String name;
@@ -32,9 +34,5 @@ public class Noble extends AbstractCard {
                 " " + "-".repeat(Constants.MAX_LENGTH) + " "
         };
         return string;
-    }
-
-    private String space(int maxLength) {
-        return " ".repeat(maxLength);
     }
 }

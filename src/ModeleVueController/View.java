@@ -148,13 +148,18 @@ public class View {
     public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck> decks){
         var print = new StringBuilder();
         for (var deck: grounds.keySet()) {
-            for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
-                for (var card : grounds.get(deck)) {
-                    print.append(card.getDisplay(i));
-                }
-                print.append("\n");
-            }
+            printCardLeftToRight(grounds.get(deck), print);
         }
         System.out.println(print);
+    }
+
+    private static void printCardLeftToRight(List<Card> grounds, StringBuilder print) {
+        for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
+            for (var card : grounds) {
+                print.append(card.getDisplay(i));
+            }
+
+            print.append("\n");
+        }
     }
 }

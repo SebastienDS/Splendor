@@ -2,6 +2,8 @@ package object;
 
 import java.util.Map;
 
+import static object.Utils.space;
+
 public class Development extends AbstractCard {
 
     private final Token bonus;
@@ -34,12 +36,5 @@ public class Development extends AbstractCard {
                 "----------------"
         };
         return string;
-    }
-
-    private static String space(int length) {
-        if(length < 0) {
-            return "";
-        }
-        return " ".repeat(length);
     }
 }

@@ -32,4 +32,8 @@ public class Deck<T> {
     public T draw(){
         return deck.pop();
     }
+
+    public int size() {
+        return deck.size();
+    }
 }
