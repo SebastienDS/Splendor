@@ -158,8 +158,11 @@ public class View {
             for (var card : grounds) {
                 print.append(card.getDisplay(i));
             }
-
             print.append("\n");
         }
+    }
+
+    private static void printDeckNumber(){
+
     }
 }

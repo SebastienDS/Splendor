@@ -16,7 +16,7 @@ public class Decks {
     }
 
     public static Deck<Noble> nobleDeck() {
-        var nobleDeck = new Deck<Noble>();
+        var nobleDeck = new Deck<Noble>("Noble");
         var tokenManager = new TokenManager();
         nobleDeck.add(createNoble(
                 tokenManager,
@@ -102,19 +102,19 @@ public class Decks {
     }
 
     public static Deck<Development> firstDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>();
+        var nobleDeck = new Deck<Development>("Développement 1");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }
 
     public static Deck<Development> secondDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>();
+        var nobleDeck = new Deck<Development>("Développement 2");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }
 
     public static Deck<Development> thirdDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>();
+        var nobleDeck = new Deck<Development>("Développement 3");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }

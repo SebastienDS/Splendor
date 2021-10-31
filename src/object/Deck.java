@@ -1,16 +1,20 @@
 package object;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Deck<T> {
 
+    private final String name;
     private final Stack<T> deck;
 
     public Deck(){
+        this("");
+    }
+
+    public Deck(String name){
+        Objects.requireNonNull(name);
         deck = new Stack<>();
+        this.name = name;
     }
 
     public void add(T t){
@@ -36,4 +40,9 @@ public class Deck<T> {
     public int size() {
         return deck.size();
     }
+
+    public String getName() {
+        return name;
+    }
+
 }
