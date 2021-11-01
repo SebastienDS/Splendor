@@ -1,5 +1,6 @@
 package object;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -7,12 +8,12 @@ import static object.Utils.space;
 
 public class Noble extends AbstractCard {
 
-    private final String name;
+    public static final String TYPE = "Noble";
+
     private final String[] display;
 
     public Noble(Map<Token, Integer> cost, String name, String image, int prestige) {
-        super(cost, image, prestige);
-        this.name = Objects.requireNonNull(name);
+        super(cost, name, image, prestige);
         display = stringDisplay();
     }
 

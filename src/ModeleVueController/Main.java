@@ -2,6 +2,7 @@ package ModeleVueController;
 
 import object.Player;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
@@ -10,6 +11,10 @@ public class Main {
 
         try (var scanner = new Scanner(System.in)) {
             Controller.startingMenu(scanner, gameData);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+            return;
         }
     }
 

@@ -8,5 +8,4 @@ public final class Constants {
     public static final int MAX_LENGTH = 14;
     public static final int DISPLAY_SIZE = 8;
 
-
 }
