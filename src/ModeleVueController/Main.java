@@ -1,13 +1,14 @@
 package ModeleVueController;
 
+import object.NumbersDisplays;
 import object.Player;
 
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        NumbersDisplays.loadNumbers();
         var gameData = new Model(initPlayer(), new HashMap<>(), new LinkedHashMap<>());
-
         try (var scanner = new Scanner(System.in)) {
             Controller.startingMenu(scanner, gameData);
         }

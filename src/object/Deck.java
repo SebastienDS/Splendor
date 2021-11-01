@@ -1,8 +1,7 @@
 package object;
 
 import java.util.*;
-
-import static object.Utils.space;
+import java.util.stream.Collectors;
 
 public class Deck<T> implements Displayable {
 
@@ -18,7 +17,7 @@ public class Deck<T> implements Displayable {
         Objects.requireNonNull(name);
         deck = new Stack<>();
         this.name = name;
-        display = refreshDisplay();
+        refreshDisplay();
     }
 
     public void add(T t){
@@ -49,24 +48,44 @@ public class Deck<T> implements Displayable {
         return name;
     }
 
-    private String[] refreshDisplay(){
+    private void refreshDisplay(){
         var size = deck.size();
         var numberOfDigit = (size == 0)? 1: (int) Math.log10(size) + 1;
-        var numberDisplay = new ArrayList<String[]>();
-        for (var i = 0; i < numberOfDigit; i++){
-            numberDisplay.add(NumbersDisplays.NUMBERS[size % (10 * (numberOfDigit - i))]);
-        }
-        var string = new String[]{
-                " " + "_".repeat(numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY) +" ",
-                "|" +  "|",
-                "|" + "|",
-                "|" + "|",
-                "|" + "|",
-                "|" + "|",
-                "|" + "|",
-                " " + "-".repeat(numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY) + " "
+        var numberDisplay = getArrayNumber(numberOfDigit, size);
+        var totalNumbersLength = numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY + 1;
+        var centerName = (totalNumbersLength - name.length()) / 2;
+        centerName = (centerName > 0)? centerName : 0;
+        var centerNumber = (name.length() - totalNumbersLength) / 2;
+        centerNumber =(centerNumber > 0)? centerNumber: 0;
+        System.out.println(centerNumber);
+        var spacing = (totalNumbersLength > name.length())? totalNumbersLength : name.length();
+        display = getString(spacing, centerName, numberDisplay, centerNumber);
+    }
+
+    private String[] getString(int spacing, int centerName, List<String[]> numberDisplay, int centerNumber){
+        return new String[]{
+                " " + "_".repeat(spacing + 2) +" ",
+                "| " + " ".repeat(centerName) + name + " ".repeat((name.length() % 2 == 0) ? centerName + 1 : centerName) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 0) + " ".repeat(centerNumber) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 1) + " ".repeat(centerNumber) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 2) + " ".repeat(centerNumber) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 3) + " ".repeat(centerNumber) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 4) + " ".repeat(centerNumber) + " |",
+                " " + "-".repeat(spacing + 2) + " "
         };
-        return string;
+    }
+
+    private List<String[]> getArrayNumber(int numberOfDigit, int size){
+        var numberDisplay = new ArrayList<String[]>();
+        for (var i = numberOfDigit - 1; i >= 0; i--){
+            numberDisplay.add(NumbersDisplays.NUMBERS[size /(int) Math.pow(10, i)]);
+            size %= Math.pow(10, i);
+        }
+        return numberDisplay;
+    }
+
+    private String getNumberDisplay(List<String[]> numberDisplay, int i) {
+        return numberDisplay.stream().map(strings -> strings[i]).collect(Collectors.joining(" "));
     }
 
     @Override
