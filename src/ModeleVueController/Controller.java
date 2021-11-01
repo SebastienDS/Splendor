@@ -7,21 +7,28 @@ import java.util.*;
 
 public class Controller {
 
-    public static int getInteger(Scanner scanner) {
+    public static int getInteger(Scanner scanner, int min, int max) {
+        int input_integer;
         while (true) {
             try {
-                var input_integer = scanner.nextInt();
-                return input_integer;
+                input_integer = scanner.nextInt();
+                if (input_integer >= min || input_integer <= max) break;
+                View.printChoiceDoNotExist(input_integer);
             } catch (InputMismatchException e) {
                 View.printNeedNumber();
                 scanner.nextLine();
             }
         }
+        return input_integer;
+    }
+
+    public static int getInteger(Scanner scanner) {
+        return getInteger(scanner, Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
         firstPhaseDeck(gameData.getDecks());
-        while(true){
+        while (true) {
             View.printStartingMenu();
             var input_menu = Controller.getInteger(scanner);
             switch (input_menu) {
@@ -35,7 +42,7 @@ public class Controller {
 
     private static void startGame(Scanner scanner, Model gameData) {
         gameData.startGame();
-        while(!gameData.getLastRound() || !gameData.startNewRound()) {
+        while (!gameData.getLastRound() || !gameData.startNewRound()) {
             View.printGround(gameData.getGrounds(), gameData.getDecks());
             View.printPlayerPlaying(gameData.getPlayerPlaying());
             View.printPlayerResource(gameData.getPlayerPlaying());
@@ -122,7 +129,7 @@ public class Controller {
                 case(1): manageAddToken(scanner, tokenChosen, gameData); break;
                 case(2): manageRemoveToken(scanner, tokenChosen); break;
                 case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return;
-                default:View.printChoiceDoNotExist(input_choice);
+                default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
