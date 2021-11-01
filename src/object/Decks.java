@@ -1,22 +1,17 @@
 package object;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class Decks {
 
     private static final int NUMBER_BASIC_CARD = 8;
 
-    public static Deck<Noble> basicDeck() {
-        var deck = new Deck<Noble>();
+    public static Deck<Card> basicDeck() {
+        var deck = new Deck<Card>();
         createBasicDeck(deck);
         return deck;
     }
 
-    public static Deck<Noble> nobleDeck() {
-        var nobleDeck = new Deck<Noble>("Noble");
+    public static Deck<Card> nobleDeck() {
+        var nobleDeck = new Deck<Card>("Noble");
         var tokenManager = new TokenManager();
         nobleDeck.add(createNoble(
                 tokenManager,
@@ -101,25 +96,25 @@ public class Decks {
         return nobleDeck;
     }
 
-    public static Deck<Development> firstDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>("Développement 1");
+    public static Deck<Card> firstDevelopmentDeck() {
+        var nobleDeck = new Deck<Card>("Développement 1");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }
 
-    public static Deck<Development> secondDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>("Développement 2");
+    public static Deck<Card> secondDevelopmentDeck() {
+        var nobleDeck = new Deck<Card>("Développement 2");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }
 
-    public static Deck<Development> thirdDevelopmentDeck() {
-        var nobleDeck = new Deck<Development>("Développement 3");
+    public static Deck<Card> thirdDevelopmentDeck() {
+        var nobleDeck = new Deck<Card>("Développement 3");
         //nobleDeck.add(new Noble());
         return nobleDeck;
     }
 
-    private static void createBasicDeck(Deck<Noble> deck) {
+    private static void createBasicDeck(Deck<Card> deck) {
         var tokenManager = new TokenManager();
         for (var token: Token.cardValues()) {
             tokenManager.addToken(token, 3);
@@ -128,7 +123,7 @@ public class Decks {
         }
     }
 
-    private static void addCardMultipleTime(Deck<Noble> deck, TokenManager tokenManager, int count) {
+    private static void addCardMultipleTime(Deck<Card> deck, TokenManager tokenManager, int count) {
         for (int j = 0; j < count; j++) {
             deck.add(new Noble(tokenManager.tokenNotEmpty(), "", "", 1));
         }

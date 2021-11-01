@@ -12,11 +12,11 @@ public class Model {
     private final List<Player> players;
     private int playerPlaying;
     private boolean lastRound = false;
-    private final Map<DeckName, Deck> decks;
+    private final Map<DeckName, Deck<Card>> decks;
     private final Map<DeckName, List<Card>> grounds;
     private final TokenManager gameTokens;
 
-    public Model(List<Player> players, Map<DeckName, Deck> decks, Map<DeckName, List<Card>> grounds) {
+    public Model(List<Player> players, Map<DeckName, Deck<Card>> decks, Map<DeckName, List<Card>> grounds) {
         this.players = Objects.requireNonNull(players);
         this.decks = Objects.requireNonNull(decks);
         this.grounds = Objects.requireNonNull(grounds);
@@ -27,7 +27,7 @@ public class Model {
         return players;
     }
 
-    public Map<DeckName, Deck> getDecks() {
+    public Map<DeckName, Deck<Card>> getDecks() {
         return decks;
     }
 

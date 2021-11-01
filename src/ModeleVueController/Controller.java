@@ -151,12 +151,12 @@ public class Controller {
         }
     }
 
-    private static void firstPhaseDeck(Map<DeckName, Deck> decks) {
+    private static void firstPhaseDeck(Map<DeckName, Deck<Card>> decks) {
         decks.clear();
         decks.put(DeckName.BASIC_DECK, Decks.basicDeck());
     }
 
-    private static void secondPhaseDeck(Map<DeckName, Deck> decks) {
+    private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) {
         decks.clear();
         decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
         decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());

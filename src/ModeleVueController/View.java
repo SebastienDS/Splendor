@@ -145,7 +145,7 @@ public class View {
         System.out.println("Vous n'avez pas encore choisis de jeton !");
     }
 
-    public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck> decks){
+    public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck<Card>> decks){
         var print = new StringBuilder();
         for (var deck: grounds.keySet()) {
             printCardLeftToRight(grounds.get(deck), print);
