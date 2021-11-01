@@ -152,12 +152,12 @@ public class Controller {
         }
     }
 
-    private static void firstPhaseDeck(Map<DeckName, Deck> decks) throws IOException {
+    private static void firstPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
         decks.clear();
         decks.put(DeckName.BASIC_DECK, Decks.basicDeck());
     }
 
-    private static void secondPhaseDeck(Map<DeckName, Deck> decks) throws IOException {
+    private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
         decks.clear();
         decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
         decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());

@@ -8,16 +8,18 @@ public class NumbersDisplays {
         if(NUMBERS != null){
             return;
         }
-        NUMBERS[0] = initZero();
-        NUMBERS[1] = initOne();
-        NUMBERS[2] = initTwo();
-        NUMBERS[3] = initThree();
-        NUMBERS[4] = initFour();
-        NUMBERS[5] = initFive();
-        NUMBERS[6] = initSix();
-        NUMBERS[7] = initSeven();
-        NUMBERS[8] = initEight();
-        NUMBERS[9] = initNine();
+        NUMBERS = new String[][]{
+                initZero(),
+                initOne(),
+                initTwo(),
+                initThree(),
+                initFour(),
+                initFive(),
+                initSix(),
+                initSeven(),
+                initEight(),
+                initNine()
+        };
     }
 
     private static String[] initZero() {
@@ -84,7 +86,7 @@ public class NumbersDisplays {
         return new String[]{
                 " 6666 ",
                 "66    ",
-                "66666",
+                "66666 ",
                 "66  66",
                 " 6666 "
         };
