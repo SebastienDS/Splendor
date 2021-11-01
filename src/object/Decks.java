@@ -9,7 +9,7 @@ public class Decks {
 
     private static final String ARGS_SEPARATOR = ";";
     private static final String TOKEN_SEPARATOR = ",";
-    private static final String VALUE_SEPARATOR = ":";
+    private static final String VALUE_SEPARATOR = ":" ;
 
     private static Deck<Card> parseDeck(Path path, String name) throws IOException {
         Objects.requireNonNull(path);
