@@ -66,6 +66,7 @@ public class Controller {
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
         if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
         while (true) {
+            System.out.println(1);
             View.printChooseDeck(gameData.getGrounds());
             var input_choice = getInteger(scanner);
             if(input_choice > 0 && input_choice <= deckName.size()){

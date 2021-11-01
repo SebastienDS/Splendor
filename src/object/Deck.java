@@ -57,7 +57,6 @@ public class Deck<T> implements Displayable {
         centerName = (centerName > 0)? centerName : 0;
         var centerNumber = (name.length() - totalNumbersLength) / 2;
         centerNumber =(centerNumber > 0)? centerNumber: 0;
-        System.out.println(centerNumber);
         var spacing = (totalNumbersLength > name.length())? totalNumbersLength : name.length();
         display = getString(spacing, centerName, numberDisplay, centerNumber);
     }

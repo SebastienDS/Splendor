@@ -148,16 +148,24 @@ public class View {
     public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck<Card>> decks){
         var print = new StringBuilder();
         for (var deck: grounds.keySet()) {
-            printCardLeftToRight(grounds.get(deck), print, decks.get(deck), true);
+            printCardLeftToRight(grounds.get(deck), print, decks.get(deck), true, false);
         }
         System.out.println(print);
     }
 
-    private static void printCardLeftToRight(List<Card> grounds, StringBuilder print, Deck<Card> deck, boolean deckSize) {
+    private static void printCardLeftToRight(List<Card> grounds, StringBuilder print, Deck<Card> deck, boolean deckSize, boolean withIndex) {
+        var index = 1;
+        var indexString = "  ";
         for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
             for (var card : grounds) {
+                if(i == 1){
+                    indexString = index + ":";
+                    index++;
+                }
+                if(withIndex) print.append(indexString);
                 print.append(card.getDisplay(i));
             }
+            indexString = "  ";
             if(deckSize) print.append(deck.getDisplay(i));
             print.append("\n");
         }
@@ -166,13 +174,16 @@ public class View {
     public static void printChooseDeck(Map<DeckName, List<Card>> grounds) {
         var print = new StringBuilder();
         var i = 1;
-        for (var deckName: grounds.values()) {
+        print.append("Choisissez le deck qui contient la carte que vous voulez réserver");
+        for (var deckName: grounds.keySet()) {
             print.append(i).append(": ").append(deckName).append("\n");
         }
+        System.out.println(print);
     }
 
     public static void printCards(List<Card> cards, int deckSize) {
         var print = new StringBuilder();
-        printCardLeftToRight(cards, print, null, false);
+        printCardLeftToRight(cards, print, null, false, true);
+        System.out.println(print);
     }
 }
