@@ -3,6 +3,7 @@ package ModeleVueController;
 import object.*;
 
 import javax.lang.model.type.ArrayType;
+import java.io.IOException;
 import java.util.*;
 
 public class Controller {
@@ -19,7 +20,7 @@ public class Controller {
         }
     }
 
-    public static void startingMenu(Scanner scanner, Model gameData) {
+    public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
         firstPhaseDeck(gameData.getDecks());
         while(true){
             View.printStartingMenu();
@@ -156,7 +157,7 @@ public class Controller {
         tokenChosen.add(token);
     }
 
-    private static void gameModeMenu(Scanner scanner, Model gameData) {
+    private static void gameModeMenu(Scanner scanner, Model gameData) throws IOException {
         while (true) {
             View.printGameModeMenu();
             var input_choice = Controller.getInteger(scanner);
@@ -169,12 +170,12 @@ public class Controller {
         }
     }
 
-    private static void firstPhaseDeck(Map<DeckName, Deck<Card>> decks) {
+    private static void firstPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
         decks.clear();
         decks.put(DeckName.BASIC_DECK, Decks.basicDeck());
     }
 
-    private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) {
+    private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
         decks.clear();
         decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
         decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());

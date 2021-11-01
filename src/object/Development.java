@@ -6,11 +6,13 @@ import static object.Utils.space;
 
 public class Development extends AbstractCard {
 
+    public static final String TYPE = "Development";
+
     private final Token bonus;
     private final String[] display;
 
-    public Development(Map<Token, Integer> cost, String image, int prestige, Token bonus) {
-        super(cost, image, prestige);
+    public Development(Map<Token, Integer> cost, String name, String image, int prestige, Token bonus) {
+        super(cost, name, image, prestige);
         this.bonus = bonus;
         display = stringDisplay();
     }

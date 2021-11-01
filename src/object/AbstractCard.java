@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 
 abstract class AbstractCard implements Card {
     private final Map<Token, Integer> cost;
+    private final String name;
     private final String image;
     private final int prestige;
     private final String price;
 
-    public AbstractCard(Map<Token, Integer> map, String image, int prestige) {
+    public AbstractCard(Map<Token, Integer> map, String name, String image, int prestige) {
         cost = new LinkedHashMap<>(Objects.requireNonNull(map));
+        this.name = Objects.requireNonNull(name);
         this.image = Objects.requireNonNull(image);
         this.prestige = prestige;
         price = cost.keySet().stream().map(token -> token.name() + " : " + cost.get(token)).collect(Collectors.joining("\n"));
