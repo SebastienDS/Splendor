@@ -63,6 +63,23 @@ public class Controller {
     }
 
     private static void reserveCard(Scanner scanner, Model gameData) {
+        View.printGround(gameData.getGrounds(), gameData.getDecks());
+        var deckName = new ArrayList<>(gameData.getGrounds().keySet());
+        if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
+        while (true) {
+            View.printChooseDeck(gameData.getGrounds());
+            var input_choice = getInteger(scanner);
+            if(input_choice > 0 && input_choice <= deckName.size()){
+                var deckSize = gameData.getDecks().size();
+                chooseCard(scanner, gameData.getGrounds().get(deckName.get(input_choice - 1)), deckSize);
+                return;
+            }
+            View.printChoiceDoNotExist(input_choice);
+        }
+    }
+
+    private static void chooseCard(Scanner scanner, List<Card> cards, int deckSize) {
+        View.printCards(cards, deckSize);
     }
 
     private static Token chooseToken(Scanner scanner, Model gameData, int number) {

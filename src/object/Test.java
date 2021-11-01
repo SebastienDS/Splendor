@@ -1,16 +1,14 @@
 package object;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Test {
     public static void main(String[] args) {
-        var numberDisplay = new ArrayList<Integer>();
-        var number = 125;
-        var numberOfDigit =(int) Math.log10(120) + 1;
-        for (var i = numberOfDigit - 1; i >= 0; i--){
-            numberDisplay.add(number /(int) Math.pow(10, i));
-            number %= Math.pow(10, i);
+        Map<Integer, String> cc = new LinkedHashMap<>();
+        for (int i = 0; i < 5; i++) {
+            cc.put(i, "cc".repeat(i));
         }
-        System.out.println(numberDisplay);
+        List<Integer> ccc = new ArrayList<>(cc.keySet());
+        System.out.println(ccc.get(3));
     }
 }
