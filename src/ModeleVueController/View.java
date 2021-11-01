@@ -171,11 +171,8 @@ public class View {
         }
     }
 
-    public static void printCantReserveNoble() {
-        System.out.println("You can");
-    }
-
     public static void printCards(List<Card> cards, int deckSize) {
-        printCardLeftToRight();
+        var print = new StringBuilder();
+        printCardLeftToRight(cards, print, null, false);
     }
 }
