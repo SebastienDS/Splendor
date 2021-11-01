@@ -2,7 +2,6 @@ package ModeleVueController;
 
 import object.*;
 
-import javax.lang.model.type.ArrayType;
 import java.io.IOException;
 import java.util.*;
 
@@ -45,21 +44,22 @@ public class Controller {
         }
     }
 
-    private static void firstChoice(Scanner scanner, Model gameData) {
+    private static void firstChoice(Scanner scanner, Model gameData) { //todo add choice to show reserved card, to show personal stats
         while (true) {
             View.printFirstChoicePlayer();
             var input_choice = getInteger(scanner);
             switch (input_choice) {
-                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 4), 2); return;
-                case(2): Controller.chooseTokens(scanner, gameData); return;
-                case(3): Controller.reserveCard(scanner, gameData); return;
-                case(4): Controller.buyCard(scanner, gameData); return;
+                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 4), 2); return; //todo verif that player will not be blocked (not enough token)
+                case(2): Controller.chooseTokens(scanner, gameData); return; //todo verif that player will not be blocked (not enough token)
+                case(3): Controller.reserveCard(scanner, gameData); return; //todo verif that player can reserve
+                case(4): Controller.buyCard(scanner, gameData); return; //todo all the function
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
 
-    private static void buyCard(Scanner scanner, Model gameData) {
+    private static void buyCard(Scanner scanner, Model gameData) { //todo
+
     }
 
     private static void reserveCard(Scanner scanner, Model gameData) {
@@ -67,20 +67,32 @@ public class Controller {
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
         if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
         while (true) {
-            System.out.println(1);
             View.printChooseDeck(gameData.getGrounds());
             var input_choice = getInteger(scanner);
             if(input_choice > 0 && input_choice <= deckName.size()){
-                var deckSize = gameData.getDecks().size();
-                chooseCard(scanner, gameData.getGrounds().get(deckName.get(input_choice - 1)), deckSize);
+                var deckNameChosen = deckName.get(input_choice - 1);
+                chooseCard(scanner, gameData, deckNameChosen);
                 return;
             }
             View.printChoiceDoNotExist(input_choice);
         }
     }
 
-    private static void chooseCard(Scanner scanner, List<Card> cards, int deckSize) {
-        View.printCards(cards, deckSize);
+    private static void chooseCard(Scanner scanner, Model gameData, DeckName deckName) {
+        var groundCards = gameData.getGrounds().get(deckName);
+        var deck = gameData.getDecks().get(deckName);
+        View.printCards(groundCards, deck.size());
+        while (true){
+            var input_choice = getInteger(scanner);
+            if(input_choice > 0 && input_choice < groundCards.size() + 1){
+
+            }
+            if(input_choice == groundCards.size() + 2){
+                var card = deck.draw();
+                gameData.getPlayerPlaying().reserve(card);
+            }
+            View.printChoiceDoNotExist(input_choice);
+        }
     }
 
     private static Token chooseToken(Scanner scanner, Model gameData, int number) {

@@ -9,7 +9,27 @@ public class Decks {
 
     private static final String ARGS_SEPARATOR = ";";
     private static final String TOKEN_SEPARATOR = ",";
-    private static final String VALUE_SEPARATOR = ":" ;
+    private static final String VALUE_SEPARATOR = ":";
+
+    public static Deck<Card> basicDeck() throws IOException {
+        return parseDeck(Path.of("resources", "basicDeck.txt"), "Basic Deck");
+    }
+
+    public static Deck<Card> nobleDeck() throws IOException {
+        return parseDeck(Path.of("resources", "nobleDeck.txt"), "Noble");
+    }
+
+    public static Deck<Card> firstDevelopmentDeck() throws IOException {
+        return parseDeck(Path.of("resources", "firstDevelopmentDeck.txt"), "Développement 1");
+    }
+
+    public static Deck<Card> secondDevelopmentDeck() throws IOException {
+        return parseDeck(Path.of("resources", "secondDevelopmentDeck.txt"), "Développement 2");
+    }
+
+    public static Deck<Card> thirdDevelopmentDeck() throws IOException {
+        return parseDeck(Path.of("resources", "thirdDevelopmentDeck.txt"), "Développement 3");
+    }
 
     private static Deck<Card> parseDeck(Path path, String name) throws IOException {
         Objects.requireNonNull(path);
@@ -58,25 +78,5 @@ public class Decks {
             case Development.TYPE -> new Development(tokenManager.tokenNotEmpty(), args.get(1), args.get(4), prestige, Token.valueOf(args.get(5)));
             default -> throw new IllegalStateException("Unexpected value: " + className);
         };
-    }
-
-    public static Deck<Card> basicDeck() throws IOException {
-        return parseDeck(Path.of("resources", "basicDeck.txt"), "");
-    }
-
-    public static Deck<Card> nobleDeck() throws IOException {
-        return parseDeck(Path.of("resources", "nobleDeck.txt"), "Noble");
-    }
-
-    public static Deck<Card> firstDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "firstDevelopmentDeck.txt"), "Développement 1");
-    }
-
-    public static Deck<Card> secondDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "secondDevelopmentDeck.txt"), "Développement 2");
-    }
-
-    public static Deck<Card> thirdDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "thirdDevelopmentDeck.txt"), "Développement 3");
     }
 }

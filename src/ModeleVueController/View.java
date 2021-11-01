@@ -174,15 +174,16 @@ public class View {
     public static void printChooseDeck(Map<DeckName, List<Card>> grounds) {
         var print = new StringBuilder();
         var i = 1;
-        print.append("Choisissez le deck qui contient la carte que vous voulez réserver");
+        print.append("Choisissez le deck qui contient la carte que vous voulez réserver\n");
         for (var deckName: grounds.keySet()) {
             print.append(i).append(": ").append(deckName).append("\n");
         }
-        System.out.println(print);
+        System.out.print(print);
     }
 
     public static void printCards(List<Card> cards, int deckSize) {
         var print = new StringBuilder();
+        print.append("Choisissez la carte ?(").append(cards.size() + 1).append("pour choisir de réserver la prochaine carte piochée)\n");
         printCardLeftToRight(cards, print, null, false, true);
         System.out.println(print);
     }

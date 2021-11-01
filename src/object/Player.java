@@ -9,6 +9,7 @@ public class Player {
     private final String name;
     private final TokenManager wallet;
     private final List<Development> cardBuy;
+    private final List<Card> cardReserved;
     private final TokenManager bonus;
     private int prestige;
 
@@ -17,6 +18,7 @@ public class Player {
         wallet = new TokenManager();
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
+        cardReserved = new ArrayList<>();
         prestige = 0;
     }
 
@@ -34,5 +36,13 @@ public class Player {
 
     public void addToken(Token token, int number) {
         wallet.addToken(token, number);
+    }
+
+    public void reserve(Card card) {
+        cardReserved.add(card);
+    }
+
+    public boolean canReserve() {
+        return cardReserved.size() < 3;
     }
 }

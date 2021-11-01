@@ -2,7 +2,7 @@ package object;
 
 import java.util.*;
 
-public class Test {
+public class Test { //todo delete this fucking shit
     public static void main(String[] args) {
         Map<Integer, String> cc = new LinkedHashMap<>();
         for (int i = 0; i < 5; i++) {
