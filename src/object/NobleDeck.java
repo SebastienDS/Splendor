@@ -19,4 +19,9 @@ public class NobleDeck extends Deck<Card>{
         super.clear();
         return list;
     }
+
+    @Override
+    public String getDisplay(int i){
+        return "";
+    }
 }
