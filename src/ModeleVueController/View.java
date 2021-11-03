@@ -84,7 +84,7 @@ public class View {
 
     public static void printTokens(Model gameData) {
         var text = new StringBuilder();
-        text.append("Quel jeton ?");
+        text.append("Quel jeton ?(0 pour annuler)");
         var gameTokens = gameData.getGameTokens();
         var iteration = 1;
         for (var token: Token.cardValues()) {
@@ -96,7 +96,7 @@ public class View {
 
     public static void printMenuChooseToken() {
         var text = new StringBuilder();
-        text.append("Que voulez vous faire?\n")
+        text.append("Que voulez vous faire?(0 pour annuler)\n")
             .append("1: Choisir un jeton\n")
             .append("2: Retirer un jeton choisis\n")
             .append("3: Confirmer le choix");
@@ -186,5 +186,13 @@ public class View {
         print.append("Choisissez la carte ?(").append(cards.size() + 1).append("pour choisir de réserver la prochaine carte piochée)\n");
         printCardLeftToRight(cards, print, null, false, true);
         System.out.println(print);
+    }
+
+    public static void printNotEnoughTokens() {
+        System.out.println("Il doit y avoir au minimum 4 jetons de la même couleur restant pour pouvoir en prendre 2 de la même couleur !");
+    }
+
+    public static void printNoTokenLeft() {
+        System.out.println("Il n'y a plus aucun jeton a récupérer !");
     }
 }

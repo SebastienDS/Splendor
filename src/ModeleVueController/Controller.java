@@ -12,7 +12,7 @@ public class Controller {
         while (true) {
             try {
                 input_integer = scanner.nextInt();
-                if (input_integer >= min || input_integer <= max) break;
+                if (input_integer >= min && input_integer <= max) break;
                 View.printChoiceDoNotExist(input_integer);
             } catch (InputMismatchException e) {
                 View.printNeedNumber();
@@ -23,7 +23,7 @@ public class Controller {
     }
 
     public static int getInteger(Scanner scanner) {
-        return getInteger(scanner, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        return getInteger(scanner, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
@@ -43,26 +43,51 @@ public class Controller {
     private static void startGame(Scanner scanner, Model gameData) {
         gameData.startGame();
         while (!gameData.getLastRound() || !gameData.startNewRound()) {
-            View.printGround(gameData.getGrounds(), gameData.getDecks());
-            View.printPlayerPlaying(gameData.getPlayerPlaying());
-            View.printPlayerResource(gameData.getPlayerPlaying());
             firstChoice(scanner, gameData);
             gameData.endTurn();
         }
     }
 
+    private static void allInformationChoice(Model gameData){
+        View.printGround(gameData.getGrounds(), gameData.getDecks());
+        View.printPlayerPlaying(gameData.getPlayerPlaying());
+        View.printPlayerResource(gameData.getPlayerPlaying());
+        View.printFirstChoicePlayer();
+    }
+
     private static void firstChoice(Scanner scanner, Model gameData) { //todo add choice to show reserved card, to show personal stats
+        var turnFinished = false;
         while (true) {
-            View.printFirstChoicePlayer();
+           allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
             switch (input_choice) {
-                case(1): gameData.takeToken(Controller.chooseToken(scanner, gameData, 4), 2); return; //todo verif that player will not be blocked (not enough token)
-                case(2): Controller.chooseTokens(scanner, gameData); return; //todo verif that player will not be blocked (not enough token)
+                case(1): turnFinished = manageChoiceToken(scanner, gameData);break; //todo verif that player will not be blocked (not enough token)
+                case(2): turnFinished = manageChoiceTokens(scanner, gameData);break; //todo verif that player will not be blocked (not enough token)
                 case(3): Controller.reserveCard(scanner, gameData); return; //todo verif that player can reserve
                 case(4): Controller.buyCard(scanner, gameData); return; //todo all the function
                 default: View.printChoiceDoNotExist(input_choice);
             }
+            if(turnFinished) return;
         }
+    }
+
+    private static boolean manageChoiceTokens(Scanner scanner, Model gameData) {
+        if(!(Arrays.stream(Token.cardValues()).anyMatch(token -> gameData.getGameTokens().get(token) > 0))) {
+            View.printNoTokenLeft();
+            return false;
+        }
+        return Controller.chooseTokens(scanner, gameData);
+    }
+
+    private static boolean manageChoiceToken(Scanner scanner, Model gameData) {
+        if(!(Arrays.stream(Token.cardValues()).anyMatch(token -> gameData.getGameTokens().get(token) >= 4))){
+            View.printNotEnoughTokens();
+            return false;
+        }
+        var token = Controller.chooseToken(scanner, gameData, 4);
+        if(token == null) return false;
+        gameData.takeToken(token, 2);
+        return true;
     }
 
     private static void buyCard(Scanner scanner, Model gameData) { //todo
@@ -73,15 +98,12 @@ public class Controller {
         View.printGround(gameData.getGrounds(), gameData.getDecks());
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
         if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
-        while (true) {
-            View.printChooseDeck(gameData.getGrounds());
-            var input_choice = getInteger(scanner);
-            if(input_choice > 0 && input_choice <= deckName.size()){
-                var deckNameChosen = deckName.get(input_choice - 1);
-                chooseCard(scanner, gameData, deckNameChosen);
-                return;
-            }
-            View.printChoiceDoNotExist(input_choice);
+        View.printChooseDeck(gameData.getGrounds());
+        var input_choice = getInteger(scanner, 1, deckName.size());
+        if(input_choice > 0 && input_choice <= deckName.size()){
+            var deckNameChosen = deckName.get(input_choice - 1);
+            chooseCard(scanner, gameData, deckNameChosen);
+            return;
         }
     }
 
@@ -89,46 +111,41 @@ public class Controller {
         var groundCards = gameData.getGrounds().get(deckName);
         var deck = gameData.getDecks().get(deckName);
         View.printCards(groundCards, deck.size());
-        while (true){
-            var input_choice = getInteger(scanner);
-            if(input_choice > 0 && input_choice < groundCards.size() + 1){
+        var input_choice = getInteger(scanner, 1, groundCards.size() + 2);
+        if(input_choice > 0 && input_choice < groundCards.size() + 1){
 
-            }
-            if(input_choice == groundCards.size() + 2){
-                var card = deck.draw();
-                gameData.getPlayerPlaying().reserve(card);
-            }
-            View.printChoiceDoNotExist(input_choice);
+        }
+        if(input_choice == groundCards.size() + 2){
+            var card = deck.draw();
+            gameData.getPlayerPlaying().reserve(card);
         }
     }
 
     private static Token chooseToken(Scanner scanner, Model gameData, int number) {
-        var tokens = Token.values();
-        while (true) {
+        var tokens = Token.cardValues();
+        while (true){
             View.printTokens(gameData);
-            var input_choice = getInteger(scanner) - 1;
-            if (input_choice >= tokens.length - 1 || input_choice < 0) {
-                View.printChoiceDoNotExist(input_choice + 1);
-                continue;
-            }
-            var token = tokens[input_choice];
+            var input_choice = getInteger(scanner, 0, tokens.length);
+            if(input_choice == 0) return null;
+            var token = tokens[input_choice - 1];
             if (gameData.getGameTokens().get(token) >= number) {
-                return token;
+               return token;
             }
             View.printNotEnoughToken();
         }
     }
 
-    private static void chooseTokens(Scanner scanner, Model gameData) {
+    private static boolean chooseTokens(Scanner scanner, Model gameData) {
         var tokenChosen = new ArrayList<Token>();
         while (true) {
             View.printTokenChosen(tokenChosen);
             View.printMenuChooseToken();
             var input_choice = getInteger(scanner);
             switch (input_choice) {
+                case(0): return false;
                 case(1): manageAddToken(scanner, tokenChosen, gameData); break;
                 case(2): manageRemoveToken(scanner, tokenChosen); break;
-                case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return;
+                case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return true;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
@@ -148,19 +165,12 @@ public class Controller {
             View.printNoTokenChosen();
             return;
         }
-        while (true) {
-            View.printTokenChosenWithIndex(tokenChosen);
-            var input_choice = getInteger(scanner);
-            if (input_choice < 1 || input_choice > tokenChosen.size() + 1) {
-                View.printChoiceDoNotExist(input_choice);
-                continue;
-            }
-            if (input_choice == tokenChosen.size() + 1) {
-                return;
-            }
-            tokenChosen.remove(input_choice - 1);
+        View.printTokenChosenWithIndex(tokenChosen);
+        var input_choice = getInteger(scanner, 1, tokenChosen.size() + 1);
+        if (input_choice == tokenChosen.size() + 1) {
             return;
         }
+        tokenChosen.remove(input_choice - 1);
     }
 
     private static void manageAddToken(Scanner scanner, List<Token> tokenChosen, Model gameData) {
@@ -169,6 +179,7 @@ public class Controller {
             return;
         }
         var token = chooseToken(scanner, gameData, 1);
+        if(token == null) return;
         if (tokenChosen.contains(token)) {
             View.printTokenAlreadyChosen(token.name());
             return;
@@ -177,15 +188,12 @@ public class Controller {
     }
 
     private static void gameModeMenu(Scanner scanner, Model gameData) throws IOException {
-        while (true) {
-            View.printGameModeMenu();
-            var input_choice = Controller.getInteger(scanner);
-            var decks = gameData.getDecks();
-            switch (input_choice) {
-                case(1): firstPhaseDeck(decks); return;
-                case(2): secondPhaseDeck(decks); return;
-                default: View.printChoiceDoNotExist(input_choice);
-            }
+        View.printGameModeMenu();
+        var input_choice = Controller.getInteger(scanner, 1, 2);
+        var decks = gameData.getDecks();
+        switch (input_choice) {
+            case(1): firstPhaseDeck(decks); return;
+            case(2): secondPhaseDeck(decks); return;
         }
     }
 
@@ -205,14 +213,13 @@ public class Controller {
     private static void playerMenu(Scanner scanner, Model gameData) {
         while (true) {
             View.printPlayerMenu(gameData);
-            var input_choice = getInteger(scanner);
+            var input_choice = getInteger(scanner, 0, 3);
             var players = gameData.getPlayers();
             switch (input_choice) {
                 case(0): changeName(scanner, gameData); break;
                 case(1): addPlayer(players, scanner); break;
                 case(2): removePlayer(players, scanner); break;
                 case(3): return;
-                default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
@@ -234,15 +241,9 @@ public class Controller {
     }
 
     private static int choosePlayer(List<Player> players, Scanner scanner) {
-        while (true) {
-            View.printChoosePlayer(players);
-            var i = getInteger(scanner);
-            if (i < 0 || i >= players.size()) {
-                View.printChoiceDoNotExist(i);
-                continue;
-            }
-            return i;
-        }
+        View.printChoosePlayer(players);
+        var i = getInteger(scanner, 0, players.size() - 1);
+        return i;
     }
 
     private static void changeName(Scanner scanner, Model gameData) {
@@ -254,7 +255,7 @@ public class Controller {
 
     private static String getName(Scanner scanner) {
         View.printChooseName();
-        String firstToken = scanner.next();
+        var firstToken = scanner.next();
         return firstToken + scanner.nextLine();
     }
 }
