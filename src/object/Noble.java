@@ -23,12 +23,16 @@ public class Noble extends AbstractCard {
     }
 
     private String[] stringDisplay() {
-        var prestigeLength = String.valueOf(getPrestige()).length() + "prestige : ".length();
+        var prestigeLength = String.valueOf(getPrestige()).length() + "Prestige: ".length();
+        var priceLength = "Price: ".length();
+        var centerName = super.getCenterName();
+        var name = super.getName();
         var string = new String[]{
                 " "+ "_".repeat(Constants.MAX_LENGTH) +" ",
-                "|prestige : " + getPrestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
+                "|" + space(centerName) + name + space((name.length() % 2 == 1)? centerName + 1 : centerName) + "|",
+                "|Prestige: " + getPrestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
                 "|" + space(Constants.MAX_LENGTH) + "|",
-                "|Price: " + space(Constants.MAX_LENGTH - "Price: ".length()) + "|",
+                "|Price: " + space(Constants.MAX_LENGTH - priceLength) + "|",
                 "|" + stringPrice(0) + space(Constants.MAX_LENGTH - stringPrice(0).length()) + "|",
                 "|" + stringPrice(1) + space(Constants.MAX_LENGTH - stringPrice(1).length()) + "|",
                 "|" + stringPrice(2) + space(Constants.MAX_LENGTH - stringPrice(2).length()) + "|",

@@ -26,16 +26,21 @@ public class Development extends AbstractCard {
     }
 
     private String[] stringDisplay() {
-        var prestigeLength = String.valueOf(getPrestige()).length();
+        var prestigeLength = String.valueOf(getPrestige()).length() + "Prestige: ".length();
+        var bonusLength =  bonus.name().length() + "Bonus: ".length();
+        var priceLength = "Price: ".length();
+        var name = super.getName();
+        var centerName = super.getCenterName();
         var string = new String[]{
-                "_______________",
-                "prestige : " + getPrestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
-                "Bonus: " + bonus.name() + space(Constants.MAX_LENGTH - bonus.name().length()) + "|",
-                "Price: ",
+                " "+ "_".repeat(Constants.MAX_LENGTH) +" ",
+                "|" + space(centerName) + name + space((name.length() % 2 == 1)? centerName + 1 : centerName) + "|",
+                "|Prestige: " + getPrestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
+                "|Bonus: " + bonus.name() + space(Constants.MAX_LENGTH - bonusLength) + "|",
+                "|Price: " + space(Constants.MAX_LENGTH - priceLength) + "|",
                 "|" + stringPrice(0) + space(Constants.MAX_LENGTH - stringPrice(0).length()) + "|",
                 "|" + stringPrice(1) + space(Constants.MAX_LENGTH - stringPrice(1).length()) + "|",
                 "|" + stringPrice(2) + space(Constants.MAX_LENGTH - stringPrice(2).length()) + "|",
-                "----------------"
+                " " + "-".repeat(Constants.MAX_LENGTH) + " "
         };
         return string;
     }

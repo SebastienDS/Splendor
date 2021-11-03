@@ -80,10 +80,23 @@ public class Model {
     }
 
     private void initGrounds() {
-        for (var deckName : decks.keySet()) {
+        //if(decks.containsKey(DeckName.NOBLE_DECK)) {
+          //  System.out.println(decks);
+            //initNobleGround(decks.get(DeckName.NOBLE_DECK));
+        //}
+        //decks.keySet().stream().filter(deckName -> deckName != DeckName.NOBLE_DECK).forEach(deckName -> {
+        for (var deckName: decks.keySet()) {
             var list = new ArrayList<Card>();
-            list.addAll(decks.get(deckName).drawMultiple(4));
+            list.addAll(decks.get(deckName).drawCards(4));
             grounds.put(deckName, list);
         }
     }
+
+    /*private void initNobleGround(Deck<Card> noble) {
+        var list = new ArrayList<Card>();
+        list.addAll(noble.drawMultiple(players.size() + 1));
+        grounds.put(deckName, list);
+        grounds.put(DeckName.NOBLE_DECK).addAll();
+        noble.clear();
+    }*/
 }

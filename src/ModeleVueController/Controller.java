@@ -115,7 +115,7 @@ public class Controller {
         if(input_choice > 0 && input_choice < groundCards.size() + 1){
 
         }
-        if(input_choice == groundCards.size() + 2){
+        if(input_choice == groundCards.size() + 2 && deck.size() > 0){
             var card = deck.draw();
             gameData.getPlayerPlaying().reserve(card);
         }
@@ -205,9 +205,9 @@ public class Controller {
     private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
         decks.clear();
         decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
-        decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());
-        decks.put(DeckName.SECOND_DEV_DECK, Decks.secondDevelopmentDeck());
         decks.put(DeckName.THIRD_DEV_DECK, Decks.thirdDevelopmentDeck());
+        decks.put(DeckName.SECOND_DEV_DECK, Decks.secondDevelopmentDeck());
+        decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());
     }
 
     private static void playerMenu(Scanner scanner, Model gameData) {

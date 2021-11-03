@@ -33,4 +33,12 @@ abstract class AbstractCard implements Card {
     public String stringPrice(int i){
         return (cost.size() >  i)? price.split("\n")[i] : "";
     }
+
+    protected int getCenterName(){
+        return (Constants.MAX_LENGTH - name.length()) / 2;
+    }
+
+    protected String getName(){
+        return name;
+    }
 }

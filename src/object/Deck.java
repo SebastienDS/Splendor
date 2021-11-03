@@ -24,7 +24,8 @@ public class Deck<T> implements Displayable {
         deck.add(t);
     }
 
-    public List<T> drawMultiple(int number) {
+    public List<T> drawCards(int number) {
+        if(deck.size() < number) number = deck.size();
         var list = new ArrayList<T>();
         for (int i = 0; i < number; i++) {
             list.add(draw());
@@ -52,24 +53,35 @@ public class Deck<T> implements Displayable {
         var size = deck.size();
         var numberOfDigit = (size == 0)? 1: (int) Math.log10(size) + 1;
         var numberDisplay = getArrayNumber(numberOfDigit, size);
-        var totalNumbersLength = numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY + 1;
-        var centerName = (totalNumbersLength - name.length()) / 2;
+        var totalNumbersLength = numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY + (numberOfDigit - 1);
+        var centerName = ((totalNumbersLength - name.length()) / 2);
         centerName = (centerName > 0)? centerName : 0;
+        var centerName2 = getSecondCenter(totalNumbersLength, name.length(),centerName);
         var centerNumber = (name.length() - totalNumbersLength) / 2;
         centerNumber =(centerNumber > 0)? centerNumber: 0;
+        var centerNumber2 = getSecondCenter(name.length(), totalNumbersLength, centerNumber);
         var spacing = (totalNumbersLength > name.length())? totalNumbersLength : name.length();
-        display = getString(spacing, centerName, numberDisplay, centerNumber);
+        display = getString(spacing, centerName, numberDisplay, centerNumber, centerName2, centerNumber2);
     }
 
-    private String[] getString(int spacing, int centerName, List<String[]> numberDisplay, int centerNumber){
+    private int getSecondCenter(int firstLength, int secondLength, int valueNormalCenter) {
+        if (firstLength > secondLength){
+            return (firstLength % secondLength % 2 == 1) ? valueNormalCenter + 1: valueNormalCenter;
+        }
+        return 0;
+    }
+
+    private String[] getString(int spacing, int centerName, List<String[]> numberDisplay, int centerNumber,
+                               int centerName2, int centerNumber2){
         return new String[]{
                 " " + "_".repeat(spacing + 2) +" ",
-                "| " + " ".repeat(centerName) + name + " ".repeat((name.length() % 2 == 0) ? centerName + 1 : centerName) + " |",
-                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 0) + " ".repeat(centerNumber) + " |",
-                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 1) + " ".repeat(centerNumber) + " |",
-                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 2) + " ".repeat(centerNumber) + " |",
-                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 3) + " ".repeat(centerNumber) + " |",
-                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 4) + " ".repeat(centerNumber) + " |",
+                "| " + " ".repeat(centerName) + name + " ".repeat(centerName2) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 0) + " ".repeat(centerNumber2) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 1) + " ".repeat(centerNumber2) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 2) + " ".repeat(centerNumber2) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 3) + " ".repeat(centerNumber2) + " |",
+                "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 4) + " ".repeat(centerNumber2) + " |",
+                "|" + " ".repeat(spacing + 2) + "|",
                 " " + "-".repeat(spacing + 2) + " "
         };
     }
@@ -95,4 +107,11 @@ public class Deck<T> implements Displayable {
         return display[i];
     }
 
+    public void clear() {
+        deck.clear();
+    }
+
+    public int getNumberToDraw(int playerSize){
+        return Constants.DRAW_NUMBER;
+    }
 }

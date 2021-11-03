@@ -12,30 +12,41 @@ public class Decks {
     private static final String VALUE_SEPARATOR = ":";
 
     public static Deck<Card> basicDeck() throws IOException {
-        return parseDeck(Path.of("resources", "basicDeck.txt"), "Basic Deck");
+        return makeDeck(Path.of("resources", "basicDeck.txt"), "Basic Deck");
     }
 
     public static Deck<Card> nobleDeck() throws IOException {
-        return parseDeck(Path.of("resources", "nobleDeck.txt"), "Noble");
+        return makeNobleDeck(Path.of("resources", "nobleDeck.txt"), "Noble");
     }
 
     public static Deck<Card> firstDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "firstDevelopmentDeck.txt"), "Développement 1");
+        return makeDeck(Path.of("resources", "firstDevelopmentDeck.txt"), "Développement 1");
     }
 
     public static Deck<Card> secondDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "secondDevelopmentDeck.txt"), "Développement 2");
+        return makeDeck(Path.of("resources", "secondDevelopmentDeck.txt"), "Développement 2");
     }
 
     public static Deck<Card> thirdDevelopmentDeck() throws IOException {
-        return parseDeck(Path.of("resources", "thirdDevelopmentDeck.txt"), "Développement 3");
+        return makeDeck(Path.of("resources", "thirdDevelopmentDeck.txt"), "Développement 3");
     }
 
-    private static Deck<Card> parseDeck(Path path, String name) throws IOException {
-        Objects.requireNonNull(path);
+    private static Deck<Card> makeNobleDeck(Path path, String name) throws IOException {
         Objects.requireNonNull(name);
+        var nobleDeck = new NobleDeck(name);
+        parseDeck(path, nobleDeck);
+        return nobleDeck;
+    }
 
+    private static Deck<Card> makeDeck(Path path, String name) throws IOException {
+        Objects.requireNonNull(name);
         var deck = new Deck<Card>(name);
+        parseDeck(path, deck);
+        return deck;
+    }
+
+    private static void parseDeck(Path path, Deck<Card> deck) throws IOException {
+        Objects.requireNonNull(path);
         var tokenManager = new TokenManager();
 
         try (var reader = Files.newBufferedReader(path)) {
@@ -54,7 +65,6 @@ public class Decks {
                 }
             }
         }
-        return deck;
     }
 
     private static Card parseCard(String line, TokenManager tokenManager, List<String> args) {
