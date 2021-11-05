@@ -45,4 +45,8 @@ public class Player {
     public boolean canReserve() {
         return cardReserved.size() < 3;
     }
+
+    public List<Card> getCardReserved() {
+        return cardReserved;
+    }
 }

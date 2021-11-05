@@ -70,7 +70,7 @@ public class Controller {
                 }
                 default: View.printChoiceDoNotExist(input_choice);
             }
-            if(turnFinished) return;
+            if(turnFinished) return; //todo if more than 10 token need to throw some
         }
     }
 
@@ -93,8 +93,15 @@ public class Controller {
         return true;
     }
 
-    private static void buyCard(Scanner scanner, Model gameData) { //todo
+    private static void buyCard(Scanner scanner, Model gameData) {
+        var player = gameData.getPlayerPlaying();
+        showCardPurchasable(gameData);
 
+    }
+
+    private static void showCardPurchasable(Model gameData) {
+        View.printCards(gameData.getPlayerPlaying().getCardReserved());
+        gameData.getGrounds().forEach(((deckName, cards) -> View.printCards(cards)));
     }
 
     private static boolean reserveCard(Scanner scanner, Model gameData) throws InterruptedException {
@@ -118,7 +125,7 @@ public class Controller {
         var deck = gameData.getDecks().get(deckName);
         var player = gameData.getPlayerPlaying();
         var tokens = gameData.getGameTokens();
-        View.printCards(groundCards, deck.size());
+        View.printCards(groundCards);
         var input_choice = getInteger(scanner, 0, groundCards.size() + 2);
         if(input_choice == 0) return false;
         if(input_choice > 0 && input_choice < groundCards.size() + 1){

@@ -181,7 +181,7 @@ public class View {
         System.out.print(print);
     }
 
-    public static void printCards(List<Card> cards, int deckSize) {
+    public static void printCards(List<Card> cards) {
         var print = new StringBuilder();
         print.append("Choisissez la carte ?(").append(cards.size() + 1).append(" pour choisir de réserver la prochaine carte piochée");
         print.append(" et 0 pour annuler)\n");
