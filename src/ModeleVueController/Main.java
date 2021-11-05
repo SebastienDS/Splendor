@@ -12,7 +12,7 @@ public class Main {
         var gameData = new Model(initPlayer(), new LinkedHashMap<>(), new LinkedHashMap<>());
         try (var scanner = new Scanner(System.in)) {
             Controller.startingMenu(scanner, gameData);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             System.err.println(e.getMessage());
             System.exit(1);
             return;

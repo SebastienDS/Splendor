@@ -174,7 +174,7 @@ public class View {
     public static void printChooseDeck(Map<DeckName, List<Card>> grounds) {
         var print = new StringBuilder();
         var i = 1;
-        print.append("Choisissez le deck qui contient la carte que vous voulez réserver\n");
+        print.append("Choisissez le deck qui contient la carte que vous voulez réserver(0 pour annuler):\n");
         for (var deckName: grounds.keySet()) {
             print.append(i).append(": ").append(deckName).append("\n");
         }
@@ -185,7 +185,7 @@ public class View {
         var print = new StringBuilder();
         print.append("Choisissez la carte ?(").append(cards.size() + 1).append("pour choisir de réserver la prochaine carte piochée)\n");
         printCardLeftToRight(cards, print, null, false, true);
-        System.out.println(print);
+        System.out.print(print);
     }
 
     public static void printNotEnoughTokens() {
@@ -194,5 +194,21 @@ public class View {
 
     public static void printNoTokenLeft() {
         System.out.println("Il n'y a plus aucun jeton a récupérer !");
+    }
+
+    public static void printCantReserve() {
+        System.out.println("Vous ne pouvez pas réserver plus de 3 cartes !");
+    }
+
+    public static void printCard(Card card) {
+        var print = new StringBuilder();
+        for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
+            print.append(card.getDisplay(i)).append("\n");
+        }
+        System.out.println(print);
+    }
+
+    public static void printYouReserved() {
+        System.out.println("Vous avez réserver:");
     }
 }
