@@ -212,4 +212,13 @@ public class View {
     public static void printYouReserved() {
         System.out.println("Vous avez réserver:");
     }
+
+    public static void printCardsWithIndex(List<Card> cards, int index) {
+        System.out.println(index + ":\n");
+        printCards(cards);
+    }
+
+    public static void printChooseGround() {
+        System.out.println("Choisissez où vous voulez acheter la carte ?(0 pour annuler)");
+    }
 }

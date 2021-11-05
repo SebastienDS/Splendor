@@ -93,15 +93,27 @@ public class Controller {
         return true;
     }
 
-    private static void buyCard(Scanner scanner, Model gameData) {
+    private static boolean buyCard(Scanner scanner, Model gameData) {
         var player = gameData.getPlayerPlaying();
-        showCardPurchasable(gameData);
-
+        var grounds = gameData.getGrounds();
+        showPurchasableCard(gameData);
+        var total = gameData.getGrounds().values().size() + ((player.getCardReserved().size() > 0)? 1 : 0);
+        var input_choice = getInteger(scanner, 0, total);
+        switch (input_choice){
+            case(0): return false;
+            case(1): break; //todo all case
+        }
     }
 
-    private static void showCardPurchasable(Model gameData) {
-        View.printCards(gameData.getPlayerPlaying().getCardReserved());
-        gameData.getGrounds().forEach(((deckName, cards) -> View.printCards(cards)));
+    private static void showPurchasableCard(Model gameData) {
+        var i = 1;
+        var reserve = gameData.getPlayerPlaying().getCardReserved();
+        View.printChooseGround();
+        for (var cards: gameData.getGrounds().values()) {
+            View.printCardsWithIndex(cards, i);
+            i++;
+        }
+        if(reserve.size() > 0) View.printCardsWithIndex(gameData.getPlayerPlaying().getCardReserved(), i);
     }
 
     private static boolean reserveCard(Scanner scanner, Model gameData) throws InterruptedException {
