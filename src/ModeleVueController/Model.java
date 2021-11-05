@@ -88,4 +88,8 @@ public class Model {
         }
     }
 
+    public boolean reservePossible(){
+        return !decks.containsKey(DeckName.BASIC_DECK);
+    }
+
 }

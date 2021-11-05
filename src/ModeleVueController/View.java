@@ -72,13 +72,13 @@ public class View {
         System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet());
     }
 
-    public static void printFirstChoicePlayer() {
+    public static void printFirstChoicePlayer(Model gameData) {
         var text = new StringBuilder();
         text.append("Que voulez vous faire ?\n")
             .append("1: Prendre 2 jetons de la même couleur\n")
             .append("2: Prendre 3 jetons de couleurs différentes\n")
-            .append("3: Réserver 1 carte développement et prendre 1 or\n")
-            .append("4: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.");
+            .append("3: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.");
+        if(gameData.reservePossible()) text.append("\n4: Réserver 1 carte développement et prendre 1 or");
         System.out.println(text);
     }
 
@@ -183,7 +183,8 @@ public class View {
 
     public static void printCards(List<Card> cards, int deckSize) {
         var print = new StringBuilder();
-        print.append("Choisissez la carte ?(").append(cards.size() + 1).append("pour choisir de réserver la prochaine carte piochée)\n");
+        print.append("Choisissez la carte ?(").append(cards.size() + 1).append(" pour choisir de réserver la prochaine carte piochée");
+        print.append(" et 0 pour annuler)\n");
         printCardLeftToRight(cards, print, null, false, true);
         System.out.print(print);
     }

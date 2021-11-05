@@ -52,19 +52,22 @@ public class Controller {
         View.printGround(gameData.getGrounds(), gameData.getDecks());
         View.printPlayerPlaying(gameData.getPlayerPlaying());
         View.printPlayerResource(gameData.getPlayerPlaying());
-        View.printFirstChoicePlayer();
+        View.printFirstChoicePlayer(gameData);
     }
 
     private static void firstChoice(Scanner scanner, Model gameData) throws InterruptedException { //todo add choice to show reserved card, to show personal stats
         var turnFinished = false;
+        allInformationChoice(gameData);
         while (true) {
-           allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
             switch (input_choice) {
                 case(1): turnFinished = manageChoiceToken(scanner, gameData);break;
                 case(2): turnFinished = manageChoiceTokens(scanner, gameData);break; //todo canConfirm less token if not enough token
-                case(3): turnFinished = Controller.reserveCard(scanner, gameData); break; //todo verif that player can reserve
-                case(4): Controller.buyCard(scanner, gameData); return; //todo all the function
+                case(3): Controller.buyCard(scanner, gameData); return; //todo all the function
+                case(4): if(gameData.reservePossible()){
+                    turnFinished = Controller.reserveCard(scanner, gameData);
+                    break;
+                }
                 default: View.printChoiceDoNotExist(input_choice);
             }
             if(turnFinished) return;
@@ -125,6 +128,7 @@ public class Controller {
         View.printYouReserved();
         View.printCard(card);
         gameData.getPlayerPlaying().reserve(card);
+        if(tokens.get(Token.GOLD) > 0) player.addToken(Token.GOLD, 1);
         Thread.sleep(500);
         return true;
     }
