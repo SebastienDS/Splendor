@@ -66,8 +66,8 @@ public class Player {
     }
 
     public void buy(Card card) {
-        for(var token: card.getTokens()){
-            if(wallet.get(token) >= card.getCost(token)){
+        for (var token : card.getTokens()) {
+            if (wallet.get(token) >= card.getCost(token)) {
                 wallet.addToken(token, -card.getCost(token));
                 continue;
             }
@@ -75,10 +75,14 @@ public class Player {
             wallet.addToken(token, -wallet.get(token));
         }
         var bonus = card.getBonus();
-        if(bonus != null){
+        if (bonus != null) {
             this.bonus.addToken(bonus, 1);
         }
 
         prestige += card.getPrestige();
+    }
+
+    public TokenManager getBonus() {
+        return bonus;
     }
 }

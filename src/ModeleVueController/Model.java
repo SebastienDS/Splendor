@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public class Model {
 
+    private int gameMode = 1;
     private final List<Player> players;
     private int playerPlaying;
     private boolean lastRound = false;
@@ -19,6 +20,15 @@ public class Model {
         this.decks = Objects.requireNonNull(decks);
         this.grounds = Objects.requireNonNull(grounds);
         gameTokens = new TokenManager();
+    }
+
+    public void setGameMode(int gameMode) {
+        if (gameMode <= 0) throw new IllegalArgumentException("GameMode must be >= 0");
+        this.gameMode = gameMode;
+    }
+
+    public int getGameMode() {
+        return gameMode;
     }
 
     public List<Player> getPlayers() {
@@ -92,7 +102,7 @@ public class Model {
     }
 
     public boolean reservePossible(){
-        return !decks.containsKey(DeckName.BASIC_DECK);
+        return gameMode >= 2;
     }
 
 }

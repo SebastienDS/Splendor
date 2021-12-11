@@ -27,6 +27,7 @@ public class Controller {
     }
 
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException, InterruptedException {
+        gameData.setGameMode(1);
         firstPhaseDeck(gameData.getDecks());
         while (true) {
             View.printStartingMenu();
@@ -51,7 +52,7 @@ public class Controller {
     private static void allInformationChoice(Model gameData){
         View.printGround(gameData.getGrounds(), gameData.getDecks());
         View.printPlayerPlaying(gameData.getPlayerPlaying());
-        View.printPlayerResource(gameData.getPlayerPlaying());
+        View.printPlayerResource(gameData.getPlayerPlaying(), gameData.getGameMode());
         View.printFirstChoicePlayer(gameData);
     }
 
@@ -61,16 +62,30 @@ public class Controller {
             allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
             switch (input_choice) {
-                case(1): turnFinished = manageChoiceToken(scanner, gameData);break;
-                case(2): turnFinished = manageChoiceTokens(scanner, gameData);break; //todo canConfirm less token if not enough token
-                case(3): if(Controller.buyCard(scanner, gameData)) return;break; //todo all the function
-                case(4): if(gameData.reservePossible()){
-                    if(Controller.reserveCard(scanner, gameData)) return;
+                case(1): turnFinished = manageChoiceToken(scanner, gameData); break;
+                case(2): turnFinished = manageChoiceTokens(scanner, gameData); break; //todo canConfirm less token if not enough token
+                case(3): turnFinished = Controller.buyCard(scanner, gameData); break; //todo all the function
+                case(4):
+                    var bonus = gameData.getPlayerPlaying().getBonus();
+                    View.printPlayerBonus(bonus, gameData.getGameMode());
+                    break;
+                case(5): if (gameData.reservePossible()) {
+                    turnFinished = Controller.reserveCard(scanner, gameData); break;
+                }
+                case(6): if (gameData.reservePossible()) {
+                    showReservedCards(gameData);
                     break;
                 }
                 default: View.printChoiceDoNotExist(input_choice);
             }
-            if(turnFinished) return; //todo if more than 10 token need to throw some
+
+            if (turnFinished) {
+                var wallet = gameData.getPlayerPlaying().getWallet();
+                if (sizeWithoutGold(wallet) > 10) {
+                    removeExcessTokens(scanner, gameData, wallet, 10);
+                }
+                return;
+            }
         }
     }
 
@@ -174,7 +189,7 @@ public class Controller {
                 case(0): return false;
                 case(1): manageAddToken(scanner, tokenChosen, gameData); break;
                 case(2): manageRemoveToken(scanner, tokenChosen); break;
-                case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return true;
+                case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return true; break;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
@@ -221,8 +236,8 @@ public class Controller {
         var input_choice = Controller.getInteger(scanner, 1, 2);
         var decks = gameData.getDecks();
         switch (input_choice) {
-            case(1): firstPhaseDeck(decks); return;
-            case(2): secondPhaseDeck(decks); return;
+            case(1): firstPhaseDeck(decks); gameData.setGameMode(1); return;
+            case(2): secondPhaseDeck(decks); gameData.setGameMode(2); return;
         }
     }
 
@@ -286,5 +301,47 @@ public class Controller {
         View.printChooseName();
         var firstToken = scanner.next();
         return firstToken + scanner.nextLine();
+    }
+
+    private static int sizeWithoutGold(TokenManager tokenManager) {
+        return tokenManager.tokenManager()
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey() != Token.GOLD)
+                .map(Map.Entry::getValue)
+                .reduce(0, Integer::sum);
+    }
+
+    private static List<Token> getNotEmptyTokens(TokenManager tokenManager) {
+        return tokenManager.tokenManager()
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey() != Token.GOLD && entry.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    private static void removeExcessTokens(Scanner scanner, Model gameData, TokenManager wallet, int maxTokens) {
+        while (sizeWithoutGold(wallet) > maxTokens) {
+            var notEmptyTokens = getNotEmptyTokens(wallet);
+
+            View.printAskRemoveExcessToken();
+            View.printTokens(wallet, notEmptyTokens);
+
+            var input_choice = getInteger(scanner, 1, notEmptyTokens.size());
+            var token = notEmptyTokens.get(input_choice - 1);
+            wallet.addToken(token, -1);
+            gameData.getGameTokens().addToken(token, 1);
+        }
+    }
+
+    private static void showReservedCards(Model gameData) {
+        var cards = gameData.getPlayerPlaying().getCardReserved();
+
+        if (cards.size() == 0) {
+            View.printNoCardsReserved();
+        } else {
+            View.printCardsGround(cards);
+        }
     }
 }

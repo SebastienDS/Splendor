@@ -4,6 +4,9 @@ import object.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class View {
     public static void printStartingMenu() {
@@ -68,8 +71,9 @@ public class View {
         System.out.println("C'est au tour du joueur: \"" + player.getName() + "\" de joué! ");
     }
 
-    public static void printPlayerResource(Player playerPlaying) {
-        System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet());
+    public static void printPlayerResource(Player playerPlaying, int gameMode) {
+        var keySet = getKeySet(playerPlaying.getWallet(), gameMode);
+        System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet().toString(keySet));
     }
 
     public static void printFirstChoicePlayer(Model gameData) {
@@ -77,8 +81,13 @@ public class View {
         text.append("Que voulez vous faire ?\n")
             .append("1: Prendre 2 jetons de la même couleur\n")
             .append("2: Prendre 3 jetons de couleurs différentes\n")
-            .append("3: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.");
-        if(gameData.reservePossible()) text.append("\n4: Réserver 1 carte développement et prendre 1 or");
+            .append("3: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.\n")
+            .append("4: Afficher les statistiques du joueur.");
+        if (gameData.reservePossible()) {
+            text.append("\n5: Réserver 1 carte développement et prendre 1 or\n")
+                    .append("6: Afficher les cartes réservés");
+        }
+
         System.out.println(text);
     }
 
@@ -212,12 +221,6 @@ public class View {
         System.out.println("Choisissez où vous voulez " + display + " la carte ?(0 pour annuler)");
     }
 
-    private static void printCardsGround(List<Card> cards) {
-        var print = new StringBuilder();
-        printCardLeftToRight(cards, print, null, false, false);
-        System.out.print(print);
-    }
-
     public static String getBuy() {
         return "acheter";
     }
@@ -236,5 +239,42 @@ public class View {
 
     public static String getReserve(int number){
         return "(" + number + " pour choisir de réserver la carte pioché et ";
+    }
+
+    public static void printTokens(TokenManager tokenManager, List<Token> tokens) {
+        var string = IntStream.range(0, tokens.size())
+                .mapToObj(i -> "" + (i + 1) + " : " + tokens.get(i) + " [" + tokenManager.get(tokens.get(i)) + "]")
+                .collect(Collectors.joining("\n"));
+
+        System.out.println(string);
+    }
+
+    public static void printAskRemoveExcessToken() {
+        System.out.println("Vous avez trop jetons, quel token voulez-vous retirer ?");
+    }
+
+    public static void printCardsGround(List<Card> cards) {
+        var print = new StringBuilder();
+        printCardLeftToRight(cards, print, null, false, false);
+        System.out.print(print);
+    }
+
+    private static Set<Token> getKeySet(TokenManager tokenManager, int gameMode) {
+        var keySet = tokenManager.keySet();
+
+        if (gameMode == 1) {
+            keySet = keySet.stream()
+                    .filter(t -> t != Token.GOLD)
+                    .collect(Collectors.toSet());
+        }
+        return keySet;
+    }
+    public static void printPlayerBonus(TokenManager bonus, int gameMode) {
+        var keySet = getKeySet(bonus, gameMode);
+        System.out.println(bonus.toString(keySet));
+    }
+
+    public static void printNoCardsReserved() {
+        System.out.println("Vous n'avez pas de cartes réservées");
     }
 }

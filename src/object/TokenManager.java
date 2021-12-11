@@ -13,10 +13,14 @@ public record TokenManager(Map<Token, Integer> tokenManager) {
 
     @Override
     public String toString() {
+        return toString(tokenManager.keySet());
+    }
+
+    public String toString(Set<Token> keySet) {
         StringBuilder text = new StringBuilder();
         String separator = "";
         text.append("[");
-        for (var token : tokenManager.keySet()) {
+        for (var token : keySet) {
             text.append(separator).append(token.name()).append(": ").append(tokenManager.get(token));
             separator = ", ";
         }
