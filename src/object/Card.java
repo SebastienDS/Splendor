@@ -2,10 +2,13 @@ package object;
 
 import java.util.Set;
 
-public interface Card extends Displayable{
+public interface Card extends Displayable {
+    String getName();
     int getCost(Token token);
     Set<Token> getTokens();
-    String getDisplay(int i);
     int getPrestige();
-    Token getBonus();
+
+    default Token getBonus() {
+        return null;
+    }
 }

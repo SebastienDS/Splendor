@@ -1,19 +1,24 @@
 package object;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 import static object.Utils.space;
 
-public class Noble extends AbstractCard {
+public class Noble implements Card {
 
     public static final String TYPE = "Noble";
 
+    private final Card card;
+
     private final String[] display;
+    private final List<String> price;
 
     public Noble(Map<Token, Integer> cost, String name, String image, int prestige) {
-        super(cost, name, image, prestige);
+        card = new BasicCard(cost, name, image, prestige);
+
+        price = cost.keySet().stream().map(token -> token.name() + " : " + cost.get(token)).toList();
         display = stringDisplay();
     }
 
@@ -23,16 +28,36 @@ public class Noble extends AbstractCard {
     }
 
     @Override
+    public String getName() {
+        return card.getName();
+    }
+
+    @Override
+    public int getCost(Token token) {
+        return card.getCost(token);
+    }
+
+    @Override
+    public Set<Token> getTokens() {
+        return card.getTokens();
+    }
+
+    @Override
+    public int getPrestige() {
+        return card.getPrestige();
+    }
+
+    @Override
     public Token getBonus() {
-        return null;
+        return card.getBonus();
     }
 
     private String[] stringDisplay() {
         var prestigeLength = String.valueOf(getPrestige()).length() + "Prestige: ".length();
         var priceLength = "Price: ".length();
-        var centerName = super.getCenterName();
-        var name = super.getName();
-        var string = new String[]{
+        var centerName = getCenterName();
+        var name = getName();
+        var string = new String[] {
                 " "+ "_".repeat(Constants.MAX_LENGTH) +" ",
                 "|" + space(centerName) + name + space((name.length() % 2 == 1)? centerName + 1 : centerName) + "|",
                 "|Prestige: " + getPrestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
@@ -45,5 +70,13 @@ public class Noble extends AbstractCard {
                 " " + "-".repeat(Constants.MAX_LENGTH) + " "
         };
         return string;
+    }
+
+    private String stringPrice(int i){
+        return (card.getTokens().size() >  i)? price.get(i) : "";
+    }
+
+    private int getCenterName(){
+        return (Constants.MAX_LENGTH - card.getName().length()) / 2;
     }
 }

@@ -40,7 +40,7 @@ public class Decks {
 
     private static Deck<Card> makeDeck(Path path, String name) throws IOException {
         Objects.requireNonNull(name);
-        var deck = new Deck<Card>(name);
+        var deck = new BasicDeck<Card>(name);
         parseDeck(path, deck);
         return deck;
     }
