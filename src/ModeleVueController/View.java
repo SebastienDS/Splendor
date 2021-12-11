@@ -82,7 +82,7 @@ public class View {
             .append("1: Prendre 2 jetons de la même couleur\n")
             .append("2: Prendre 3 jetons de couleurs différentes\n")
             .append("3: Acheter 1 carte développement face visible au centre de la table ou préalablement réservée.\n")
-            .append("4: Afficher les statistiques du joueur.");
+            .append("4: Afficher les bonus du joueur.");
         if (gameData.reservePossible()) {
             text.append("\n5: Réserver 1 carte développement et prendre 1 or\n")
                     .append("6: Afficher les cartes réservés");
