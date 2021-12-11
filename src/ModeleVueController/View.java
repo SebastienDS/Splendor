@@ -136,8 +136,9 @@ public class View {
         System.out.println(text);
     }
 
-    public static void printNotEnoughTokenChosen(int number) {
-        System.out.println("Vous n'avez choisis que " + number + " / 3 jetons");
+    public static void printNotEnoughTokenChosen(int number, int size) {
+        var s = (size > 1)? "s": "";
+        System.out.println("Vous n'avez choisis que " + number + " / " + size + " jeton" + s);
     }
 
     public static void printTokenChosenWithIndex(List<Token> tokenChosen) {

@@ -82,6 +82,7 @@ public class Deck<T> implements Displayable {
                 "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 3) + " ".repeat(centerNumber2) + " |",
                 "| " + " ".repeat(centerNumber) + getNumberDisplay(numberDisplay, 4) + " ".repeat(centerNumber2) + " |",
                 "|" + " ".repeat(spacing + 2) + "|",
+                "|" + " ".repeat(spacing + 2) + "|",
                 " " + "-".repeat(spacing + 2) + " "
         };
     }

@@ -4,6 +4,7 @@ import object.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -27,8 +28,8 @@ public class Controller {
     }
 
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException, InterruptedException {
-        gameData.setGameMode(1);
-        firstPhaseDeck(gameData.getDecks());
+        gameData.setGameMode(2);
+        secondPhaseDeck(gameData.getDecks());
         while (true) {
             View.printStartingMenu();
             var input_menu = Controller.getInteger(scanner);
@@ -41,7 +42,7 @@ public class Controller {
         }
     }
 
-    private static void startGame(Scanner scanner, Model gameData) throws InterruptedException {
+    private static void startGame(Scanner scanner, Model gameData){
         gameData.startGame();
         while (!gameData.getLastRound() || !gameData.startNewRound()) {
             firstChoice(scanner, gameData);
@@ -56,15 +57,15 @@ public class Controller {
         View.printFirstChoicePlayer(gameData);
     }
 
-    private static void firstChoice(Scanner scanner, Model gameData) throws InterruptedException { //todo add choice to show reserved card, to show personal stats
+    private static void firstChoice(Scanner scanner, Model gameData){
         var turnFinished = false;
         while (true) {
             allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
             switch (input_choice) {
                 case(1): turnFinished = manageChoiceToken(scanner, gameData); break;
-                case(2): turnFinished = manageChoiceTokens(scanner, gameData); break; //todo canConfirm less token if not enough token
-                case(3): turnFinished = Controller.buyCard(scanner, gameData); break; //todo all the function
+                case(2): turnFinished = manageChoiceTokens(scanner, gameData); break;
+                case(3): turnFinished = Controller.buyCard(scanner, gameData); break;
                 case(4):
                     var bonus = gameData.getPlayerPlaying().getBonus();
                     View.printPlayerBonus(bonus, gameData.getGameMode());
@@ -79,7 +80,7 @@ public class Controller {
                 default: View.printChoiceDoNotExist(input_choice);
             }
 
-            if (turnFinished) {
+            if (turnFinished) { //todo noble come to player
                 var wallet = gameData.getPlayerPlaying().getWallet();
                 if (sizeWithoutGold(wallet) > 10) {
                     removeExcessTokens(scanner, gameData, wallet, 10);
@@ -108,40 +109,45 @@ public class Controller {
         return true;
     }
 
-    private static Card chooseACardWithGrounds(Scanner scanner, Model gameData, String display, boolean buy) throws InterruptedException {
+    private static Card chooseACardWithGrounds(Scanner scanner, Model gameData, String display, boolean buy){
         var player = gameData.getPlayerPlaying();
         var grounds = gameData.getGroundsWithoutNoble();
-        showPurchasableCard(gameData, display);
-        var total = gameData.getGrounds().values().size() + ((player.getCardReserved().size() > 0)? 1 : 0);
-        var input_choice = getInteger(scanner, 0, total);
+        var decks = gameData.getDecks();
+        showPurchasableCard(grounds, player, display);
+        var total = gameData.getGroundsWithoutNoble().values().size() + ((player.getCardReserved().size() > 0 && buy)? 1 : 0);
+        var input_choice = (total == 1)? 1 : getInteger(scanner, 0, total);
         if(input_choice == 0){
             return null;
+        }
+        if(input_choice == total && player.getCardReserved().size() > 0){
+            return chooseCard(scanner, player.getCardReserved(), null, player, buy);
         }
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
         if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
         var deckNameChosen = deckName.get(input_choice - 1);
-        return chooseCard(scanner, grounds.get(deckNameChosen), player, buy);
+        return chooseCard(scanner, grounds.get(deckNameChosen), decks.get(deckNameChosen), player, buy);
     }
 
-    private static boolean buyCard(Scanner scanner, Model gameData) throws InterruptedException {
+    private static boolean buyCard(Scanner scanner, Model gameData){
         var card = chooseACardWithGrounds(scanner, gameData, View.getBuy(), true);
         if(card == null) return false;
-        gameData.getPlayerPlaying().buy(card);
+        var tokens = gameData.getPlayerPlaying().buy(card);
+        gameData.addTokenUsed(tokens);
         return true;
     }
 
-    private static void showPurchasableCard(Model gameData, String display) {
+    private static void showPurchasableCard(Map<DeckName, List<Card>> grounds, Player player, String display) {
         var i = 1;
-        var reserve = gameData.getPlayerPlaying().getCardReserved();
+        var reserve = player.getCardReserved();
         View.printChooseGround(display);
-        for (var cards: gameData.getGroundsWithoutNoble().values()) {
-            View.printCardsWithIndex(cards, i);
+        for (var deckName: grounds.keySet()) {
+            View.printCardsWithIndex(grounds.get(deckName), i);
             i++;
         }
-        if(reserve.size() > 0) View.printCardsWithIndex(gameData.getPlayerPlaying().getCardReserved(), i);
+        if(reserve.size() > 0) View.printCardsWithIndex(reserve, i);
     }
 
-    private static boolean reserveCard(Scanner scanner, Model gameData) throws InterruptedException {
+    private static boolean reserveCard(Scanner scanner, Model gameData){
         if(!gameData.getPlayerPlaying().canReserve()){
             View.printCantReserve();
             return false;
@@ -153,16 +159,26 @@ public class Controller {
         return true;
     }
 
-    private static Card chooseCard(Scanner scanner, List<Card> cards, Player player, boolean buy) throws InterruptedException {
+    private static Card chooseCard(Scanner scanner, List<Card> cards, Deck<Card> deck, Player player, boolean buy){
         while(true){
             View.printCards(cards, (buy)? View.getParenthesis(): View.getReserve(cards.size() + 1));
-            var input_choice = getInteger(scanner, 0, cards.size() + 2);
+            var input_choice = (buy)? getInteger(scanner, 0, cards.size() + 1):getInteger(scanner, 0, cards.size() + 2);
             if(input_choice == 0) return null;
             if(input_choice > 0 && input_choice < cards.size() + 1) {
-                if(!buy || player.canBuy(cards.get(input_choice - 1))) return cards.remove(input_choice - 1);
+                if(!buy || player.canBuy(cards.get(input_choice - 1))){
+                    drawDeck(cards, deck);
+                    return cards.remove(input_choice - 1);
+                }
                 View.printDontHaveEnoughToken();
             }
+            if(!buy && input_choice == cards.size() + 2){
+                return deck.draw();
+            }
         }
+    }
+
+    private static void drawDeck(List<Card> cards, Deck<Card> deck) {
+        if(deck != null) cards.add(deck.draw());
     }
 
     private static Token chooseToken(Scanner scanner, Model gameData, int number) {
@@ -189,18 +205,22 @@ public class Controller {
                 case(0): return false;
                 case(1): manageAddToken(scanner, tokenChosen, gameData); break;
                 case(2): manageRemoveToken(scanner, tokenChosen); break;
-                case(3): if (manageConfirmTokens(scanner, tokenChosen, gameData)) return true; break;
+                case(3): if (manageConfirmTokens(tokenChosen, gameData)) return true; break;
                 default: View.printChoiceDoNotExist(input_choice);
             }
         }
     }
 
-    private static boolean manageConfirmTokens(Scanner scanner, List<Token> tokenChosen, Model gameData) {
-        if (tokenChosen.size() == 3) {
+    private static boolean manageConfirmTokens(List<Token> tokenChosen, Model gameData) {
+        var size = gameData.getGameTokens().tokenNotEmpty()
+                .keySet().stream().filter(token -> Token.GOLD != token)
+                .collect(Collectors.toSet()).size();
+        var maxSize = Math.min(size, 3);
+        if (tokenChosen.size() == maxSize) {
             tokenChosen.stream().forEach(token -> gameData.takeToken(token, 1));
             return true;
         }
-        View.printNotEnoughTokenChosen(tokenChosen.size());
+        View.printNotEnoughTokenChosen(tokenChosen.size(), maxSize);
         return false;
     }
 

@@ -1,8 +1,7 @@
 package object;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import javax.swing.*;
+import java.util.*;
 
 public class Player {
 
@@ -51,27 +50,37 @@ public class Player {
     }
 
     public boolean canBuy(Card card) {
-        int gold = 0;
+        var gold = 0;
         for(var token: card.getTokens()){
-            if(wallet.get(token) >= card.getCost(token)){
+            if(getTokenPlusBonus(token) >= card.getCost(token)){
                 continue;
             }
-            if(wallet.get(token) + (wallet.get(Token.GOLD) - gold) >= card.getCost(token)){
-                gold += card.getCost(token) - wallet.get(token);
+            if(getTokenPlusBonus(token) + (wallet.get(Token.GOLD) - gold) >= card.getCost(token)){
+                gold += card.getCost(token) - getTokenPlusBonus(token);
                 continue;
             }
+            System.out.println(token + " " + getTokenPlusBonus(token) + " " + card.getCost(token));
             return false;
         }
         return true;
     }
 
-    public void buy(Card card) {
+    private int getTokenPlusBonus(Token token) {
+        return wallet.get(token) + bonus.get(token);
+    }
+
+    public Map<Token, Integer> buy(Card card) {
+        var tokens = new HashMap<Token, Integer>();
         for (var token : card.getTokens()) {
-            if (wallet.get(token) >= card.getCost(token)) {
-                wallet.addToken(token, -card.getCost(token));
+            if (getTokenPlusBonus(token) >= card.getCost(token)) {
+                var tokenToPay = -(card.getCost(token) - bonus.get(token));
+                wallet.addToken(token, Math.min(tokenToPay, 0));
+                tokens.put(token, Math.min(tokenToPay, 0));
                 continue;
             }
-            wallet.addToken(Token.GOLD, wallet.get(token) - card.getCost(token));
+            tokens.put(token, wallet.get(token));
+            tokens.merge(Token.GOLD, card.getCost(token) - getTokenPlusBonus(token), Integer::sum);
+            wallet.addToken(Token.GOLD, getTokenPlusBonus(token) - card.getCost(token));
             wallet.addToken(token, -wallet.get(token));
         }
         var bonus = card.getBonus();
@@ -80,6 +89,7 @@ public class Player {
         }
 
         prestige += card.getPrestige();
+        return tokens;
     }
 
     public TokenManager getBonus() {

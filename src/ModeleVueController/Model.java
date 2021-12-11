@@ -44,8 +44,12 @@ public class Model {
     }
 
     public Map<DeckName, List<Card>> getGroundsWithoutNoble(){
-        return grounds.keySet().stream().filter(deckName -> deckName != DeckName.NOBLE_DECK)
-                .collect(Collectors.toMap(deckName -> deckName, deckName -> grounds.get(deckName)));
+        return grounds.keySet().stream().filter(deckName -> deckName != DeckName.NOBLE_DECK).collect(Collectors.toMap(
+                deckName -> deckName,
+                deckName -> grounds.get(deckName),
+                (a, b) -> {throw new IllegalStateException("duplicated key");},
+                LinkedHashMap::new
+        ));
     }
 
     public void startGame() {
@@ -105,4 +109,9 @@ public class Model {
         return gameMode >= 2;
     }
 
+    public void addTokenUsed(Map<Token, Integer> tokens) {
+        for (var token: tokens.keySet()){
+            gameTokens.addToken(token, tokens.get(token));
+        }
+    }
 }
