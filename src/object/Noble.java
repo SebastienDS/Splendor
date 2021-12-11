@@ -22,6 +22,11 @@ public class Noble extends AbstractCard {
         return display[i];
     }
 
+    @Override
+    public Token getBonus() {
+        return null;
+    }
+
     private String[] stringDisplay() {
         var prestigeLength = String.valueOf(getPrestige()).length() + "Prestige: ".length();
         var priceLength = "Price: ".length();

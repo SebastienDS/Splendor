@@ -57,15 +57,15 @@ public class Controller {
 
     private static void firstChoice(Scanner scanner, Model gameData) throws InterruptedException { //todo add choice to show reserved card, to show personal stats
         var turnFinished = false;
-        allInformationChoice(gameData);
         while (true) {
+            allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
             switch (input_choice) {
                 case(1): turnFinished = manageChoiceToken(scanner, gameData);break;
                 case(2): turnFinished = manageChoiceTokens(scanner, gameData);break; //todo canConfirm less token if not enough token
-                case(3): Controller.buyCard(scanner, gameData); return; //todo all the function
+                case(3): if(Controller.buyCard(scanner, gameData)) return;break; //todo all the function
                 case(4): if(gameData.reservePossible()){
-                    turnFinished = Controller.reserveCard(scanner, gameData);
+                    if(Controller.reserveCard(scanner, gameData)) return;
                     break;
                 }
                 default: View.printChoiceDoNotExist(input_choice);
@@ -93,23 +93,33 @@ public class Controller {
         return true;
     }
 
-    private static boolean buyCard(Scanner scanner, Model gameData) {
+    private static Card chooseACardWithGrounds(Scanner scanner, Model gameData, String display, boolean buy) throws InterruptedException {
         var player = gameData.getPlayerPlaying();
-        var grounds = gameData.getGrounds();
-        showPurchasableCard(gameData);
+        var grounds = gameData.getGroundsWithoutNoble();
+        showPurchasableCard(gameData, display);
         var total = gameData.getGrounds().values().size() + ((player.getCardReserved().size() > 0)? 1 : 0);
         var input_choice = getInteger(scanner, 0, total);
-        switch (input_choice){
-            case(0): return false;
-            case(1): break; //todo all case
+        if(input_choice == 0){
+            return null;
         }
+        var deckName = new ArrayList<>(gameData.getGrounds().keySet());
+        if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
+        var deckNameChosen = deckName.get(input_choice - 1);
+        return chooseCard(scanner, grounds.get(deckNameChosen), player, buy);
     }
 
-    private static void showPurchasableCard(Model gameData) {
+    private static boolean buyCard(Scanner scanner, Model gameData) throws InterruptedException {
+        var card = chooseACardWithGrounds(scanner, gameData, View.getBuy(), true);
+        if(card == null) return false;
+        gameData.getPlayerPlaying().buy(card);
+        return true;
+    }
+
+    private static void showPurchasableCard(Model gameData, String display) {
         var i = 1;
         var reserve = gameData.getPlayerPlaying().getCardReserved();
-        View.printChooseGround();
-        for (var cards: gameData.getGrounds().values()) {
+        View.printChooseGround(display);
+        for (var cards: gameData.getGroundsWithoutNoble().values()) {
             View.printCardsWithIndex(cards, i);
             i++;
         }
@@ -121,43 +131,23 @@ public class Controller {
             View.printCantReserve();
             return false;
         }
-        View.printGround(gameData.getGrounds(), gameData.getDecks());
-        var deckName = new ArrayList<>(gameData.getGrounds().keySet());
-        if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
-        View.printChooseDeck(gameData.getGrounds());
-        var input_choice = getInteger(scanner, 0, deckName.size());
-        if(input_choice == 0) return false;
-        var deckNameChosen = deckName.get(input_choice - 1);
-        if(chooseCard(scanner, gameData, deckNameChosen)) return true;
-        return false;
-    }
-
-    private static boolean chooseCard(Scanner scanner, Model gameData, DeckName deckName) throws InterruptedException {
-        var groundCards = gameData.getGrounds().get(deckName);
-        var deck = gameData.getDecks().get(deckName);
-        var player = gameData.getPlayerPlaying();
-        var tokens = gameData.getGameTokens();
-        View.printCards(groundCards);
-        var input_choice = getInteger(scanner, 0, groundCards.size() + 2);
-        if(input_choice == 0) return false;
-        if(input_choice > 0 && input_choice < groundCards.size() + 1){
-            return takeCard(groundCards, input_choice, deck, player, tokens);
-        }
-        var card = deck.draw();
-        View.printYouReserved();
-        View.printCard(card);
+        var card = chooseACardWithGrounds(scanner, gameData, View.getReserved(), false);
+        if(card == null) return false;
         gameData.getPlayerPlaying().reserve(card);
-        if(tokens.get(Token.GOLD) > 0) player.addToken(Token.GOLD, 1);
-        Thread.sleep(500);
+        gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
         return true;
     }
 
-    private static boolean takeCard(List<Card> groundCards, int input_choice, Deck<Card> deck, Player player, TokenManager tokens) {
-        var card = groundCards.remove(input_choice - 1);
-        groundCards.add(deck.draw());
-        player.reserve(card);
-        if(tokens.get(Token.GOLD) > 0) player.addToken(Token.GOLD, 1);
-        return true;
+    private static Card chooseCard(Scanner scanner, List<Card> cards, Player player, boolean buy) throws InterruptedException {
+        while(true){
+            View.printCards(cards, (buy)? View.getParenthesis(): View.getReserve(cards.size() + 1));
+            var input_choice = getInteger(scanner, 0, cards.size() + 2);
+            if(input_choice == 0) return null;
+            if(input_choice > 0 && input_choice < cards.size() + 1) {
+                if(!buy || player.canBuy(cards.get(input_choice - 1))) return cards.remove(input_choice - 1);
+                View.printDontHaveEnoughToken();
+            }
+        }
     }
 
     private static Token chooseToken(Scanner scanner, Model gameData, int number) {

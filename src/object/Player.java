@@ -49,4 +49,36 @@ public class Player {
     public List<Card> getCardReserved() {
         return cardReserved;
     }
+
+    public boolean canBuy(Card card) {
+        int gold = 0;
+        for(var token: card.getTokens()){
+            if(wallet.get(token) >= card.getCost(token)){
+                continue;
+            }
+            if(wallet.get(token) + (wallet.get(Token.GOLD) - gold) >= card.getCost(token)){
+                gold += card.getCost(token) - wallet.get(token);
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void buy(Card card) {
+        for(var token: card.getTokens()){
+            if(wallet.get(token) >= card.getCost(token)){
+                wallet.addToken(token, -card.getCost(token));
+                continue;
+            }
+            wallet.addToken(Token.GOLD, wallet.get(token) - card.getCost(token));
+            wallet.addToken(token, -wallet.get(token));
+        }
+        var bonus = card.getBonus();
+        if(bonus != null){
+            this.bonus.addToken(bonus, 1);
+        }
+
+        prestige += card.getPrestige();
+    }
 }

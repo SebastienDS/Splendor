@@ -25,6 +25,11 @@ public class Development extends AbstractCard {
         return display[i];
     }
 
+    @Override
+    public Token getBonus() {
+        return bonus;
+    }
+
     private String[] stringDisplay() {
         var prestigeLength = String.valueOf(getPrestige()).length() + "Prestige: ".length();
         var bonusLength =  bonus.name().length() + "Bonus: ".length();

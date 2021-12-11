@@ -2,10 +2,8 @@ package ModeleVueController;
 
 import object.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Model {
 
@@ -33,6 +31,11 @@ public class Model {
 
     public Map<DeckName, List<Card>> getGrounds() {
         return grounds;
+    }
+
+    public Map<DeckName, List<Card>> getGroundsWithoutNoble(){
+        return grounds.keySet().stream().filter(deckName -> deckName != DeckName.NOBLE_DECK)
+                .collect(Collectors.toMap(deckName -> deckName, deckName -> grounds.get(deckName)));
     }
 
     public void startGame() {

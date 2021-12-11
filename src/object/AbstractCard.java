@@ -1,9 +1,6 @@
 package object;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 abstract class AbstractCard implements Card {
@@ -21,8 +18,14 @@ abstract class AbstractCard implements Card {
         price = cost.keySet().stream().map(token -> token.name() + " : " + cost.get(token)).collect(Collectors.joining("\n"));
     }
 
+    @Override
     public int getCost(Token token) {
         return cost.get(token);
+    }
+
+    @Override
+    public Set<Token> getTokens() {
+        return cost.keySet();
     }
 
     @Override

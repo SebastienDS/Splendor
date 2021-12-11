@@ -171,20 +171,10 @@ public class View {
         }
     }
 
-    public static void printChooseDeck(Map<DeckName, List<Card>> grounds) {
+    public static void printCards(List<Card> cards, String reserve) {
         var print = new StringBuilder();
-        var i = 1;
-        print.append("Choisissez le deck qui contient la carte que vous voulez réserver(0 pour annuler):\n");
-        for (var deckName: grounds.keySet()) {
-            print.append(i).append(": ").append(deckName).append("\n");
-        }
-        System.out.print(print);
-    }
-
-    public static void printCards(List<Card> cards) {
-        var print = new StringBuilder();
-        print.append("Choisissez la carte ?(").append(cards.size() + 1).append(" pour choisir de réserver la prochaine carte piochée");
-        print.append(" et 0 pour annuler)\n");
+        print.append("Choisissez la carte ?").append(reserve);
+        print.append("0 pour annuler)\n");
         printCardLeftToRight(cards, print, null, false, true);
         System.out.print(print);
     }
@@ -214,11 +204,37 @@ public class View {
     }
 
     public static void printCardsWithIndex(List<Card> cards, int index) {
-        System.out.println(index + ":\n");
-        printCards(cards);
+        System.out.println(index + ":");
+        printCardsGround(cards);
     }
 
-    public static void printChooseGround() {
-        System.out.println("Choisissez où vous voulez acheter la carte ?(0 pour annuler)");
+    public static void printChooseGround(String display) {
+        System.out.println("Choisissez où vous voulez " + display + " la carte ?(0 pour annuler)");
+    }
+
+    private static void printCardsGround(List<Card> cards) {
+        var print = new StringBuilder();
+        printCardLeftToRight(cards, print, null, false, false);
+        System.out.print(print);
+    }
+
+    public static String getBuy() {
+        return "acheter";
+    }
+
+    public static String getReserved() {
+        return "réserver";
+    }
+
+    public static void printDontHaveEnoughToken() {
+        System.out.println("Card is too expensive to be purchased");
+    }
+
+    public static String getParenthesis() {
+        return "(";
+    }
+
+    public static String getReserve(int number){
+        return "(" + number + " pour choisir de réserver la carte pioché et ";
     }
 }
