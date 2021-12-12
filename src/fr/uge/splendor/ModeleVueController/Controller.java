@@ -212,14 +212,14 @@ public class Controller {
         var player = gameData.getPlayerPlaying();
         var grounds = gameData.getGroundsWithoutNoble();
         var decks = gameData.getDecks();
-        showPurchasableCard(grounds, player, display);
+        showPurchasableCard(grounds, player, display, buy);
         var total = gameData.getGroundsWithoutNoble().values().size() + ((player.getCardReserved().size() > 0 && buy)? 1 : 0);
         var input_choice = (total == 1)? 1 : getInteger(scanner, 0, total);
         if(input_choice == 0){
             return null;
         }
-        if(input_choice == total && player.getCardReserved().size() > 0){
-            return chooseCard(scanner, player.getCardReserved(), null, player, buy);
+        if(input_choice == total && player.getCardReserved().size() > 0 && buy){
+            return chooseCard(scanner, player.getCardReserved(), null, player, true);
         }
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
         if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
@@ -248,7 +248,7 @@ public class Controller {
      * @param player player currently playing
      * @param display verb to show (purchase or reserve)
      */
-    private static void showPurchasableCard(Map<DeckName, List<Card>> grounds, Player player, String display) {
+    private static void showPurchasableCard(Map<DeckName, List<Card>> grounds, Player player, String display, boolean buy) {
         var i = 1;
         var reserve = player.getCardReserved();
         View.printChooseGround(display);
@@ -256,7 +256,7 @@ public class Controller {
             View.printCardsWithIndex(grounds.get(deckName), i);
             i++;
         }
-        if(reserve.size() > 0) View.printCardsWithIndex(reserve, i);
+        if(reserve.size() > 0 && buy) View.printCardsWithIndex(reserve, i);
     }
 
     /**
@@ -293,16 +293,17 @@ public class Controller {
             View.printCards(cards, (buy)? View.getParenthesis(): View.getReserve(cards.size() + 1));
             var input_choice = (buy)? getInteger(scanner, 0, cards.size() + 1):getInteger(scanner, 0, cards.size() + 2);
             if(input_choice == 0) return null;
-            if(input_choice > 0 && input_choice < cards.size() + 1) {
+            if(input_choice > 0 && input_choice <= cards.size()) {
                 if(!buy || player.canBuy(cards.get(input_choice - 1))){
                     drawDeck(cards, deck);
                     return cards.remove(input_choice - 1);
                 }
                 View.printDontHaveEnoughToken();
             }
-            if(!buy && input_choice == cards.size() + 2){
+            if(!buy && input_choice == cards.size() + 1){
                 return deck.draw();
             }
+            View.printChoiceDoNotExist(input_choice);
         }
     }
 
