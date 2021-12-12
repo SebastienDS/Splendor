@@ -48,7 +48,6 @@ public class Noble implements Card {
      * This method return the string of the display of the card for the i-th line
      * @param i th line
      * @return string of the display of the card for the i-th line
-     * @Override getDisplay of interface displayable
      */
     @Override
     public String getDisplay(int i) {
@@ -58,7 +57,6 @@ public class Noble implements Card {
     /**
      * This method return the name of the card
      * @return the name of the card
-     * @Override getName of interface Card
      */
     @Override
     public String getName() {
@@ -69,7 +67,6 @@ public class Noble implements Card {
      * This method return the corresponding price of the specified token
      * @param token specified token
      * @return corresponding price of the specified token
-     * @Override getCost of interface Card
      */
     @Override
     public int getCost(Token token) {
@@ -79,7 +76,6 @@ public class Noble implements Card {
     /**
      * This method return a set of all the token needed to buy it
      * @return set of all the token needed to buy it
-     * @Override getTokens of interface Card
      */
     @Override
     public Set<Token> getTokens() {
@@ -89,7 +85,6 @@ public class Noble implements Card {
     /**
      * This method return the prestige the card gives
      * @return prestige the card gives
-     * @Override getPrestige of interface Card
      */
     @Override
     public int getPrestige() {
@@ -99,7 +94,6 @@ public class Noble implements Card {
     /**
      * This method return the bonus the card gives
      * @return the bonus the card gives
-     * @Override getBonus of interface Card
      */
     @Override
     public Token getBonus() {

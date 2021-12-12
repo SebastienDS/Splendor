@@ -33,7 +33,7 @@ public record TokenManager(Map<Token, Integer> tokenManager) {
 
     /**
      * This method return a string corresponding of the values of the specified Set with the form [key: value, ...]
-     * @param keySet
+     * @param keySet set of all token to add to string
      * @return the string corresponding of the values of the specified Set with the form [key: value, ...]
      */
     public String toString(Set<Token> keySet) {

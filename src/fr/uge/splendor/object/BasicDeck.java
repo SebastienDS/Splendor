@@ -45,7 +45,6 @@ public class BasicDeck<T> implements Deck<T> {
     /**
      * This method add the specified element to the deck
      * @param t element to add
-     * @Override add in interface Deck
      */
     @Override
     public void add(T t) {
@@ -57,7 +56,6 @@ public class BasicDeck<T> implements Deck<T> {
      * The deck is cleared after drawing the element.
      * @param number of element to draw
      * @return list of element drawn from the deck
-     * @Override drawCards of interface Deck
      */
     @Override
     public List<T> drawCards(int number) {
@@ -71,7 +69,6 @@ public class BasicDeck<T> implements Deck<T> {
 
     /**
      * This method shuffle all the element of the deck
-     * @Override shuffle of interface Deck
      */
     @Override
     public void shuffle(){
@@ -81,7 +78,6 @@ public class BasicDeck<T> implements Deck<T> {
     /**
      * This method draw an element
      * @return element drawn
-     * @Override draw of interface deck
      */
     @Override
     public T draw(){
@@ -183,7 +179,6 @@ public class BasicDeck<T> implements Deck<T> {
      * This method return the string of the display of the deck for the i-th line
      * @param i th line
      * @return string of the display of the deck for the i-th line
-     * @Override getDisplay of interface displayable
      */
     @Override
     public String getDisplay(int i) {
@@ -195,7 +190,6 @@ public class BasicDeck<T> implements Deck<T> {
 
     /**
      * This method clear all the element of the deck
-     * @Override clear of interface Deck
      */
     @Override
     public void clear() {
@@ -206,7 +200,6 @@ public class BasicDeck<T> implements Deck<T> {
      * This method return the number of element that will be drawn at the start
      * @param playerSize number of player
      * @return number of card that will be drawn at the start
-     * @Override getNumberToDraw of interface deck
      */
     @Override
     public int getNumberToDraw(int playerSize) {

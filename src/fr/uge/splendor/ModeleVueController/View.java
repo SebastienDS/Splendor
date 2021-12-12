@@ -37,6 +37,7 @@ public class View {
 
     /**
      * Print the player menu
+     * @param gameData data of the game
      */
     public static void printPlayerMenu(Model gameData) {
         var sb = new StringBuilder();
@@ -68,6 +69,7 @@ public class View {
 
     /**
      * Print error when choice doesn't exist
+     * @param n choice made
      */
     public static void printChoiceDoNotExist(int n) {
         System.out.println("Le choix: \"" + n + "\" n'existe pas");
@@ -82,6 +84,7 @@ public class View {
 
     /**
      * Print menu to choose a player
+     * @param players list of all players
      */
     public static void printChoosePlayer(List<Player> players) {
         var text = new StringBuilder();
@@ -101,6 +104,7 @@ public class View {
 
     /**
      * Print current player playing
+     * @param player player playing
      */
     public static void printPlayerPlaying(Player player) {
         System.out.println("C'est au tour du joueur: \"" + player.getName() + "\" de joué! ");
@@ -108,6 +112,8 @@ public class View {
 
     /**
      * Print resources of the current player
+     * @param playerPlaying player playing
+     * @param gameMode game mode
      */
     public static void printPlayerResource(Player playerPlaying, int gameMode) {
         var keySet = getKeySet(playerPlaying.getWallet());
@@ -118,6 +124,7 @@ public class View {
 
     /**
      * Print choice of the player
+     * @param gameData data of the game
      */
     public static void printFirstChoicePlayer(Model gameData) {
         var text = new StringBuilder();
@@ -136,6 +143,7 @@ public class View {
 
     /**
      * Print menu to choose token
+     * @param gameData data of the game
      */
     public static void printTokens(Model gameData) {
         var text = new StringBuilder();
@@ -177,6 +185,7 @@ public class View {
 
     /**
      * Print error when token chosen is already selected
+     * @param tokenName name of token chosen
      */
     public static void printTokenAlreadyChosen(String tokenName) {
         System.out.println("Jeton déjà séléctionné: " + tokenName);
@@ -184,6 +193,7 @@ public class View {
 
     /**
      * Print all tokens chosen by the player
+     * @param tokenChosen list of all token chosen
      */
     public static void printTokenChosen(List<Token> tokenChosen) {
         var text = new StringBuilder();
@@ -199,6 +209,8 @@ public class View {
 
     /**
      * Print error when player doesn't have enough token selected and try to confirm
+     * @param number number of token chosen
+     * @param size max size of list of token
      */
     public static void printNotEnoughTokenChosen(int number, int size) {
         var s = (size > 1)? "s": "";
@@ -207,6 +219,7 @@ public class View {
 
     /**
      * Print all token chosen with index and remove menu
+     * @param tokenChosen  list of token chosen
      */
     public static void printTokenChosenWithIndex(List<Token> tokenChosen) {
         var text = new StringBuilder();
@@ -425,6 +438,7 @@ public class View {
     /**
      * Print all game tokens
      * @param gameTokens game tokens
+     * @param gameMode game mode
      */
     public static void printBank(TokenManager gameTokens, int gameMode) {
         StringBuilder text = new StringBuilder();

@@ -6,8 +6,14 @@ import fr.uge.splendor.object.Player;
 import java.io.IOException;
 import java.util.*;
 
-
+/**
+ * This class represents the Main
+ */
 public class Main {
+    /**
+     * Main of the project
+     * @param args args
+     */
     public static void main(String[] args) {
         NumbersDisplays.loadNumbers();
         var gameData = new Model(initPlayer(), new LinkedHashMap<>(), new LinkedHashMap<>());

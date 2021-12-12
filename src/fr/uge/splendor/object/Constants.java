@@ -1,9 +1,11 @@
 package fr.uge.splendor.object;
 
+/**
+ * This class represents all the constant used in the project
+ */
 public final class Constants {
 
     private Constants(){}
-
     /**
      * Represent the maximum length a line can be for a card
      */

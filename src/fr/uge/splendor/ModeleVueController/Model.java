@@ -85,7 +85,7 @@ public class Model {
 
     /**
      * This method return the decks. A map containing the deckName as a key and a deck as a value.
-     * @return
+     * @return return map containing all the deck with deck name as key
      */
     public Map<DeckName, Deck<Card>> getDecks() {
         return decks;
