@@ -18,6 +18,7 @@ public class Main {
             System.exit(1);
             return;
         }
+        View.printWinner(gameData.getWinner());
     }
 
     /**

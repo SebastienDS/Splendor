@@ -82,9 +82,9 @@ public class Controller {
      * @param gameData data of the game
      */
     private static void allInformationChoice(Model gameData){
-        View.printGround(gameData.getGrounds(), gameData.getDecks());
         View.printPlayerPlaying(gameData.getPlayerPlaying());
         View.printPlayerResource(gameData.getPlayerPlaying(), gameData.getGameMode());
+        View.printBank(gameData.getGameTokens(), gameData.getGameMode());
         View.printFirstChoicePlayer(gameData);
     }
 
@@ -101,6 +101,7 @@ public class Controller {
      */
     private static void firstChoice(Scanner scanner, Model gameData){
         var turnFinished = false;
+        View.printGround(gameData.getGrounds(), gameData.getDecks());
         while (true) {
             allInformationChoice(gameData);
             var input_choice = getInteger(scanner);
@@ -134,10 +135,10 @@ public class Controller {
      * @return true if turn is finished
      */
     private static boolean endOfTurn(Scanner scanner, Model gameData, boolean turnFinished) {
-        if (turnFinished) { //todo noble come to player
+        if (turnFinished) {
             var wallet = gameData.getPlayerPlaying().getWallet();
             if (sizeWithoutGold(wallet) > 10) {
-                removeExcessTokens(scanner, gameData, wallet, 10);
+                removeExcessTokens(scanner, gameData, wallet, 999);
             }
             manageNoble(gameData);
             return true;
@@ -535,7 +536,7 @@ public class Controller {
     }
 
     /**
-     * This method return the number of tokens in tokenManager without taking into account gold token
+     * This method return the number of tokens in tokenManager without taking into account gold token in
      * @param tokenManager contains all tokens
      * @return the number of tokens in tokenManager without taking into account gold token
      */

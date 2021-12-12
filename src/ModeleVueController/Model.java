@@ -132,7 +132,7 @@ public class Model {
      * This method see verify if current round is the last and change the player that play to the next one
      */
     public void endTurn() {
-        lastRound = players.get(playerPlaying).getPrestige() >= 15;
+        lastRound = lastRound || players.get(playerPlaying).getPrestige() >= 15;
         playerPlaying = (playerPlaying + 1) % players.size();
     }
 
@@ -218,5 +218,16 @@ public class Model {
         for (var token: tokens.keySet()){
             gameTokens.addToken(token, tokens.get(token));
         }
+    }
+
+    public Player getWinner() {
+        var maxPrestigePlayer = players.stream()
+                .filter(player ->
+                        player.getPrestige() >= players.stream()
+                                                .mapToInt(player1 -> player1.getPrestige()).max().getAsInt()).toList();
+        if(maxPrestigePlayer.size() == 1){
+            return maxPrestigePlayer.get(0);
+        }
+        return maxPrestigePlayer.stream().min(Comparator.comparingInt(Player::getCardPurchased)).get();
     }
 }

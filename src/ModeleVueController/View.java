@@ -111,6 +111,7 @@ public class View {
      */
     public static void printPlayerResource(Player playerPlaying, int gameMode) {
         var keySet = getKeySet(playerPlaying.getWallet());
+        if(gameMode == 2) keySet = playerPlaying.getWallet().keySet();
         System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet().toString(keySet));
         System.out.println("Prestige : " + playerPlaying.getPrestige());
     }
@@ -335,7 +336,7 @@ public class View {
      * Print error when player don't have enough token to purchase the card
      */
     public static void printDontHaveEnoughToken() {
-        System.out.println("Card is too expensive to be purchased");
+        System.out.println("La carte est trop chère pour être acheté.");
     }
 
     /**
@@ -390,7 +391,7 @@ public class View {
      * @param tokenManager bonus of the player
      * @return set of Token from tokenManager without the gold token.
      */
-    private static Set<Token> getKeySet(TokenManager tokenManager) {
+    private static Set<Token> getKeySet(TokenManager tokenManager) { //todo change set to have same token order
         var keySet = tokenManager.keySet().stream()
                 .filter(t -> t != Token.GOLD)
                 .collect(Collectors.toSet());
@@ -403,7 +404,7 @@ public class View {
      */
     public static void printPlayerBonus(TokenManager bonus) {
         var keySet = getKeySet(bonus);
-        System.out.println(bonus.toString(keySet));
+        System.out.println("Bonus : " + bonus.toString(keySet) + "\n");
     }
 
     /**
@@ -411,5 +412,32 @@ public class View {
      */
     public static void printNoCardsReserved() {
         System.out.println("Vous n'avez pas de cartes réservées");
+    }
+
+    /**
+     * Print the winner of the game
+     * @param winner winner of the game
+     */
+    public static void printWinner(Player winner) {
+        System.out.println("Le joueur : \"" + winner.getName() + "\" a gagné ! Bien joué à toi !");
+    }
+
+    /**
+     * Print all game tokens
+     * @param gameTokens game tokens
+     */
+    public static void printBank(TokenManager gameTokens, int gameMode) {
+        StringBuilder text = new StringBuilder();
+        String separator = "";
+        text.append("Banque : [");
+        for (var token : gameTokens.keySet()) {
+            if(token == Token.GOLD && gameMode == 1){
+                continue;
+            }
+            text.append(separator).append(token.name()).append(": ").append(gameTokens.get(token));
+            separator = ", ";
+        }
+        text.append("]");
+        System.out.println(text);
     }
 }

@@ -18,7 +18,7 @@ public class Player {
     /**
      * List of card the player already purchased.
      */
-    private final List<Development> cardBuy;
+    private final List<Card> cardBuy;
     /**
      * List of card that the player reserved. All card reserved can be purchased at any moments.
      * To remove one, the player need to buy it.
@@ -44,7 +44,10 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
-        prestige = 0;
+        for (var token: Token.values()){
+            wallet.addToken(Token.GOLD, 99);
+        }
+        prestige = 12;
     }
 
     /**
@@ -146,7 +149,7 @@ public class Player {
         if (bonus != null) {
             this.bonus.addToken(bonus, 1);
         }
-
+        cardBuy.add(card);
         prestige += card.getPrestige();
         return manageTokenPurchase(card);
     }
@@ -162,8 +165,8 @@ public class Player {
         for (var token : card.getTokens()) {
             if (getTokenPlusBonus(token) >= card.getCost(token)) {
                 var tokenToPay = -(card.getCost(token) - bonus.get(token));
-                wallet.addToken(token, Math.min(tokenToPay, 0));
-                tokens.put(token, Math.min(tokenToPay, 0));
+                wallet.addToken(token, tokenToPay);
+                tokens.put(token, -(tokenToPay));
                 continue;
             }
             tokens.put(token, wallet.get(token));
@@ -188,5 +191,9 @@ public class Player {
      */
     public void addNoble(Card card) {
         prestige += card.getPrestige();
+    }
+
+    public int getCardPurchased() {
+        return cardBuy.size();
     }
 }
