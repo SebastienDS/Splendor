@@ -1,17 +1,43 @@
 package object;
 
-import javax.swing.*;
 import java.util.*;
 
+/**
+ * Instance that represents the player during the game.
+ */
 public class Player {
 
+    /**
+     * Name of the player.
+     */
     private final String name;
+    /**
+     * Represents all the tokens the player own. Used to buy cards.
+     */
     private final TokenManager wallet;
+    /**
+     * List of card the player already purchased.
+     */
     private final List<Development> cardBuy;
+    /**
+     * List of card that the player reserved. All card reserved can be purchased at any moments.
+     * To remove one, the player need to buy it.
+     */
     private final List<Card> cardReserved;
+    /**
+     * Bonus of the player. This element represents the token the player own passively.
+     * All token of bonus are reduced during the purchase of other card.
+     */
     private final TokenManager bonus;
+    /**
+     * prestige point the player possess
+     */
     private int prestige;
 
+    /**
+     * Construct a player with the name given and initialise the other champ at zero/empty
+     * @param name name of the player
+     */
     public Player(String name) {
         this.name = Objects.requireNonNull(name);
         wallet = new TokenManager();
@@ -21,34 +47,69 @@ public class Player {
         prestige = 0;
     }
 
+    /**
+     * This method return the name of the player
+     * @return the name of the player
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * This method return the prestige point the player has
+     * @return the prestige point of the player
+     */
     public int getPrestige() {
         return prestige;
     }
 
+    /**
+     * This method return the wallet of the player
+     * @return the wallet of the player
+     */
     public TokenManager getWallet() {
         return wallet;
     }
 
+    /**
+     * This method add token to the wallet of the player
+     * @param token name of the token
+     * @param number to add
+     */
     public void addToken(Token token, int number) {
         wallet.addToken(token, number);
     }
 
+    /**
+     * This methode add the card in parameter to the reserved list.
+     * @param card the player choose to reserve
+     */
     public void reserve(Card card) {
         cardReserved.add(card);
     }
 
+    /**
+     * This method return true if the player can reserve and false otherwise.
+     * The player can reserve if he has less than 3 card already reserved
+     * @return true if the player can reserve and false otherwise
+     */
     public boolean canReserve() {
         return cardReserved.size() < 3;
     }
 
+    /**
+     * This method return the list of card reserved by the player
+     * @return list of card reserved by the player
+     */
     public List<Card> getCardReserved() {
         return cardReserved;
     }
 
+    /**
+     * This method return true if the card can be purchased by the player, false otherwise
+     * @param card the player wants to buy
+     * @return true if the card is purchasable false otherwise
+     */
     public boolean canBuy(Card card) {
         var gold = 0;
         for(var token: card.getTokens()){
@@ -59,17 +120,44 @@ public class Player {
                 gold += card.getCost(token) - getTokenPlusBonus(token);
                 continue;
             }
-            System.out.println(token + " " + getTokenPlusBonus(token) + " " + card.getCost(token));
             return false;
         }
         return true;
     }
 
+    /**
+     * This method return the number obtained by sum of the specified token owned in the wallet and
+     * the token specified owned passively in bonus
+     * @param token specified token
+     * @return sum of the chosen token in wallet and the chosen token in the bonus
+     */
     private int getTokenPlusBonus(Token token) {
         return wallet.get(token) + bonus.get(token);
     }
 
+    /**
+     * This method buy the card by adding the card bonus to bonus, adding prestige point and using token needed.
+     * The token used are returned to the form of a map with the token as the key and the number(int) as the value
+     * @param card purchased card
+     * @return map containing token used. Token as key and number of token used(int) as value.
+     */
     public Map<Token, Integer> buy(Card card) {
+        var bonus = card.getBonus();
+        if (bonus != null) {
+            this.bonus.addToken(bonus, 1);
+        }
+
+        prestige += card.getPrestige();
+        return manageTokenPurchase(card);
+    }
+
+    /**
+     * This method remove the token used during the purchase and return them with a map containing token as key and
+     * the number of token used (int) as value
+     * @param card purchased
+     * @return map containing token as key and the number of token used (int) as value
+     */
+    private Map<Token, Integer> manageTokenPurchase(Card card){
         var tokens = new HashMap<Token, Integer>();
         for (var token : card.getTokens()) {
             if (getTokenPlusBonus(token) >= card.getCost(token)) {
@@ -83,16 +171,22 @@ public class Player {
             wallet.addToken(Token.GOLD, getTokenPlusBonus(token) - card.getCost(token));
             wallet.addToken(token, -wallet.get(token));
         }
-        var bonus = card.getBonus();
-        if (bonus != null) {
-            this.bonus.addToken(bonus, 1);
-        }
-
-        prestige += card.getPrestige();
         return tokens;
     }
 
+    /**
+     * This method return the bonus of the player
+     * @return bonus of the player
+     */
     public TokenManager getBonus() {
         return bonus;
+    }
+
+    /**
+     * This method add prestige of the noble to the player.
+     * @param card gained by visit of noblee
+     */
+    public void addNoble(Card card) {
+        prestige += card.getPrestige();
     }
 }

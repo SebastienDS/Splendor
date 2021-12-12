@@ -1,8 +1,8 @@
 package object;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Enum representing all the token of the game
+ */
 public enum Token {
     EMERALD,
     SAPPHIRE,
@@ -11,6 +11,10 @@ public enum Token {
     ONYX,
     GOLD;
 
+    /**
+     * This method return the table of all the token representing card
+     * @return table of all the token representing card
+     */
     public static Token[] cardValues() {
         return new Token[] { EMERALD, SAPPHIRE, RUBY, DIAMOND, ONYX };
     }
