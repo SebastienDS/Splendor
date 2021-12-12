@@ -138,7 +138,7 @@ public class Controller {
         if (turnFinished) {
             var wallet = gameData.getPlayerPlaying().getWallet();
             if (sizeWithoutGold(wallet) > 10) {
-                removeExcessTokens(scanner, gameData, wallet, 999);
+                removeExcessTokens(scanner, gameData, wallet, 999); // todo hmm
             }
             manageNoble(gameData);
             return true;

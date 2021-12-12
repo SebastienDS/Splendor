@@ -44,10 +44,6 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
-        for (var token: Token.values()){
-            wallet.addToken(Token.GOLD, 99);
-        }
-        prestige = 12;
     }
 
     /**
@@ -193,6 +189,10 @@ public class Player {
         prestige += card.getPrestige();
     }
 
+    /**
+     * This method return the number of the purchased cards
+     * @return number of purchased cards
+     */
     public int getCardPurchased() {
         return cardBuy.size();
     }

@@ -1,5 +1,6 @@
 package object;
 
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -17,7 +18,7 @@ class BasicCard implements Card {
     /**
      * Image of the card
      */
-    private final String image;
+    private final Path image;
     /**
      * Prestige given by the card
      */
@@ -30,7 +31,7 @@ class BasicCard implements Card {
      * @param image of the card
      * @param prestige given by the card
      */
-    public BasicCard(Map<Token, Integer> map, String name, String image, int prestige) {
+    public BasicCard(Map<Token, Integer> map, String name, Path image, int prestige) {
         cost = new LinkedHashMap<>(Objects.requireNonNull(map));
         this.name = Objects.requireNonNull(name);
         this.image = Objects.requireNonNull(image);

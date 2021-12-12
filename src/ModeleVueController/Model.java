@@ -220,6 +220,10 @@ public class Model {
         }
     }
 
+    /**
+     * This method return the winning player
+     * @return Player winner
+     */
     public Player getWinner() {
         var maxPrestigePlayer = players.stream()
                 .filter(player ->

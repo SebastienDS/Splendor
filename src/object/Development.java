@@ -1,5 +1,6 @@
 package object;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +46,7 @@ public class Development implements Card {
      * @param prestige given by the card
      * @param bonus given by the card
      */
-    public Development(Map<Token, Integer> cost, String name, String image, int prestige, Token bonus) {
+    public Development(Map<Token, Integer> cost, String name, Path image, int prestige, Token bonus) {
         card = new BasicCard(cost, name, image, prestige);
         this.bonus = Objects.requireNonNull(bonus);
 
@@ -153,8 +154,8 @@ public class Development implements Card {
     }
 
     /**
-     *
-     * @return
+     * Tihs method return the spaces needed to center the card's name
+     * @return spaces needed to center the name
      */
     private int getCenterName(){
         return (Constants.MAX_LENGTH - card.getName().length()) / 2;

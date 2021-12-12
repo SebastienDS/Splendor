@@ -150,8 +150,8 @@ public class Decks {
         var prestige = Integer.parseInt(args.get(3));
 
         return switch (className) {
-            case Noble.TYPE -> new Noble(tokenManager.tokenNotEmpty(), args.get(1), args.get(4), prestige);
-            case Development.TYPE -> new Development(tokenManager.tokenNotEmpty(), args.get(1), args.get(4), prestige, Token.valueOf(args.get(5)));
+            case Noble.TYPE -> new Noble(tokenManager.tokenNotEmpty(), args.get(1), Path.of(args.get(4)), prestige);
+            case Development.TYPE -> new Development(tokenManager.tokenNotEmpty(), args.get(1), Path.of(args.get(4)), prestige, Token.valueOf(args.get(5)));
             default -> throw new IllegalStateException("Unexpected value: " + className);
         };
     }

@@ -1,5 +1,6 @@
 package object;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class Noble implements Card {
      * @param image of the card
      * @param prestige given by the card
      */
-    public Noble(Map<Token, Integer> cost, String name, String image, int prestige) {
+    public Noble(Map<Token, Integer> cost, String name, Path image, int prestige) {
         card = new BasicCard(cost, name, image, prestige);
         price = cost.keySet().stream().map(token -> token.name() + " : " + cost.get(token)).toList();
         display = stringDisplay();
