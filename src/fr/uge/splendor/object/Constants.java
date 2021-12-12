@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 public final class Constants {
 

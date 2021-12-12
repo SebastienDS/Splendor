@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 /**
  * Represents all drawing of digit in console

@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 import java.nio.file.Path;
 import java.util.*;

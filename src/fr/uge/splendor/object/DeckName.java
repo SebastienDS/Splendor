@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 /**
  * Enum of all the deck of the game

@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 /**
  * Interface for all the displayable element

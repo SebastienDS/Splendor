@@ -1,6 +1,6 @@
-package ModeleVueController;
+package fr.uge.splendor.ModeleVueController;
 
-import object.*;
+import fr.uge.splendor.object.*;
 
 import java.io.IOException;
 import java.util.*;

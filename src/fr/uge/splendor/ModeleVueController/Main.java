@@ -1,7 +1,7 @@
-package ModeleVueController;
+package fr.uge.splendor.ModeleVueController;
 
-import object.NumbersDisplays;
-import object.Player;
+import fr.uge.splendor.object.NumbersDisplays;
+import fr.uge.splendor.object.Player;
 
 import java.io.IOException;
 import java.util.*;

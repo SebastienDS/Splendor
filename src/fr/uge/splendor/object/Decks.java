@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 import java.io.IOException;
 import java.nio.file.Files;

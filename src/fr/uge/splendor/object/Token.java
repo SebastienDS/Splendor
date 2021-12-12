@@ -1,4 +1,4 @@
-package object;
+package fr.uge.splendor.object;
 
 /**
  * Enum representing all the token of the game
