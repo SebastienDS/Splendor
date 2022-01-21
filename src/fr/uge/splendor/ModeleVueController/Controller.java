@@ -51,15 +51,19 @@ public class Controller {
      */
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
         gameData.setGameMode(2);
-        secondPhaseDeck(gameData.getDecks());
+        initDecks(gameData.getDecks());
+
         while (true) {
             View.printStartingMenu();
             var input_menu = Controller.getInteger(scanner);
             switch (input_menu) {
-                case(0): playerMenu(scanner, gameData); break;
-                case(1): gameModeMenu(scanner, gameData); break;
-                case(2): startGame(scanner, gameData); return;
-                default: View.printChoiceDoNotExist(input_menu);
+                case (0) -> playerMenu(scanner, gameData);
+                case (1) -> gameModeMenu(scanner, gameData);
+                case (2) -> {
+                    startGame(scanner, gameData);
+                    return;
+                }
+                default -> View.printChoiceDoNotExist(input_menu);
             }
         }
     }
@@ -154,14 +158,14 @@ public class Controller {
     private static void manageNoble(Model gameData) {
         if(gameData.getGameMode() == 2){
             var bonus = gameData.getPlayerPlaying().getBonus();
-            var noble =   gameData.getGrounds().get(DeckName.NOBLE_DECK);
-            noble.removeIf(card -> {
-                        if(card.getTokens()
+            var nobles =   gameData.getNobles();
+            nobles.removeIf(noble -> {
+                        if(noble.cost().keySet()
                                 .stream()
-                                .filter(token -> card.getCost(token) > bonus.get(token))
+                                .filter(token -> noble.cost().get(token) > bonus.get(token))
                                 .findAny()
                                 .isEmpty()){
-                            gameData.getPlayerPlaying().addNoble(card);
+                            gameData.getPlayerPlaying().addNoble(noble);
                             return true;
                         }
                         return false;
@@ -176,7 +180,7 @@ public class Controller {
      * @return true if the player have chosen, false if there was no token or the player canceled
      */
     private static boolean manageChoiceTokens(Scanner scanner, Model gameData) {
-        if(!(Arrays.stream(Token.cardValues()).anyMatch(token -> gameData.getGameTokens().get(token) > 0))) {
+        if(Arrays.stream(Token.cardValues()).noneMatch(token -> gameData.getGameTokens().get(token) > 0)) {
             View.printNoTokenLeft();
             return false;
         }
@@ -190,7 +194,7 @@ public class Controller {
      * @return true if the player have chosen a valid token false otherwise
      */
     private static boolean manageChoiceToken(Scanner scanner, Model gameData) {
-        if(!(Arrays.stream(Token.cardValues()).anyMatch(token -> gameData.getGameTokens().get(token) >= 4))){
+        if(Arrays.stream(Token.cardValues()).noneMatch(token -> gameData.getGameTokens().get(token) >= 4)){
             View.printNotEnoughTokens();
             return false;
         }
@@ -206,14 +210,13 @@ public class Controller {
      * @param gameData data of the game
      * @param display verb to display(purchase or reserve)
      * @param buy true if the player is buying
-     * @return
      */
-    private static Card chooseACardWithGrounds(Scanner scanner, Model gameData, String display, boolean buy){
+    private static Development chooseACardWithGrounds(Scanner scanner, Model gameData, String display, boolean buy){
         var player = gameData.getPlayerPlaying();
-        var grounds = gameData.getGroundsWithoutNoble();
+        var grounds = gameData.getGrounds();
         var decks = gameData.getDecks();
         showPurchasableCard(grounds, player, display, buy);
-        var total = gameData.getGroundsWithoutNoble().values().size() + ((player.getCardReserved().size() > 0 && buy)? 1 : 0);
+        var total = gameData.getGrounds().values().size() + ((player.getCardReserved().size() > 0 && buy)? 1 : 0);
         var input_choice = (total == 1)? 1 : getInteger(scanner, 0, total);
         if(input_choice == 0){
             return null;
@@ -222,7 +225,6 @@ public class Controller {
             return chooseCard(scanner, player.getCardReserved(), null, player, true);
         }
         var deckName = new ArrayList<>(gameData.getGrounds().keySet());
-        if(deckName.contains(DeckName.NOBLE_DECK)) deckName.remove(DeckName.NOBLE_DECK);
         var deckNameChosen = deckName.get(input_choice - 1);
         return chooseCard(scanner, grounds.get(deckNameChosen), decks.get(deckNameChosen), player, buy);
     }
@@ -248,7 +250,7 @@ public class Controller {
      * @param player player currently playing
      * @param display verb to show (purchase or reserve)
      */
-    private static void showPurchasableCard(Map<DeckName, List<Card>> grounds, Player player, String display, boolean buy) {
+    private static void showPurchasableCard(Map<Integer, List<Development>> grounds, Player player, String display, boolean buy) {
         var i = 1;
         var reserve = player.getCardReserved();
         View.printChooseGround(display);
@@ -288,7 +290,7 @@ public class Controller {
      * @param buy true if player is buying false if he is reserving
      * @return card chosen (null if canceled)
      */
-    private static Card chooseCard(Scanner scanner, List<Card> cards, Deck<Card> deck, Player player, boolean buy){
+    private static Development chooseCard(Scanner scanner, List<Development> cards, Deck<Development> deck, Player player, boolean buy){
         while(true){
             View.printCards(cards, (buy)? View.getParenthesis(): View.getReserve(cards.size() + 1));
             var input_choice = (buy)? getInteger(scanner, 0, cards.size() + 1):getInteger(scanner, 0, cards.size() + 2);
@@ -299,6 +301,7 @@ public class Controller {
                     return cards.remove(input_choice - 1);
                 }
                 View.printDontHaveEnoughToken();
+                continue;
             }
             if(!buy && input_choice == cards.size() + 1){
                 return deck.draw();
@@ -312,7 +315,7 @@ public class Controller {
      * @param cards list of cards where card drawn will be added
      * @param deck deck where card will be drawn
      */
-    private static void drawDeck(List<Card> cards, Deck<Card> deck) {
+    private static void drawDeck(List<Development> cards, Deck<Development> deck) {
         if(deck != null) cards.add(deck.draw());
     }
 
@@ -367,12 +370,12 @@ public class Controller {
      * @return true if player have chosen enough token
      */
     private static boolean manageConfirmTokens(List<Token> tokenChosen, Model gameData) {
-        var size = gameData.getGameTokens().tokenNotEmpty()
+        var size = gameData.getGameTokens()
                 .keySet().stream().filter(token -> Token.GOLD != token)
                 .collect(Collectors.toSet()).size();
         var maxSize = Math.min(size, 3);
         if (tokenChosen.size() == maxSize) {
-            tokenChosen.stream().forEach(token -> gameData.takeToken(token, 1));
+            tokenChosen.forEach(token -> gameData.takeToken(token, 1));
             return true;
         }
         View.printNotEnoughTokenChosen(tokenChosen.size(), maxSize);
@@ -426,34 +429,20 @@ public class Controller {
     private static void gameModeMenu(Scanner scanner, Model gameData) throws IOException {
         View.printGameModeMenu();
         var input_choice = Controller.getInteger(scanner, 1, 2);
-        var decks = gameData.getDecks();
         switch (input_choice) {
-            case(1): firstPhaseDeck(decks); gameData.setGameMode(1); return;
-            case(2): secondPhaseDeck(decks); gameData.setGameMode(2); return;
+            case 1 -> gameData.setGameMode(1);
+            case 2 -> gameData.setGameMode(2);
         }
     }
 
     /**
-     * Initialise decks of first game mode
+     * Initialise decks
      * @param decks map containing decks of game
      * @throws IOException if an I/O exception occurs
      */
-    private static void firstPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
+    private static void initDecks(Map<Integer, Deck<Development>> decks) throws IOException {
         decks.clear();
-        decks.put(DeckName.BASIC_DECK, Decks.basicDeck());
-    }
-
-    /**
-     * Initialise decks of second game mode
-     * @param decks map containing decks of game
-     * @throws IOException if an I/O exception occurs
-     */
-    private static void secondPhaseDeck(Map<DeckName, Deck<Card>> decks) throws IOException {
-        decks.clear();
-        decks.put(DeckName.NOBLE_DECK, Decks.nobleDeck());
-        decks.put(DeckName.THIRD_DEV_DECK, Decks.thirdDevelopmentDeck());
-        decks.put(DeckName.SECOND_DEV_DECK, Decks.secondDevelopmentDeck());
-        decks.put(DeckName.FIRST_DEV_DECK, Decks.firstDevelopmentDeck());
+        decks.putAll(Decks.developmentDecks());
     }
 
     /**
@@ -509,8 +498,7 @@ public class Controller {
      */
     private static int choosePlayer(List<Player> players, Scanner scanner) {
         View.printChoosePlayer(players);
-        var i = getInteger(scanner, 0, players.size() - 1);
-        return i;
+        return getInteger(scanner, 0, players.size() - 1);
     }
 
     /**
@@ -542,7 +530,7 @@ public class Controller {
      * @return the number of tokens in tokenManager without taking into account gold token
      */
     private static int sizeWithoutGold(TokenManager tokenManager) {
-        return tokenManager.tokenManager()
+        return tokenManager.tokens()
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey() != Token.GOLD)
@@ -556,7 +544,7 @@ public class Controller {
      * @return list created
      */
     private static List<Token> getNotEmptyTokens(TokenManager tokenManager) {
-        return tokenManager.tokenManager()
+        return tokenManager.tokens()
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey() != Token.GOLD && entry.getValue() > 0)

@@ -18,12 +18,12 @@ public class Player {
     /**
      * List of card the player already purchased.
      */
-    private final List<Card> cardBuy;
+    private final List<Development> cardBuy;
     /**
      * List of card that the player reserved. All card reserved can be purchased at any moments.
      * To remove one, the player need to buy it.
      */
-    private final List<Card> cardReserved;
+    private final List<Development> cardReserved;
     /**
      * Bonus of the player. This element represents the token the player own passively.
      * All token of bonus are reduced during the purchase of other card.
@@ -44,6 +44,8 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
+        wallet.addToken(Token.GOLD, 50000);
+        wallet.addToken(Token.EMERALD, 10);
     }
 
     /**
@@ -83,7 +85,8 @@ public class Player {
      * This methode add the card in parameter to the reserved list.
      * @param card the player choose to reserve
      */
-    public void reserve(Card card) {
+    public void reserve(Development card) {
+        Objects.requireNonNull(card);
         cardReserved.add(card);
     }
 
@@ -100,7 +103,7 @@ public class Player {
      * This method return the list of card reserved by the player
      * @return list of card reserved by the player
      */
-    public List<Card> getCardReserved() {
+    public List<Development> getCardReserved() {
         return cardReserved;
     }
 
@@ -109,29 +112,8 @@ public class Player {
      * @param card the player wants to buy
      * @return true if the card is purchasable false otherwise
      */
-    public boolean canBuy(Card card) {
-        var gold = 0;
-        for(var token: card.getTokens()){
-            if(getTokenPlusBonus(token) >= card.getCost(token)){
-                continue;
-            }
-            if(getTokenPlusBonus(token) + (wallet.get(Token.GOLD) - gold) >= card.getCost(token)){
-                gold += card.getCost(token) - getTokenPlusBonus(token);
-                continue;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * This method return the number obtained by sum of the specified token owned in the wallet and
-     * the token specified owned passively in bonus
-     * @param token specified token
-     * @return sum of the chosen token in wallet and the chosen token in the bonus
-     */
-    private int getTokenPlusBonus(Token token) {
-        return wallet.get(token) + bonus.get(token);
+    public boolean canBuy(Development card) {
+        return card.canBeBought(wallet, bonus);
     }
 
     /**
@@ -140,13 +122,13 @@ public class Player {
      * @param card purchased card
      * @return map containing token used. Token as key and number of token used(int) as value.
      */
-    public Map<Token, Integer> buy(Card card) {
-        var bonus = card.getBonus();
+    public Map<Token, Integer> buy(Development card) {
+        var bonus = card.bonus();
         if (bonus != null) {
             this.bonus.addToken(bonus, 1);
         }
         cardBuy.add(card);
-        prestige += card.getPrestige();
+        prestige += card.prestige();
         return manageTokenPurchase(card);
     }
 
@@ -156,21 +138,34 @@ public class Player {
      * @param card purchased
      * @return map containing token as key and the number of token used (int) as value
      */
-    private Map<Token, Integer> manageTokenPurchase(Card card){
+    private Map<Token, Integer> manageTokenPurchase(Development card){
         var tokens = new HashMap<Token, Integer>();
-        for (var token : card.getTokens()) {
-            if (getTokenPlusBonus(token) >= card.getCost(token)) {
-                var tokenToPay = -(card.getCost(token) - bonus.get(token));
+        for (var token : card.cost().keySet()) {
+            if (getTokenPlusBonus(wallet, bonus, token) >= card.cost().get(token)) {
+                var tokenToPay = -(card.cost().get(token) - bonus.get(token));
                 wallet.addToken(token, tokenToPay);
                 tokens.put(token, -(tokenToPay));
                 continue;
             }
             tokens.put(token, wallet.get(token));
-            tokens.merge(Token.GOLD, card.getCost(token) - getTokenPlusBonus(token), Integer::sum);
-            wallet.addToken(Token.GOLD, getTokenPlusBonus(token) - card.getCost(token));
+            tokens.merge(Token.GOLD, card.cost().get(token) - getTokenPlusBonus(wallet, bonus, token), Integer::sum);
+            wallet.addToken(Token.GOLD, getTokenPlusBonus(wallet, bonus, token) - card.cost().get(token));
             wallet.addToken(token, -wallet.get(token));
         }
+        wallet.tokens().values().removeIf(v -> v == 0);
         return tokens;
+    }
+
+    /**
+     * This method return the number obtained by sum of the specified token owned in the wallet and
+     * the token specified owned passively in bonus
+     * @param wallet wallet of the player
+     * @param bonus bonus of the player
+     * @param token specified token
+     * @return sum of the chosen token in wallet and the chosen token in the bonus
+     */
+    public static int getTokenPlusBonus(TokenManager wallet, TokenManager bonus, Token token) {
+        return wallet.get(token) + bonus.get(token);
     }
 
     /**
@@ -185,8 +180,8 @@ public class Player {
      * This method add prestige of the noble to the player.
      * @param card gained by visit of noblee
      */
-    public void addNoble(Card card) {
-        prestige += card.getPrestige();
+    public void addNoble(Noble card) {
+        prestige += card.prestige();
     }
 
     /**
