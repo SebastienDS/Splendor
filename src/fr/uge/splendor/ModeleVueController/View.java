@@ -2,11 +2,15 @@ package fr.uge.splendor.ModeleVueController;
 
 import fr.uge.splendor.object.*;
 
+import static fr.uge.splendor.object.Utils.space;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 
 /**
  * This class represent all the string to print of the game
@@ -118,7 +122,7 @@ public class View {
     public static void printPlayerResource(Player playerPlaying, int gameMode) {
         var keySet = getKeySet(playerPlaying.getWallet());
         if(gameMode == 2) keySet = playerPlaying.getWallet().keySet();
-        System.out.println(playerPlaying.getName() + ' ' + playerPlaying.getWallet().toString(keySet));
+        System.out.println(playerPlaying.getName() + ' ' + printTokenManager(playerPlaying.getWallet(), keySet));
         System.out.println("Prestige : " + playerPlaying.getPrestige());
     }
 
@@ -243,7 +247,7 @@ public class View {
      * @param grounds grounds to print
      * @param decks decks of the corresponding grounds
      */
-    public static void printGround(Map<DeckName, List<Card>> grounds, Map<DeckName, Deck<Card>> decks){
+    public static void printGround(Map<Integer, List<Development>> grounds, Map<Integer, Deck<Development>> decks){
         var print = new StringBuilder();
         for (var deck: grounds.keySet()) {
             printCardLeftToRight(grounds.get(deck), print, decks.get(deck), true, false);
@@ -259,7 +263,7 @@ public class View {
      * @param deckSize true if print of deck size needed
      * @param withIndex true if print of index needed
      */
-    private static void printCardLeftToRight(List<Card> grounds, StringBuilder print, Deck<Card> deck, boolean deckSize, boolean withIndex) {
+    private static void printCardLeftToRight(List<Development> grounds, StringBuilder print, Deck<Development> deck, boolean deckSize, boolean withIndex) {
         var index = 1;
         var indexString = "  ";
         for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
@@ -269,10 +273,10 @@ public class View {
                     index++;
                 }
                 if(withIndex) print.append(indexString);
-                print.append(card.getDisplay(i));
+                print.append(getDisplayCard(card, i));
             }
             indexString = "  ";
-            if(deckSize) print.append(deck.getDisplay(i));
+            if(deckSize) print.append(getDisplayDeck(deck, i));
             print.append("\n");
         }
     }
@@ -282,7 +286,7 @@ public class View {
      * @param cards cards to print
      * @param reserve string to add after the question (need at least a parenthesis)
      */
-    public static void printCards(List<Card> cards, String reserve) {
+    public static void printCards(List<Development> cards, String reserve) {
         var print = new StringBuilder();
         print.append("Choisissez la carte ?").append(reserve);
         print.append("0 pour annuler)\n");
@@ -316,7 +320,7 @@ public class View {
      * @param cards cards to print
      * @param index index of the list
      */
-    public static void printCardsWithIndex(List<Card> cards, int index) {
+    public static void printCardsWithIndex(List<Development> cards, int index) {
         System.out.println(index + ":");
         printCardsGround(cards);
     }
@@ -393,7 +397,7 @@ public class View {
      * Prints card of cards from left to right
      * @param cards list of cards to print
      */
-    public static void printCardsGround(List<Card> cards) {
+    public static void printCardsGround(List<Development> cards) {
         var print = new StringBuilder();
         printCardLeftToRight(cards, print, null, false, false);
         System.out.print(print);
@@ -405,10 +409,9 @@ public class View {
      * @return set of Token from tokenManager without the gold token.
      */
     private static Set<Token> getKeySet(TokenManager tokenManager) { //todo change set to have same token order
-        var keySet = tokenManager.keySet().stream()
+        return tokenManager.keySet().stream()
                 .filter(t -> t != Token.GOLD)
                 .collect(Collectors.toSet());
-        return keySet;
     }
 
     /**
@@ -417,7 +420,7 @@ public class View {
      */
     public static void printPlayerBonus(TokenManager bonus) {
         var keySet = getKeySet(bonus);
-        System.out.println("Bonus : " + bonus.toString(keySet) + "\n");
+        System.out.println("Bonus : " + printTokenManager(bonus, keySet) + "\n");
     }
 
     /**
@@ -453,5 +456,140 @@ public class View {
         }
         text.append("]");
         System.out.println(text);
+    }
+
+    /**
+     * This method return a string corresponding of the values of the specified Set with the form [key: value, ...]
+     * @param keySet set of all token to add to string
+     * @return the string corresponding of the values of the specified Set with the form [key: value, ...]
+     */
+    private static String printTokenManager(TokenManager tokenManager, Set<Token> keySet) {
+        StringBuilder text = new StringBuilder();
+        String separator = "";
+        text.append("[");
+        for (var token : keySet) {
+            text.append(separator).append(token.name()).append(": ").append(tokenManager.tokens().get(token));
+            separator = ", ";
+        }
+        text.append("]");
+        return text.toString();
+    }
+
+    private static String getDisplayCard(Development card, int i) {
+        var display = stringDisplayCard(card);
+        if (i > display.length) {
+            throw new IllegalArgumentException("i(" + i +") is higher than length of display(" + display.length + ")");
+        }
+        return display[i];
+    }
+
+    /**
+     * This method create the tab of all string to display to draw the card and return it
+     * @return the tab of all string to display to draw the card
+     */
+    private static String[] stringDisplayCard(Development card) {
+        var prestigeLength = String.valueOf(card.prestige()).length() + "Prestige: ".length();
+        var bonusLength =  card.bonus().name().length() + "Bonus: ".length();
+        var priceLength = "Price: ".length();
+        var name = card.name();
+        var centerName = getCenterName(card);
+        return new String[] {
+                " "+ "_".repeat(Constants.MAX_LENGTH) + " ",
+                "|" + space(centerName) + name + space((name.length() % 2 == 1)? centerName + 1 : centerName) + "|",
+                "|Prestige: " + card.prestige() + space(Constants.MAX_LENGTH - prestigeLength) + "|",
+                "|Bonus: " + card.bonus().name() + space(Constants.MAX_LENGTH - bonusLength) + "|",
+                "|Price: " + space(Constants.MAX_LENGTH - priceLength) + "|",
+                "|" + stringPrice(card, 0) + space(Constants.MAX_LENGTH - stringPrice(card, 0).length()) + "|",
+                "|" + stringPrice(card, 1) + space(Constants.MAX_LENGTH - stringPrice(card, 1).length()) + "|",
+                "|" + stringPrice(card, 2) + space(Constants.MAX_LENGTH - stringPrice(card, 2).length()) + "|",
+                "|" + stringPrice(card, 3) + space(Constants.MAX_LENGTH - stringPrice(card, 3).length()) + "|",
+                " " + "-".repeat(Constants.MAX_LENGTH) + " "
+        };
+    }
+
+    /**
+     * This method return the string value of the i-th price of the card or an empty list if the price doesn't exist
+     * @param i th price
+     * @return string value of the i-th price of the card or an empty list if the price doesn't exist
+     */
+    private static String stringPrice(Development card, int i){
+        var price = card.cost().keySet().stream().map(token -> token.name() + " : " + card.cost().get(token)).toList();
+        return (card.cost().keySet().size() >  i)? price.get(i) : "";
+    }
+
+    /**
+     * This method return the spaces needed to center the card's name
+     * @return spaces needed to center the name
+     */
+    private static int getCenterName(Development card) {
+        return (Constants.MAX_LENGTH - card.name().length()) / 2;
+    }
+
+
+    /**
+     * This method refresh the value saved of the display
+     */
+    private static String[] refreshDisplay(Deck<Development> deck) {
+        var size = deck.size();
+        var numberOfDigit = (size == 0)? 1: (int) Math.log10(size) + 1;
+        var numberDisplay = getArrayNumber(numberOfDigit, size);
+        var spacing = numberOfDigit * Constants.LENGTH_NUMBER_DISPLAY + (numberOfDigit - 1);
+        return getStringDeck(spacing,numberDisplay);
+    }
+
+    /**
+     * This method create a table of string corresponding of the display of the deck
+     * @param spacing space between the start of the card and the end
+     * @param numberDisplay List of table of string corresponding to the display of the number of element in the deck
+     * @return the table created
+     */
+    private static String[] getStringDeck(int spacing, List<String[]> numberDisplay){
+        return new String[]{
+                " " + "_".repeat(spacing + 2) + " ",
+                "|" + " ".repeat(spacing + 2) + "|",
+                "|" + " ".repeat(spacing + 2) + "|",
+                "| " + getNumberDisplay(numberDisplay, 0) + " |",
+                "| " + getNumberDisplay(numberDisplay, 1) + " |",
+                "| " + getNumberDisplay(numberDisplay, 2) + " |",
+                "| " + getNumberDisplay(numberDisplay, 3) + " |",
+                "| " + getNumberDisplay(numberDisplay, 4) + " |",
+                "|" + " ".repeat(spacing + 2) + "|",
+                " " + "-".repeat(spacing + 2) + " "
+        };
+    }
+
+    /**
+     * This method return the list of table of string corresponding to the display of number
+     * @param numberOfDigit number of digits in the size
+     * @param size size of deck
+     * @return list of table of string corresponding to the display of number
+     */
+    private static List<String[]> getArrayNumber(int numberOfDigit, int size){
+        var numberDisplay = new ArrayList<String[]>();
+        for (var i = numberOfDigit - 1; i >= 0; i--){
+            numberDisplay.add(NumbersDisplays.NUMBERS[size /(int) Math.pow(10, i)]);
+            size %= Math.pow(10, i);
+        }
+        return numberDisplay;
+    }
+
+    /**
+     * This method return the sum of all the string of the i-th element of each table of number display and separate them by a space
+     * @param numberDisplay list of table of string corresponding to display of the size of deck
+     * @param i th line
+     * @return joining of all the string of the i-th element of each table of numberDisplay with a space delimiter
+     */
+    private static String getNumberDisplay(List<String[]> numberDisplay, int i) {
+        return numberDisplay.stream().map(strings -> strings[i]).collect(Collectors.joining(" "));
+    }
+
+    /**
+     * This method return the string of the display of the deck for the i-th line
+     * @param i th line
+     * @return string of the display of the deck for the i-th line
+     */
+    public static String getDisplayDeck(Deck<Development> deck, int i) {
+        var display = refreshDisplay(deck);
+        return display[i];
     }
 }

@@ -26,76 +26,49 @@ public class Decks {
     private static final String VALUE_SEPARATOR = ":";
 
     /**
-     * Create a deck of card created with the file "basicDeck.txt" and return it
-     * @return a deck of card created with the file "basicDeck.txt"
-     * @throws IOException if file "basicDeck.txt" in resource directory doesn't exist
-     */
-    public static Deck<Card> basicDeck() throws IOException {
-        return makeDeck(Path.of("resources", "basicDeck.txt"), "Basic Deck");
-    }
-
-    /**
      * Create a deck of card created with the file "nobleDeck.txt" and return it
      * @return a deck of card created with the file "nobleDeck.txt"
      * @throws IOException if file "nobleDeck.txt" in resource directory doesn't exist
      */
-    public static Deck<Card> nobleDeck() throws IOException {
-        return makeNobleDeck(Path.of("resources", "nobleDeck.txt"), "Noble");
+    public static Deck<Noble> nobleDeck() throws IOException {
+        return makeNobleDeck(Path.of("resources", "nobleDeck.txt"));
     }
 
     /**
-     * Create a deck of card created with the file "firstDevelopmentDeck.txt" and return it
-     * @return a deck of card created with the file "firstDevelopmentDeck.txt"
-     * @throws IOException if file "firstDevelopmentDeck.txt" in resource directory doesn't exist
+     * Create decks of cards created with the file "DevelopmentDeck.txt" and return it
+     * @return decks of cards created with the file "DevelopmentDeck.txt"
+     * @throws IOException if file "DevelopmentDeck.txt" in resource directory doesn't exist
      */
-    public static Deck<Card> firstDevelopmentDeck() throws IOException {
-        return makeDeck(Path.of("resources", "firstDevelopmentDeck.txt"), "Développement 1");
-    }
-
-    /**
-     * Create a deck of card created with the file "secondDevelopmentDeck.txt" and return it
-     * @return a deck of card created with the file "secondDevelopmentDeck.txt"
-     * @throws IOException if file "secondDevelopmentDeck.txt" in resource directory doesn't exist
-     */
-    public static Deck<Card> secondDevelopmentDeck() throws IOException {
-        return makeDeck(Path.of("resources", "secondDevelopmentDeck.txt"), "Développement 2");
-    }
-
-    /**
-     * Create a deck of card created with the file "thirdDevelopmentDeck.txt" and return it
-     * @return a deck of card created with the file "thirdDevelopmentDeck.txt"
-     * @throws IOException if file "thirdDevelopmentDeck.txt" in resource directory doesn't exist
-     */
-    public static Deck<Card> thirdDevelopmentDeck() throws IOException {
-        return makeDeck(Path.of("resources", "thirdDevelopmentDeck.txt"), "Développement 3");
+    public static Map<Integer, Deck<Development>> developmentDecks() throws IOException {
+        return makeDevelopmentDecks(Path.of("resources", "DevelopmentDeck.txt"));
     }
 
     /**
      * This method make a nobleDeck from the file in path and with the specified name and return it
      * @param path of file
-     * @param name of deck
      * @return a deck from the file in path and with the specified name
      * @throws IOException if file in path don't exist
      */
-    private static Deck<Card> makeNobleDeck(Path path, String name) throws IOException {
-        Objects.requireNonNull(name);
-        var nobleDeck = new NobleDeck(name);
-        parseDeck(path, nobleDeck);
+    private static Deck<Noble> makeNobleDeck(Path path) throws IOException {
+        Objects.requireNonNull(path);
+
+        var nobleDeck = new Deck<Noble>();
+        parseNobleDeck(path, nobleDeck);
         return nobleDeck;
     }
 
     /**
      * This method make a deck from the file in path and with the specified name
      * @param path of file
-     * @param name of deck
      * @return a deck from the file in path and with the specified name
      * @throws IOException if file in path don't exist
      */
-    private static Deck<Card> makeDeck(Path path, String name) throws IOException {
-        Objects.requireNonNull(name);
-        var deck = new BasicDeck<Card>(name);
-        parseDeck(path, deck);
-        return deck;
+    private static Map<Integer, Deck<Development>> makeDevelopmentDecks(Path path) throws IOException {
+        Objects.requireNonNull(path);
+
+        var decks = new HashMap<Integer, Deck<Development>>();
+        parseDevelopmentDecks(path, decks);
+        return decks;
     }
 
     /**
@@ -104,9 +77,9 @@ public class Decks {
      * @param deck with card to add
      * @throws IOException if file in path doesn't exist
      */
-    private static void parseDeck(Path path, Deck<Card> deck) throws IOException {
+    private static void parseNobleDeck(Path path, Deck<Noble> deck) throws IOException {
         Objects.requireNonNull(path);
-        var tokenManager = new TokenManager();
+        Objects.requireNonNull(deck);
 
         try (var reader = Files.newBufferedReader(path)) {
             String line;
@@ -118,41 +91,97 @@ public class Decks {
                 var args = List.of(params).subList(1, params.length);
 
                 int count = Integer.parseInt(params[0]);
+
+                var card = parseNoble(args);
+
                 for (int i = 0; i < count; i++) {
-                    deck.add(parseCard(line, tokenManager, args));
-                    tokenManager.clear();
+                    deck.add(card);
                 }
             }
         }
     }
 
     /**
-     * Create a card from the information given by the args by using the tokenManger to create the cost
-     * @param line
-     * @param tokenManager to add cost to card
+     * This method parse the file and add the card to the deck of his level
+     * @param path of the file
+     * @param decks with card to add to the right level
+     * @throws IOException if file in path doesn't exist
+     */
+    private static void parseDevelopmentDecks(Path path, Map<Integer, Deck<Development>> decks) throws IOException {
+        Objects.requireNonNull(path);
+        Objects.requireNonNull(decks);
+
+        try (var reader = Files.newBufferedReader(path)) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.length() == 0) continue; // Allow Empty Line
+
+                var params = line.split(ARGS_SEPARATOR);
+                var args = List.of(params).subList(2, params.length);
+
+                int count = Integer.parseInt(params[0]);
+                int level = Integer.parseInt(params[1]);
+
+                var card = parseDevelopment(args);
+
+                for (int i = 0; i < count; i++) {
+                    decks.computeIfAbsent(level, k -> new Deck<>()).add(card);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a token manager from a string
+     * @param string String containing tokenManager informations
+     * @return tokenManager
+     */
+    private static TokenManager parseTokens(String string) {
+        var tokens = new TokenManager();
+
+        for (var tokenFormat : string.split(TOKEN_SEPARATOR)) {
+            var entryToken = tokenFormat.split(VALUE_SEPARATOR);
+            var token = Token.valueOf(entryToken[0]);
+            var value = Integer.parseInt(entryToken[1]);
+
+            if (value != 0) tokens.addToken(token, value);
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Create a development card from the information given by the args
      * @param args list of string with all card information
      * @return card created
      */
-    private static Card parseCard(String line, TokenManager tokenManager, List<String> args) { //todo demander à seb pour utilité de line
-        Objects.requireNonNull(line);
-        Objects.requireNonNull(tokenManager);
+    private static Development parseDevelopment(List<String> args) {
         Objects.requireNonNull(args);
 
         var className = args.get(0);
-        for (var tokenFormat : args.get(2).split(TOKEN_SEPARATOR)) {
-            var entrytoken = tokenFormat.split(VALUE_SEPARATOR);
-            var token = Token.valueOf(entrytoken[0]);
-            var value = Integer.parseInt(entrytoken[1]);
+        if (!className.equals(Development.TYPE)) throw new IllegalArgumentException("Incompatible type " + className + " and " + Development.TYPE);
 
-            tokenManager.addToken(token, value);
-        }
-
+        var tokenManager = parseTokens(args.get(2));
         var prestige = Integer.parseInt(args.get(3));
 
-        return switch (className) {
-            case Noble.TYPE -> new Noble(tokenManager.tokenNotEmpty(), args.get(1), Path.of(args.get(4)), prestige);
-            case Development.TYPE -> new Development(tokenManager.tokenNotEmpty(), args.get(1), Path.of(args.get(4)), prestige, Token.valueOf(args.get(5)));
-            default -> throw new IllegalStateException("Unexpected value: " + className);
-        };
+        return new Development(tokenManager, args.get(1), prestige, Token.valueOf(args.get(5)));
+    }
+
+    /**
+     * Create a noble card from the information given by the args
+     * @param args list of string with all card information
+     * @return card created
+     */
+    private static Noble parseNoble(List<String> args) {
+        Objects.requireNonNull(args);
+
+        var className = args.get(0);
+        if (!className.equals(Development.TYPE)) throw new IllegalArgumentException("Incompatible type " + className + " and " + Development.TYPE);
+
+        var tokenManager = parseTokens(args.get(2));
+        var prestige = Integer.parseInt(args.get(3));
+
+        return new Noble(tokenManager, args.get(1), prestige);
     }
 }

@@ -1,46 +1,80 @@
 package fr.uge.splendor.object;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Interface corresponding of the deck of the game
- * @param <T> type of element in the deck
+ * This class represents the deck of the game
+ * @param <T> element of the deck
  */
-public interface Deck<T> extends Displayable {
+public class Deck<T> {
+
+    /**
+     * Stack representing the deck
+     */
+    private final Deque<T> deck;
+
+    /**
+     * Create an instance of BasicDeck with the specified name
+     */
+    public Deck() {
+        deck = new ArrayDeque<>();
+    }
 
     /**
      * This method add the specified element to the deck
-     * @param t to add to the deck
+     * @param t element to add
      */
-    void add(T t);
+    public void add(T t) {
+        Objects.requireNonNull(t);
+        deck.add(t);
+    }
 
     /**
-     * This method draw number of element in the deck and return them in a list
-     * @param number of card to draw
-     * @return list of drawn element
+     * This method draw number of element and return them on a list instance.
+     * The deck is cleared after drawing the element.
+     * @param number of element to draw
+     * @return list of element drawn from the deck
      */
-    List<T> drawCards(int number);
+    public List<T> drawCards(int number) {
+        if (deck.size() < number) number = deck.size();
+        var list = new ArrayList<T>();
+        for (int i = 0; i < number; i++) {
+            list.add(draw());
+        }
+        return list;
+    }
 
     /**
-     * This method clear the deck
+     * This method shuffle all the element of the deck
      */
-    void clear();
+    public void shuffle() {
+        var list = deck.stream().collect(Collectors.toList());
+        Collections.shuffle(list);
+        deck.clear();
+        deck.addAll(list);
+    }
 
     /**
-     * This method shuffle the deck
+     * This method draw an element
+     * @return element drawn
      */
-    void shuffle();
+    public T draw(){
+        return deck.pop();
+    }
 
     /**
-     * This method return the number of element to draw for the start of the game
-     * @param size of player list
-     * @return the number of element to draw for the start of the game
+     * This method clear all the element of the deck
      */
-    int getNumberToDraw(int size);
+    public void clear() {
+        deck.clear();
+    }
 
     /**
-     * This method draw a card from the deck
-     * @return drawn card
+     * This method return the size of the deck
+     * @return size of the deck
      */
-    T draw();
+    public int size() {
+        return deck.size();
+    }
 }

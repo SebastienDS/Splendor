@@ -5,6 +5,10 @@ package fr.uge.splendor.object;
  */
 public enum Token {
     /**
+     * Token representing no token :)
+     */
+    NONE,
+    /**
      * Token representing emerald
      */
     EMERALD,

@@ -3,7 +3,6 @@ package fr.uge.splendor.ModeleVueController;
 import fr.uge.splendor.object.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class represents all data of the game
@@ -33,12 +32,17 @@ public class Model {
     /**
      * Represents the card that will be drawn for the grounds
      */
-    private final Map<DeckName, Deck<Card>> decks;
+    private final Map<Integer, Deck<Development>> decks;
 
     /**
      * Represents the cards visible from the deck
      */
-    private final Map<DeckName, List<Card>> grounds;
+    private final Map<Integer, List<Development>> grounds;
+
+    /**
+     * Represents the nobles
+     */
+    private final List<Noble> nobles;
 
     /**
      * represents all the tokens that player can take
@@ -51,11 +55,16 @@ public class Model {
      * @param decks decks of the games
      * @param grounds grounds of the games
      */
-    public Model(List<Player> players, Map<DeckName, Deck<Card>> decks, Map<DeckName, List<Card>> grounds) {
+    public Model(List<Player> players, Map<Integer, Deck<Development>> decks, Map<Integer, List<Development>> grounds, List<Noble> nobles) {
         this.players = Objects.requireNonNull(players);
         this.decks = Objects.requireNonNull(decks);
         this.grounds = Objects.requireNonNull(grounds);
+        this.nobles = Objects.requireNonNull(nobles);
         gameTokens = new TokenManager();
+    }
+
+    public Model(List<Player> players) {
+        this(players, new LinkedHashMap<>(), new LinkedHashMap<>(), new ArrayList<>());
     }
 
     /**
@@ -87,7 +96,7 @@ public class Model {
      * This method return the decks. A map containing the deckName as a key and a deck as a value.
      * @return return map containing all the deck with deck name as key
      */
-    public Map<DeckName, Deck<Card>> getDecks() {
+    public Map<Integer, Deck<Development>> getDecks() {
         return decks;
     }
 
@@ -95,27 +104,15 @@ public class Model {
      * This method return the grounds. A map containing the deckName as a key and a list of card as a value
      * @return grounds
      */
-    public Map<DeckName, List<Card>> getGrounds() {
+    public Map<Integer, List<Development>> getGrounds() {
         return grounds;
-    }
-
-    /**
-     * This method return the map of grounds without the grounds of noble
-     * @return map of grounds without the grounds of noble
-     */
-    public Map<DeckName, List<Card>> getGroundsWithoutNoble(){
-        return grounds.keySet().stream().filter(deckName -> deckName != DeckName.NOBLE_DECK).collect(Collectors.toMap(
-                deckName -> deckName,
-                deckName -> grounds.get(deckName),
-                (a, b) -> {throw new IllegalStateException("duplicated key");},
-                LinkedHashMap::new
-        ));
     }
 
     /**
      * This method initialise value to begin the game
      */
     public void startGame() {
+        initDecks();
         shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
@@ -195,9 +192,8 @@ public class Model {
      */
     private void initGrounds() {
         for (var deckName: decks.keySet()) {
-            var list = new ArrayList<Card>();
             var deck = decks.get(deckName);
-            list.addAll(deck.drawCards(deck.getNumberToDraw(players.size())));
+            var list = new ArrayList<>(deck.drawCards(Constants.DRAW_NUMBER));
             grounds.put(deckName, list);
         }
     }
@@ -228,10 +224,24 @@ public class Model {
         var maxPrestigePlayer = players.stream()
                 .filter(player ->
                         player.getPrestige() >= players.stream()
-                                                .mapToInt(player1 -> player1.getPrestige()).max().getAsInt()).toList();
+                                .mapToInt(Player::getPrestige)
+                                .max()
+                                .orElse(0)).toList();
         if(maxPrestigePlayer.size() == 1){
             return maxPrestigePlayer.get(0);
         }
         return maxPrestigePlayer.stream().min(Comparator.comparingInt(Player::getCardPurchased)).get();
+    }
+
+    public List<Noble> getNobles() {
+        return nobles;
+    }
+
+    private void initDecks() {
+        if (gameMode == 1) {
+            decks.keySet().removeIf(key -> key != 0);
+        } else {
+            decks.remove(0);
+        }
     }
 }
