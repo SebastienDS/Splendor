@@ -2,7 +2,9 @@ package fr.uge.splendor.ModeleVueController;
 
 import fr.uge.splendor.object.*;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents all data of the game
@@ -56,15 +58,18 @@ public class Model {
      * @param grounds grounds of the games
      */
     public Model(List<Player> players, Map<Integer, Deck<Development>> decks, Map<Integer, List<Development>> grounds, List<Noble> nobles) {
+        Objects.requireNonNull(nobles);
         this.players = Objects.requireNonNull(players);
         this.decks = Objects.requireNonNull(decks);
         this.grounds = Objects.requireNonNull(grounds);
-        this.nobles = Objects.requireNonNull(nobles);
         gameTokens = new TokenManager();
+
+        Collections.shuffle(nobles);
+        this.nobles = nobles.stream().limit(players.size() + 1).collect(Collectors.toList());
     }
 
-    public Model(List<Player> players) {
-        this(players, new LinkedHashMap<>(), new LinkedHashMap<>(), new ArrayList<>());
+    public Model(List<Player> players) throws IOException {
+        this(players, Decks.developmentDecks(), new LinkedHashMap<>(), Decks.nobleDeck());
     }
 
     /**
@@ -113,6 +118,7 @@ public class Model {
      */
     public void startGame() {
         initDecks();
+        initNobles();
         shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
@@ -242,6 +248,12 @@ public class Model {
             decks.keySet().removeIf(key -> key != 0);
         } else {
             decks.remove(0);
+        }
+    }
+
+    private void initNobles() {
+        if (gameMode == 1) {
+            nobles.clear();
         }
     }
 }

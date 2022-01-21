@@ -16,15 +16,14 @@ public class Main {
      */
     public static void main(String[] args) {
         NumbersDisplays.loadNumbers();
-        var gameData = new Model(initPlayer());
         try (var scanner = new Scanner(System.in)) {
+            var gameData = new Model(initPlayer());
             Controller.startingMenu(scanner, gameData);
+            View.printWinner(gameData.getWinner());
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(1);
-            return;
         }
-        View.printWinner(gameData.getWinner());
     }
 
     /**

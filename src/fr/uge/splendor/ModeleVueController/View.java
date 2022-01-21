@@ -111,7 +111,7 @@ public class View {
      * @param player player playing
      */
     public static void printPlayerPlaying(Player player) {
-        System.out.println("C'est au tour du joueur: \"" + player.getName() + "\" de joué! ");
+        System.out.println("C'est au tour du joueur: \"" + player.getName() + "\" de jouer! ");
     }
 
     /**
@@ -139,7 +139,7 @@ public class View {
             .append("4: Afficher les bonus du joueur.");
         if (gameData.reservePossible()) {
             text.append("\n5: Réserver 1 carte développement et prendre 1 or\n")
-                    .append("6: Afficher les cartes réservés");
+                    .append("6: Afficher les cartes réservées");
         }
 
         System.out.println(text);
@@ -591,5 +591,68 @@ public class View {
     public static String getDisplayDeck(Deck<Development> deck, int i) {
         var display = refreshDisplay(deck);
         return display[i];
+    }
+
+    /**
+     * This method add string of cards of grounds to StringBuilder print to print them left to right
+     * @param nobles nobles
+     */
+    public static void printNoble(List<Noble> nobles) {
+        if (nobles.isEmpty()) return;
+
+        var print = new StringBuilder();
+        for (int i = 0; i < Constants.DISPLAY_SIZE; i++) {
+            for (var noble : nobles) {
+                print.append(getDisplayNoble(noble, i));
+            }
+            print.append("\n");
+        }
+        System.out.println(print);
+    }
+
+    public static String getDisplayNoble(Noble noble, int i) {
+        var display = stringDisplayNoble(noble);
+        return display[i];
+    }
+
+    /**
+     * This method create the tab of all string to display to draw the card and return it
+     * @return the tab of all string to display to draw the card
+     */
+    private static String[] stringDisplayNoble(Noble noble) {
+        var prestigeLength = String.valueOf(noble.prestige()).length() + "Prestige: ".length();
+        var priceLength = "Price: ".length();
+        var centerName = getCenterName(noble);
+        var name = noble.name();
+        return new String[] {
+                " "+ "_".repeat(Constants.MAX_LENGTH) +" ",
+                "|" + space(centerName) + name + space((name.length() % 2 == 1)? centerName + 1 : centerName) + "|",
+                "|Prestige: " + noble.prestige() +space(Constants.MAX_LENGTH - prestigeLength) + "|",
+                "|" + space(Constants.MAX_LENGTH) + "|",
+                "|Price: " + space(Constants.MAX_LENGTH - priceLength) + "|",
+                "|" + stringPrice(noble, 0) + space(Constants.MAX_LENGTH - stringPrice(noble, 0).length()) + "|",
+                "|" + stringPrice(noble, 1) + space(Constants.MAX_LENGTH - stringPrice(noble, 1).length()) + "|",
+                "|" + stringPrice(noble, 2) + space(Constants.MAX_LENGTH - stringPrice(noble, 2).length()) + "|",
+                "|" + stringPrice(noble, 3) + space(Constants.MAX_LENGTH - stringPrice(noble, 3).length()) + "|",
+                " " + "-".repeat(Constants.MAX_LENGTH) + " "
+        };
+    }
+
+    /**
+     * This method return the string value of the i-th price of the card or an empty list if the price doesn't exist
+     * @param i th price
+     * @return string value of the i-th price of the card or an empty list if the price doesn't exist
+     */
+    private static String stringPrice(Noble noble, int i){
+        var price = noble.cost().keySet().stream().map(token -> token.name() + " : " + noble.cost().get(token)).toList();
+        return (noble.cost().keySet().size() >  i)? price.get(i) : "";
+    }
+
+    /**
+     * This method return the length needed to add to center the name
+     * @return length needed to add to center the name
+     */
+    private static int getCenterName(Noble noble){
+        return (Constants.MAX_LENGTH - noble.name().length()) / 2;
     }
 }

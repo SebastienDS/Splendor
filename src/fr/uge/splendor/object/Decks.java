@@ -30,7 +30,7 @@ public class Decks {
      * @return a deck of card created with the file "nobleDeck.txt"
      * @throws IOException if file "nobleDeck.txt" in resource directory doesn't exist
      */
-    public static Deck<Noble> nobleDeck() throws IOException {
+    public static List<Noble> nobleDeck() throws IOException {
         return makeNobleDeck(Path.of("resources", "nobleDeck.txt"));
     }
 
@@ -49,10 +49,10 @@ public class Decks {
      * @return a deck from the file in path and with the specified name
      * @throws IOException if file in path don't exist
      */
-    private static Deck<Noble> makeNobleDeck(Path path) throws IOException {
+    private static List<Noble> makeNobleDeck(Path path) throws IOException {
         Objects.requireNonNull(path);
 
-        var nobleDeck = new Deck<Noble>();
+        var nobleDeck = new ArrayList<Noble>();
         parseNobleDeck(path, nobleDeck);
         return nobleDeck;
     }
@@ -66,7 +66,7 @@ public class Decks {
     private static Map<Integer, Deck<Development>> makeDevelopmentDecks(Path path) throws IOException {
         Objects.requireNonNull(path);
 
-        var decks = new HashMap<Integer, Deck<Development>>();
+        var decks = new LinkedHashMap<Integer, Deck<Development>>();
         parseDevelopmentDecks(path, decks);
         return decks;
     }
@@ -77,7 +77,7 @@ public class Decks {
      * @param deck with card to add
      * @throws IOException if file in path doesn't exist
      */
-    private static void parseNobleDeck(Path path, Deck<Noble> deck) throws IOException {
+    private static void parseNobleDeck(Path path, List<Noble> deck) throws IOException {
         Objects.requireNonNull(path);
         Objects.requireNonNull(deck);
 
@@ -177,7 +177,7 @@ public class Decks {
         Objects.requireNonNull(args);
 
         var className = args.get(0);
-        if (!className.equals(Development.TYPE)) throw new IllegalArgumentException("Incompatible type " + className + " and " + Development.TYPE);
+        if (!className.equals(Noble.TYPE)) throw new IllegalArgumentException("Incompatible type " + className + " and " + Noble.TYPE);
 
         var tokenManager = parseTokens(args.get(2));
         var prestige = Integer.parseInt(args.get(3));

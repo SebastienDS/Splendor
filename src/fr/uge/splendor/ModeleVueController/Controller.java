@@ -51,7 +51,6 @@ public class Controller {
      */
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
         gameData.setGameMode(2);
-        initDecks(gameData.getDecks());
 
         while (true) {
             View.printStartingMenu();
@@ -105,6 +104,8 @@ public class Controller {
      */
     private static void firstChoice(Scanner scanner, Model gameData){
         var turnFinished = false;
+
+        View.printNoble(gameData.getNobles());
         View.printGround(gameData.getGrounds(), gameData.getDecks());
         while (true) {
             allInformationChoice(gameData);
@@ -433,16 +434,6 @@ public class Controller {
             case 1 -> gameData.setGameMode(1);
             case 2 -> gameData.setGameMode(2);
         }
-    }
-
-    /**
-     * Initialise decks
-     * @param decks map containing decks of game
-     * @throws IOException if an I/O exception occurs
-     */
-    private static void initDecks(Map<Integer, Deck<Development>> decks) throws IOException {
-        decks.clear();
-        decks.putAll(Decks.developmentDecks());
     }
 
     /**

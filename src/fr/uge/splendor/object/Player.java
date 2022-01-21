@@ -44,8 +44,7 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
-        wallet.addToken(Token.GOLD, 50000);
-        wallet.addToken(Token.EMERALD, 10);
+        List.of(Token.values()).forEach(t -> bonus.addToken(t, 10));
     }
 
     /**
