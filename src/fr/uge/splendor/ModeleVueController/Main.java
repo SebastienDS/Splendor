@@ -28,7 +28,13 @@ public class Main {
                 Controller.startingMenu(scanner, gameData);
                 View.printWinner(gameData.getWinner());
             } else {
-                Application.run(Color.BLACK, context -> GraphicsController.startingMenu(context, gameData));
+                Application.run(Color.BLACK, context -> {
+                    try {
+                        GraphicsController.startingMenu(context, gameData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

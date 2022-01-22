@@ -9,11 +9,13 @@ import fr.umlv.zen5.ScreenInfo;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class GraphicsController {
-    public static void startingMenu(ApplicationContext context, Model gameData) {
+    public static void startingMenu(ApplicationContext context, Model gameData) throws IOException {
         gameData.setGameMode(2);
 
         ScreenInfo screenInfo = context.getScreenInfo();
@@ -58,7 +60,7 @@ public class GraphicsController {
                             case 0 -> playerMenu(context, gameData);
                             case 1 -> gameModeMenu(context, gameData);
                             case 2 -> {
-//                                startGame(context, gameData);
+                                startGame(context, gameData);
                                 return;
                             }
                             case 3 -> context.exit(0);
@@ -232,6 +234,47 @@ public class GraphicsController {
                         return i;
                     }
                 }
+            }
+        }
+    }
+
+    private static void startGame(ApplicationContext context, Model gameData) throws IOException {
+        ScreenInfo screenInfo = context.getScreenInfo();
+        int width = (int)screenInfo.getWidth();
+        int height = (int)screenInfo.getHeight();
+
+        Point2D.Float mousePos;
+
+        gameData.startGame();
+
+        var length = gameData.getDecks().keySet().size();
+        var w = Integer.MAX_VALUE;
+        var h = Math.min(height / length, 400);
+
+        var image = GraphicsView.loadImage(Path.of("resources", "images", "Alliance Frigate.png"), w, h);
+
+        while (!gameData.getLastRound() || !gameData.startNewRound()) {
+            context.renderFrame(graphics -> {
+                graphics.setColor(Color.LIGHT_GRAY);
+                graphics.fill(new Rectangle(0, 0, width, height));
+
+                IntStream.range(0, length).forEach(i -> GraphicsView.drawImage(graphics, 0, h * i, image));
+            });
+
+            Event event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
+            if (event == null) { // no event
+                continue;
+            }
+
+            Event.Action action = event.getAction();
+            if (action == Event.Action.KEY_PRESSED) {
+                if (event.getKey() == KeyboardKey.E) { // EXIT
+                    System.out.println("Quitting ... !");
+                    context.exit(0);
+                }
+            } else if (action == Event.Action.POINTER_DOWN) {
+                mousePos = event.getLocation();
+
             }
         }
     }
