@@ -425,9 +425,8 @@ public class Controller {
      * Let the user choose between all the game mode
      * @param scanner to have the input
      * @param gameData data of the game
-     * @throws IOException if an I/O exception occurs
      */
-    private static void gameModeMenu(Scanner scanner, Model gameData) throws IOException {
+    private static void gameModeMenu(Scanner scanner, Model gameData) {
         View.printGameModeMenu();
         var input_choice = Controller.getInteger(scanner, 1, 2);
         switch (input_choice) {

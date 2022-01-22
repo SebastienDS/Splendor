@@ -3,6 +3,7 @@ package fr.uge.splendor.ModeleVueController;
 import fr.uge.splendor.object.NumbersDisplays;
 import fr.uge.splendor.object.Player;
 import fr.umlv.zen5.Application;
+import fr.umlv.zen5.ScreenInfo;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,6 +31,9 @@ public class Main {
             } else {
                 Application.run(Color.BLACK, context -> {
                     try {
+                        ScreenInfo screenInfo = context.getScreenInfo();
+                        GraphicsView.WIDTH_SCREEN = (int)screenInfo.getWidth();
+                        GraphicsView.HEIGHT_SCREEN = (int)screenInfo.getHeight();
                         GraphicsController.startingMenu(context, gameData);
                     } catch (IOException e) {
                         e.printStackTrace();
