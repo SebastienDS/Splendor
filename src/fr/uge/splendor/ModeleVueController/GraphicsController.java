@@ -3,16 +3,12 @@ package fr.uge.splendor.ModeleVueController;
 import fr.uge.splendor.object.Button;
 import fr.uge.splendor.object.Player;
 import fr.uge.splendor.object.TextField;
-
 import fr.umlv.zen5.ApplicationContext;
 import fr.umlv.zen5.Event;
 import fr.umlv.zen5.KeyboardKey;
-import fr.umlv.zen5.ScreenInfo;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -25,16 +21,16 @@ public class GraphicsController {
      * @param gameData data of the game
      * @throws IOException if an I/O exception occurs
      */
-    public static void startingMenu(ApplicationContext context, Model gameData) throws IOException {
+    public static void startingMenu(ApplicationContext context, Model gameData, ImageManager images) throws IOException {
         gameData.setGameMode(2);
         var buttons = initButtonStartingMenu();
         while (true) {
-            GraphicsView.drawStartingMenu(context, buttons);
+            GraphicsView.drawStartingMenu(context, buttons, images);
             var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
             if (event == null) continue;
             var action = event.getAction();
             if (action == Event.Action.POINTER_DOWN) {
-                var finish = haveClickedStartingMenu(event.getLocation(), buttons, context, gameData);
+                var finish = haveClickedStartingMenu(event.getLocation(), buttons, context, gameData, images);
                 if(finish) return;
             }
         }
@@ -46,18 +42,17 @@ public class GraphicsController {
      * @param buttons list of all buttons
      * @param context display context
      * @param gameData data of the game
-     * @throws IOException if an I/O occur
      */
     private static boolean haveClickedStartingMenu(Point2D mousePos, List<Button> buttons, ApplicationContext context,
-                                                Model gameData) throws IOException {
+                                                Model gameData, ImageManager images) {
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
             if (button.rect().contains(mousePos)) {
                 switch (i) {
-                    case 0 -> playerMenu(context, gameData);
-                    case 1 -> gameModeMenu(context, gameData);
+                    case 0 -> playerMenu(context, gameData, images);
+                    case 1 -> gameModeMenu(context, gameData, images);
                     case 2 -> {
-                        startGame(context, gameData);
+                        startGame(context, gameData, images);
                         return true;
                     }
                     case 3 -> context.exit(0);
@@ -109,9 +104,9 @@ public class GraphicsController {
      * @param context Display context
      * @param gameData data of the game
      */
-    private static void gameModeMenu(ApplicationContext context, Model gameData) {
+    private static void gameModeMenu(ApplicationContext context, Model gameData, ImageManager images) {
         var buttons = initButtonModeMenu();
-        GraphicsView.drawModeMenu(context, buttons);
+        GraphicsView.drawModeMenu(context, buttons, images);
         while (true) {
             var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
             if (event == null) continue;
@@ -173,16 +168,16 @@ public class GraphicsController {
      * @param context display context
      * @param gameData data of the game
      */
-    private static void playerMenu(ApplicationContext context, Model gameData) {
+    private static void playerMenu(ApplicationContext context, Model gameData, ImageManager images) {
         var buttons = initButtonPlayerMenu();
         var players = gameData.getPlayers();
         while (true) {
-            GraphicsView.drawPlayerMenu(context, buttons, gameData);
+            GraphicsView.drawPlayerMenu(context, buttons, gameData, images);
             var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
             if (event == null) continue;
             var action = event.getAction();
             if (action == Event.Action.POINTER_DOWN) {
-                var finish = haveClickedPlayerMenu(event.getLocation(), buttons, context, gameData, players);
+                var finish = haveClickedPlayerMenu(event.getLocation(), buttons, context, gameData, players, images);
                 if(finish) return;
             }
         }
@@ -197,14 +192,14 @@ public class GraphicsController {
      * @param players list of players
      */
     private static boolean haveClickedPlayerMenu(Point2D.Float mousePos, List<Button> buttons, ApplicationContext context,
-                                              Model gameData, List<Player> players) {
+                                              Model gameData, List<Player> players, ImageManager images) {
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
             if (button.rect().contains(mousePos)) {
                 switch (i) {
-                    case 0 -> changeName(context, gameData);
-                    case 1 -> addPlayer(context, players);
-                    case 2 -> removePlayer(context, players);
+                    case 0 -> changeName(context, gameData, images);
+                    case 1 -> addPlayer(context, players, images);
+                    case 2 -> removePlayer(context, players, images);
                     default -> {
                         return true;
                     }
@@ -256,12 +251,12 @@ public class GraphicsController {
      * @param context display context
      * @param players all players
      */
-    private static void removePlayer(ApplicationContext context, List<Player> players) {
+    private static void removePlayer(ApplicationContext context, List<Player> players, ImageManager images) {
         if (players.size() == 2) {
             // print not enough player
             return;
         }
-        players.remove(choosePlayer(context, players));
+        players.remove(choosePlayer(context, players, images));
     }
 
     /**
@@ -269,13 +264,13 @@ public class GraphicsController {
      * @param context display context
      * @param players list of all players
      */
-    private static void addPlayer(ApplicationContext context, List<Player> players) {
+    private static void addPlayer(ApplicationContext context, List<Player> players, ImageManager images) {
         if (players.size() == 4) {
 //            GraphicsView.printTooMuchPlayer();
             return;
         }
         players.add(new Player("Player" + (players.size() + 1)));
-        changeName(context, players, players.size() - 1);
+        changeName(context, players, players.size() - 1, images);
     }
 
     /**
@@ -283,10 +278,10 @@ public class GraphicsController {
      * @param context display context
      * @param gameData data of the game
      */
-    private static void changeName(ApplicationContext context, Model gameData) {
+    private static void changeName(ApplicationContext context, Model gameData, ImageManager images) {
         var players = gameData.getPlayers();
-        var player = choosePlayer(context, players);
-        changeName(context, players, player);
+        var player = choosePlayer(context, players, images);
+        changeName(context, players, player, images);
     }
 
     /**
@@ -295,11 +290,11 @@ public class GraphicsController {
      * @param players list of players
      * @param index index of player chosen
      */
-    private static void changeName(ApplicationContext context, List<Player> players, int index) {
+    private static void changeName(ApplicationContext context, List<Player> players, int index, ImageManager images) {
         var textField = initTextField(players.get(index).getName());
         var buttons = initButtonChangeName();
         while (true) {
-            GraphicsView.drawChangeNameMenu(context, textField, buttons);
+            GraphicsView.drawChangeNameMenu(context, textField, buttons, images);
             var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
             if (event == null) continue;
             var action = event.getAction();
@@ -386,18 +381,16 @@ public class GraphicsController {
      * @param players list of all players
      * @return index of player chosen
      */
-    private static int choosePlayer(ApplicationContext context, List<Player> players) {
+    private static int choosePlayer(ApplicationContext context, List<Player> players, ImageManager images) {
         var buttons = initButtonChoosePlayer(players);
         while (true) {
-            GraphicsView.drawChoosePlayerMenu(context, buttons);
-            Event event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
-            if (event == null) { // no event
-                continue;
-            }
-            Event.Action action = event.getAction();
+            GraphicsView.drawChoosePlayerMenu(context, buttons, images);
+            var event = context.pollOrWaitEvent(20);
+            if (event == null) continue;
+            var action = event.getAction();
             if (action == Event.Action.POINTER_DOWN) {
                 var i = haveClickedChoosePlayer(event.getLocation(), buttons);
-                if(i != -1) return 1;
+                if(i != -1) return i;
             }
         }
     }
@@ -412,6 +405,7 @@ public class GraphicsController {
         for (int i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
             if (button.rect().contains(mousePos)) {
+                System.out.println(i);
                 return i;
             }
         }
@@ -436,36 +430,25 @@ public class GraphicsController {
                 .toList();
     }
 
-    private static void startGame(ApplicationContext context, Model gameData) throws IOException {
-        ScreenInfo screenInfo = context.getScreenInfo();
-        int width = (int)screenInfo.getWidth();
-        int height = (int)screenInfo.getHeight();
-        Point2D.Float mousePos;
+    private static void startGame(ApplicationContext context, Model gameData, ImageManager images) {
         gameData.startGame();
-        var length = gameData.getDecks().keySet().size();
-        var w = Integer.MAX_VALUE;
-        var h = Math.min(height / length, 400);
-        var image = GraphicsView.loadImage(Path.of("resources", "images", "Alliance Frigate.png"), w, h);
         while (!gameData.getLastRound() || !gameData.startNewRound()) {
-            context.renderFrame(graphics -> {
-                graphics.setColor(Color.LIGHT_GRAY);
-                graphics.fill(new Rectangle(0, 0, width, height));
-                IntStream.range(0, length).forEach(i -> GraphicsView.drawImage(graphics, 0, h * i, image));
-            });
-            Event event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
-            if (event == null) { // no event
-                continue;
-            }
-            Event.Action action = event.getAction();
+            GraphicsView.drawGame(context, gameData, images);
+            var event = context.pollOrWaitEvent(20);
+            if (event == null) continue;
+            var action = event.getAction();
             if (action == Event.Action.KEY_PRESSED) {
                 if (event.getKey() == KeyboardKey.E) { // EXIT
                     System.out.println("Quitting ... !");
                     context.exit(0);
                 }
             } else if (action == Event.Action.POINTER_DOWN) {
-                mousePos = event.getLocation();
-
+                haveClickedGameStarted(event.getLocation()); // todo
             }
         }
+    }
+
+    private static void haveClickedGameStarted(Point2D.Float location) {
+        System.out.println(location);
     }
 }

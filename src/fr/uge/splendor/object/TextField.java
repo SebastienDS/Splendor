@@ -47,7 +47,8 @@ public class TextField{
     }
 
     public void remove() {
-        label.delete(label.length() - 1, label.length());
+        if(label.length() > 0)
+            label.delete(label.length() - 1, label.length());
     }
 }
 

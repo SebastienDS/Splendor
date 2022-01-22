@@ -256,4 +256,8 @@ public class Model {
             nobles.clear();
         }
     }
+
+    public int getNumberOfDecks() {
+        return decks.size() + ((nobles.size() > 0)? 1 : 0);
+    }
 }

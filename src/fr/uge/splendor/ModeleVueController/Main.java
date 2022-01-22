@@ -34,9 +34,11 @@ public class Main {
                         ScreenInfo screenInfo = context.getScreenInfo();
                         GraphicsView.WIDTH_SCREEN = (int)screenInfo.getWidth();
                         GraphicsView.HEIGHT_SCREEN = (int)screenInfo.getHeight();
-                        GraphicsController.startingMenu(context, gameData);
+                        var images = new ImageManager(GraphicsView.WIDTH_SCREEN, GraphicsView.HEIGHT_SCREEN);
+                        GraphicsController.startingMenu(context, gameData, images);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
+                        System.exit(1);
                     }
                 });
             }
