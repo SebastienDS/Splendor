@@ -249,7 +249,8 @@ public class GraphicsController {
 
         var length = gameData.getDecks().keySet().size();
         var w = Integer.MAX_VALUE;
-        var h = Math.min(height / length, 400);
+        var h = Math.min(height / (length + 1), 500);
+        var p = (height - h * length) / (length + 1);
 
         var image = GraphicsView.loadImage(Path.of("resources", "images", "Alliance Frigate.png"), w, h);
 
@@ -258,7 +259,7 @@ public class GraphicsController {
                 graphics.setColor(Color.LIGHT_GRAY);
                 graphics.fill(new Rectangle(0, 0, width, height));
 
-                IntStream.range(0, length).forEach(i -> GraphicsView.drawImage(graphics, 0, h * i, image));
+                IntStream.range(0, length).forEach(i -> GraphicsView.drawImage(graphics, 0, h * i + p * (i + 1), image));
             });
 
             Event event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
