@@ -2,9 +2,12 @@ package fr.uge.splendor.ModeleVueController;
 
 import fr.uge.splendor.object.NumbersDisplays;
 import fr.uge.splendor.object.Player;
+import fr.umlv.zen5.Application;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 /**
  * This class represents the Main
@@ -18,8 +21,15 @@ public class Main {
         NumbersDisplays.loadNumbers();
         try (var scanner = new Scanner(System.in)) {
             var gameData = new Model(initPlayer());
-            Controller.startingMenu(scanner, gameData);
-            View.printWinner(gameData.getWinner());
+            System.out.println("Console ? (y/n)");
+//            var a = scanner.next();
+            var a = "n";
+            if (a.toLowerCase(Locale.ROOT).equals("y")) {
+                Controller.startingMenu(scanner, gameData);
+                View.printWinner(gameData.getWinner());
+            } else {
+                Application.run(Color.BLACK, context -> GraphicsController.startingMenu(context, gameData));
+            }
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(1);

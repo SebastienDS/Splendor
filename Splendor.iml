@@ -7,5 +7,18 @@
     </content>
     <orderEntry type="jdk" jdkName="openjdk-17" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/zen5" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/lib/zen5/demo" />
+          <root url="file://$MODULE_DIR$/lib/zen5/zen5-src" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib/zen5" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
