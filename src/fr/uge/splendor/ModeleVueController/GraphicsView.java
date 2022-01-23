@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -253,14 +254,31 @@ public class GraphicsView {
                 var length = gameData.getNumberOfDecks();
                 drawBackGround(graphics, images.background());
                 drawDecks(graphics, gameData, images, length, actionManager);
-                drawTokens(graphics, gameData, actionManager);
+                drawTokens(graphics, gameData, gameData.getGameTokens().tokens(), actionManager,
+                        WIDTH_SCREEN / 2, HEIGHT_SCREEN / 3);
                 drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images, actionManager);
                 drawPlayers(graphics, gameData);
                 drawButtons(graphics, buttons, actionManager, gameData);
+
+                if (actionManager.getAction() == ActionManager.Action.REMOVE_EXCESS_TOKEN) drawExcessTokens(graphics, gameData, actionManager);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static void drawExcessTokens(Graphics2D graphics, Model gameData, ActionManager actionManager) {
+        graphics.setColor(Color.GRAY);
+        graphics.fillRect(WIDTH_SCREEN / 2 - WIDTH_SCREEN / 10, HEIGHT_SCREEN / 4, WIDTH_SCREEN / 5, HEIGHT_SCREEN / 2);
+        drawTokens(graphics, gameData, gameData.getPlayerPlaying().getWallet().tokens(),
+                actionManager, WIDTH_SCREEN / 2 - WIDTH_SCREEN / 12, HEIGHT_SCREEN / 4 + 50);
+        var font = new Font("Serif", Font.PLAIN, 30);
+        drawString(graphics, "Appuyer", WIDTH_SCREEN / 2, HEIGHT_SCREEN / 4 + 50, WIDTH_SCREEN / 10,
+                HEIGHT_SCREEN / 4, Color.BLACK, font);
+        drawString(graphics, "pour", WIDTH_SCREEN / 2, HEIGHT_SCREEN / 4 + 100, WIDTH_SCREEN / 10,
+                HEIGHT_SCREEN / 4, Color.BLACK, font);
+        drawString(graphics, "Supprimer", WIDTH_SCREEN / 2, HEIGHT_SCREEN / 4 + 150, WIDTH_SCREEN / 10,
+                HEIGHT_SCREEN / 4, Color.BLACK, font);
     }
 
     /**
@@ -364,20 +382,20 @@ public class GraphicsView {
      * @param gameData data of the game
      * @param actionManager actionManager
      */
-    private static void drawTokens(Graphics2D graphics, Model gameData, ActionManager actionManager) {
+    private static void drawTokens(Graphics2D graphics, Model gameData, Map<Token, Integer> tokens,
+                                   ActionManager actionManager, int x, int y) {
         var selectedTokens = actionManager.getSelectedTokens();
-        var tokensGame = gameData.getGameTokens().tokens();
         var i = 0;
-        for (var token : tokensGame.keySet()) {
+        for (var token : tokens.keySet()) {
             if(token == Token.GOLD && gameData.getGameMode() == 1) continue;
             var isSelected = selectedTokens.contains(token);
             drawTokenWithNumber(graphics,
-                    WIDTH_SCREEN / 2,
-                    HEIGHT_SCREEN / 3 + i * HEIGHT_SCREEN / 14,
+                    x,
+                    y + i * HEIGHT_SCREEN / 14,
                     HEIGHT_SCREEN / 15,
                     HEIGHT_SCREEN /15,
                     token,
-                    tokensGame.get(token),
+                    tokens.get(token),
                     isSelected
             );
             i++;

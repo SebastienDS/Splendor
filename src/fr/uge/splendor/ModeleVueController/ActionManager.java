@@ -41,7 +41,11 @@ public class ActionManager {
         /**
          * Represents end turn action
          */
-        END_TURN
+        END_TURN,
+        /**
+         * Represents remove excess token action
+         */
+        REMOVE_EXCESS_TOKEN
     }
 
     /**

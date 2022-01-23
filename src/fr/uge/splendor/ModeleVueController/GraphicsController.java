@@ -497,7 +497,9 @@ public class GraphicsController {
      * @param images all images
      */
     private static void manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
-        if (!manageCardAction(location, actionManager, gameData, images) && !manageTokenAction(location, actionManager, gameData) && !manageDeckAction(location, actionManager, gameData, images)) {
+        if (!manageCardAction(location, actionManager, gameData, images)
+                && !manageTokenAction(location, actionManager, gameData)
+                && !manageDeckAction(location, actionManager, gameData, images)) {
             manageReservedCardAction(location, actionManager, gameData, images);
         }
     }
@@ -762,13 +764,42 @@ public class GraphicsController {
      */
     private static void haveClickedGameStarted(Point2D.Float location, ActionManager actionManager,
                                                Model gameData, ImageManager images, List<Button> buttons) {
+        var wallet = gameData.getPlayerPlaying().getWallet();
         if (actionManager.getAction() != ActionManager.Action.END_TURN) {
-            manageAction(location, actionManager, gameData, images);
-            manageButtons(buttons, location, actionManager, gameData);
+            if (actionManager.getAction() == ActionManager.Action.REMOVE_EXCESS_TOKEN) {
+                manageRemoveExcessToken(location, actionManager, gameData);
+            } else {
+                manageAction(location, actionManager, gameData, images);
+                manageButtons(buttons, location, actionManager, gameData);
+            }
+        }
+        else if (Controller.numberOfTokens(wallet) > 10) {
+            actionManager.setAction(ActionManager.Action.REMOVE_EXCESS_TOKEN);
         }
         else if (manageEndTurn(buttons, location)) {
             gameData.endTurn();
             actionManager.setAction(ActionManager.Action.NONE);
+        }
+    }
+
+    private static void manageRemoveExcessToken(Point2D.Float location, ActionManager actionManager, Model gameData) {
+        var tokens = gameData.getPlayerPlaying().getWallet().tokens();
+        var i = 0;
+        for (var token : tokens.keySet()) {
+            var rect = new Rectangle(
+                    GraphicsView.WIDTH_SCREEN / 2 - GraphicsView.WIDTH_SCREEN / 12,
+                    GraphicsView.HEIGHT_SCREEN / 4 + 50 + i * GraphicsView.HEIGHT_SCREEN / 14,
+                    GraphicsView.HEIGHT_SCREEN / 15,
+                    GraphicsView.HEIGHT_SCREEN / 15
+            );
+            if (tokens.get(token) > 0 && rect.contains(location)) {
+                gameData.getPlayerPlaying().addToken(token, -1);
+                gameData.getGameTokens().addToken(token, 1);
+                if (Controller.numberOfTokens(gameData.getPlayerPlaying().getWallet()) <= 10)
+                    actionManager.setAction(ActionManager.Action.END_TURN);
+                return;
+            }
+            i++;
         }
     }
 }

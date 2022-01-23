@@ -146,7 +146,7 @@ public class Controller {
     private static boolean endOfTurn(Scanner scanner, Model gameData, boolean turnFinished) {
         if (turnFinished) {
             var wallet = gameData.getPlayerPlaying().getWallet();
-            if (sizeWithoutGold(wallet) > 10) {
+            if (numberOfTokens(wallet) > 10) {
                 removeExcessTokens(scanner, gameData, wallet, 10);
             }
             return true;
@@ -500,12 +500,11 @@ public class Controller {
      * @param tokenManager contains all tokens
      * @return the number of tokens in tokenManager without taking into account gold token
      */
-    private static int sizeWithoutGold(TokenManager tokenManager) {
+    public static int numberOfTokens(TokenManager tokenManager) {
+        Objects.requireNonNull(tokenManager);
         return tokenManager.tokens()
-                .entrySet()
+                .values()
                 .stream()
-                .filter(entry -> entry.getKey() != Token.GOLD)
-                .map(Map.Entry::getValue)
                 .reduce(0, Integer::sum);
     }
 
@@ -531,7 +530,7 @@ public class Controller {
      * @param maxTokens max total of tokens
      */
     private static void removeExcessTokens(Scanner scanner, Model gameData, TokenManager wallet, int maxTokens) {
-        while (sizeWithoutGold(wallet) > maxTokens) {
+        while (numberOfTokens(wallet) > maxTokens) {
             var notEmptyTokens = getNotEmptyTokens(wallet);
             View.printAskRemoveExcessToken();
             View.printTokens(wallet, notEmptyTokens);

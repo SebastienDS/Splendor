@@ -78,6 +78,7 @@ public class Player {
     public void addToken(Token token, int number) {
         Objects.requireNonNull(token);
         wallet.addToken(token, number);
+        if (wallet.get(token) == 0) wallet.tokens().remove(token);
     }
 
     /**
