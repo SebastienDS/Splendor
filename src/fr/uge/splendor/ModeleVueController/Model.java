@@ -63,9 +63,8 @@ public class Model {
         this.decks = Objects.requireNonNull(decks);
         this.grounds = Objects.requireNonNull(grounds);
         gameTokens = new TokenManager();
-
+        this.nobles = nobles;
         Collections.shuffle(nobles);
-        this.nobles = nobles.stream().limit(players.size() + 1).collect(Collectors.toList());
     }
 
     public Model(List<Player> players) throws IOException {
@@ -128,7 +127,7 @@ public class Model {
      * This method shuffles all the decks of the games
      */
     private void shuffleDecks() {
-        decks.values().forEach(deck -> deck.shuffle());
+        decks.values().forEach(Deck::shuffle);
     }
 
     /**
@@ -239,10 +238,17 @@ public class Model {
         return maxPrestigePlayer.stream().min(Comparator.comparingInt(Player::getCardPurchased)).get();
     }
 
+    /**
+     * This methode return lise of all nobles
+     * @return list of all nobles
+     */
     public List<Noble> getNobles() {
         return nobles;
     }
 
+    /**
+     * Keep only decks used in game mode
+     */
     private void initDecks() {
         if (gameMode == 1) {
             decks.keySet().removeIf(key -> key != 0);
@@ -251,12 +257,21 @@ public class Model {
         }
     }
 
+    /**
+     * Clear nobles if game mode dont have them else let only size of player + 1 noble in list
+     */
     private void initNobles() {
         if (gameMode == 1) {
             nobles.clear();
+            return;
         }
+        nobles.removeAll(nobles.stream().limit(nobles.size() - (players.size() + 1)).toList());
     }
 
+    /**
+     * Get total number of decks in game (counting noble list)
+     * @return number of decks in game
+     */
     public int getNumberOfDecks() {
         return decks.size() + ((nobles.size() > 0)? 1 : 0);
     }

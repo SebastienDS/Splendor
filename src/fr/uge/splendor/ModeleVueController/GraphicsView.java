@@ -1,8 +1,7 @@
 package fr.uge.splendor.ModeleVueController;
 
+import fr.uge.splendor.object.*;
 import fr.uge.splendor.object.Button;
-import fr.uge.splendor.object.Constants;
-import fr.uge.splendor.object.Player;
 import fr.uge.splendor.object.TextField;
 import fr.umlv.zen5.ApplicationContext;
 
@@ -253,40 +252,78 @@ public class GraphicsView {
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
-                drawDecks(graphics, gameData);
+                drawDecks(graphics, gameData, images);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static void drawDecks(Graphics2D graphics, Model gameData) throws IOException {
+    private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images) throws IOException {
         var length = gameData.getNumberOfDecks();
-        var w = Integer.MAX_VALUE;
-        var h = Math.min(HEIGHT_SCREEN / (length + 1), 500);
-        var image = loadImage(Path.of("resources", "images", "Alliance Frigate.png"), w, h);
         for (var key : gameData.getGrounds().keySet()) {
-            drawCards(graphics, gameData, image, length, key);
+            drawCards(graphics, gameData, images, length, key);
         }
-        drawNoble(graphics, gameData, image, length);
+        drawNobles(graphics, gameData, images, length);
     }
 
-    private static void drawNoble(Graphics2D graphics, Model gameData, BufferedImage image, int length) {
-        var cards = gameData.getNobles();
-        for (int i = 0; i < cards.size(); i++) {
-            drawCard(graphics, length, i, 0, image);
+    private static void drawNobles(Graphics2D graphics, Model gameData, ImageManager images, int length) throws IOException {
+        var nobles = gameData.getNobles();
+        for (int i = 0; i < nobles.size(); i++) {
+            drawImage(graphics, length, i, 0, images.get(nobles.get(i)));
         }
     }
 
-    private static void drawCards(Graphics2D graphics, Model gameData, BufferedImage image, int length, int index) {
+    private static void drawCards(Graphics2D graphics, Model gameData, ImageManager images, int length, int index) {
         var cards = gameData.getGrounds().get(index);
         for (int i = 0; i < cards.size(); i++) {
-            drawCard(graphics, length, i, index, image);
+            drawImage(graphics, length, i, index, images.get(cards.get(i)));
+            drawCardCharacteristic(graphics, cards.get(i), images.get(cards.get(i)), i, index, length);
         }
     }
 
-    private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image){
-        var spacingX = 2 * WIDTH_SCREEN / (3 * Constants.DRAW_NUMBER);
+    private static void drawCardCharacteristic(Graphics2D graphics, Development card, BufferedImage image,
+                                                int indexWidth, int indexHeight, int length) {
+        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+        var spacingY = HEIGHT_SCREEN / length;
+        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
+        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        var font = new Font("Serif", Font.BOLD, 15);
+        drawPrestige(graphics, String.valueOf(card.prestige()), image, x, y, font);
+        drawBonus(graphics, card.bonus(), x, y, image);
+    }
+
+    private static void drawBonus(Graphics2D graphics, Token bonus, int x, int y, BufferedImage image) {
+        graphics.fillRect(x + image.getWidth() /5, y, image.getWidth() / 5, image.getHeight() / 7);
+        graphics.setPaint(bonus.getColor());
+    }
+
+    private static void drawNobleCharacteristic(Graphics2D graphics, Noble noble, BufferedImage image,
+                                               int indexWidth, int indexHeight, int length) {
+        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+        var spacingY = HEIGHT_SCREEN / length;
+        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
+        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        var font = new Font("Serif", Font.BOLD, 15);
+        drawPrestige(graphics, String.valueOf(noble.prestige()), image, x, y, font);
+    }
+
+    private static void drawPrestige(Graphics2D graphics, String prestige, BufferedImage image, int x, int y, Font font) {
+        graphics.setPaint(Color.LIGHT_GRAY);
+        graphics.fillRect(x, y, image.getWidth() / 5, image.getHeight() / 7);
+        drawString(graphics, prestige, x, y, image.getWidth() / 5, image.getHeight() / 7, font);
+    }
+
+    private static void drawString(Graphics2D graphics, String prestige, int x, int y, int width, int height,  Font font) {
+        graphics.setFont(font);
+        var metrics = graphics.getFontMetrics(font);
+        var bounds = metrics.getStringBounds(prestige, graphics);
+        graphics.setColor(Color.BLACK);
+        graphics.drawString(prestige, (int)(x + width / 2 - bounds.getCenterX()), (int)(y + height / 2 - bounds.getCenterY()));
+    }
+
+    private static void drawImage(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image){
+        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
         var spacingY = HEIGHT_SCREEN / length;
         var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
         var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;

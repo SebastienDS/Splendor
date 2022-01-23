@@ -9,6 +9,7 @@ import fr.umlv.zen5.KeyboardKey;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -431,11 +432,14 @@ public class GraphicsController {
     }
 
     private static void startGame(ApplicationContext context, Model gameData, ImageManager images) {
+        images.initCards(Path.of("resources", "images", "cards"), gameData);
+        images.initNoble(Path.of("resources", "images", "nobles"), gameData);
         gameData.startGame();
+        GraphicsView.drawGame(context, gameData, images);
         while (!gameData.getLastRound() || !gameData.startNewRound()) {
-            GraphicsView.drawGame(context, gameData, images);
             var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
+            GraphicsView.drawGame(context, gameData, images);
             var action = event.getAction();
             if (action == Event.Action.KEY_PRESSED) {
                 if (event.getKey() == KeyboardKey.E) { // EXIT

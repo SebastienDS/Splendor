@@ -1,5 +1,7 @@
 package fr.uge.splendor.ModeleVueController;
 
+import fr.uge.splendor.object.Development;
+import fr.uge.splendor.object.Noble;
 import fr.uge.splendor.object.Token;
 
 import javax.imageio.ImageIO;
@@ -7,38 +9,85 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ImageManager {
     private final BufferedImage backGround;
     private final Map<String, Map<Token, BufferedImage>> cards;
+    private final Map<String, BufferedImage> nobles;
 
-    public ImageManager(Path backGround, Path cards, int width_screen, int height_screen) throws IOException {
+    public ImageManager(Path backGround, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
-        Objects.requireNonNull(cards);
         this.backGround = loadImage(backGround, width_screen, height_screen);
         this.cards = new HashMap<>();
-        initCards(cards);
+        this.nobles = new HashMap<>();
     }
 
     public ImageManager(int width_screen, int height_screen) throws IOException {
         this(
                 Path.of("resources", "images", "background.jpg"),
-                Path.of("resources", "images", "cards"),
                 width_screen,
                 height_screen
         );
     }
 
-    private void initCards(Path cards) {
+    public void initCards(Path cards, Model gameData) {
         try (var paths = Files.walk(cards)) {
-            paths.filter(Files::isRegularFile).forEach(System.out::println);
+            paths.filter(Files::isRegularFile).forEach(
+                    path-> {
+                        try {
+                            create_image(path, gameData);
+                        } catch (IOException e) {
+                            System.err.println(e.getMessage());
+                            System.exit(1);
+                        }
+                    }
+            );
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
+    }
+
+    private void create_image(Path path, Model gameData) throws IOException {
+        var token = Token.valueOf(path.getFileName().toString().split("[.]")[0]);
+        var nameDirectory = path.getName(path.getNameCount() - 2).toString();
+        if(cards.containsKey(nameDirectory)){
+            cards.get(nameDirectory).put(token, loadCard(path, gameData));
+            return;
+        }
+        cards.put(nameDirectory, new HashMap<>());
+        cards.get(nameDirectory).put(token, loadCard(path, gameData));
+    }
+
+    public void initNoble(Path nobles, Model gameData) {
+        try (var paths = Files.walk(nobles)) {
+            paths.filter(Files::isRegularFile).forEach(
+                    path-> {
+                        try {
+                            create_noble(path, gameData);
+                        } catch (IOException e) {
+                            System.err.println(e.getMessage());
+                            System.exit(1);
+                        }
+                    }
+            );
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private void create_noble(Path path, Model gameData) throws IOException {
+        var name = path.getFileName().toString().split("[.]")[0];
+        nobles.put(name, loadCard(path, gameData));
+    }
+
+    private BufferedImage loadCard(Path path, Model gameData) throws IOException {
+        var length = gameData.getNumberOfDecks();
+        var w = Integer.MAX_VALUE;
+        var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
+        return loadImage(path, w, h);
     }
 
     /**
@@ -104,5 +153,18 @@ public class ImageManager {
      */
     public BufferedImage background() {
         return backGround;
+    }
+
+    /**
+     * This methode return the image of the card
+     * @param card card associated to the image
+     * @return image associated to the card
+     */
+    public BufferedImage get(Development card) {
+        return cards.get(card.name()).get(card.bonus());
+    }
+
+    public BufferedImage get(Noble noble) {
+        return nobles.get(noble.name());
     }
 }
