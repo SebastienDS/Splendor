@@ -165,7 +165,7 @@ public class Decks {
         var tokenManager = parseTokens(args.get(2));
         var prestige = Integer.parseInt(args.get(3));
 
-        return new Development(tokenManager, args.get(1), prestige, Token.valueOf(args.get(5)));
+        return new Development(tokenManager, args.get(1), prestige, Token.valueOf(args.get(4)));
     }
 
     /**
