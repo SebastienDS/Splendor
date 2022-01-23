@@ -463,6 +463,16 @@ public class GraphicsController {
                 haveClickedGameStarted(event.getLocation(), actionManager, gameData, images, buttons);
             }
         }
+        winnerMenu(context, gameData, images);
+    }
+
+    private static void winnerMenu(ApplicationContext context, Model gameData, ImageManager images) {
+        GraphicsView.drawWinner(context, gameData, images);
+        while(true){
+            var event = context.pollOrWaitEvent(20);
+            if(event == null)continue;
+            if(event.getAction() == Event.Action.POINTER_DOWN) context.exit(0);
+        }
     }
 
     /**
@@ -581,7 +591,7 @@ public class GraphicsController {
      * @param actionManager manage action
      * @param gameData data of game
      * @param images all images
-     * @return
+     * @return true if user clicked on deck
      */
     private static boolean manageDeckAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
         var length = gameData.getNumberOfDecks();

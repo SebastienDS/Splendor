@@ -719,4 +719,19 @@ public class GraphicsView {
             graphics.drawRect(x, y, image.getWidth(), image.getHeight());
         }
     }
+
+    /**
+     * draw winner menu
+     * @param context application context
+     * @param gameData data of the game
+     * @param images all images
+     */
+    public static void drawWinner(ApplicationContext context, Model gameData, ImageManager images) {
+        var font = new Font("Serif", Font.BOLD, 125);
+        context.renderFrame(graphics2D -> {
+            graphics2D.drawImage(images.backgroundWin(), null, 0, 0);
+            graphics2D.drawImage(images.stringWin(), null, WIDTH_SCREEN / 2 - images.stringWin().getWidth() / 2, 50);
+            drawStringOutlined(graphics2D, gameData.getWinner().getName(), 0, 0, WIDTH_SCREEN, HEIGHT_SCREEN, Color.WHITE, font);
+        });
+    }
 }
