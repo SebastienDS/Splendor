@@ -55,6 +55,9 @@ public class ImageManager {
      */
     public ImageManager(Path backGround, Path title, Path backGroundWin, Path winString, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
+        Objects.requireNonNull(title);
+        Objects.requireNonNull(backGroundWin);
+        Objects.requireNonNull(winString);
         this.backGround = loadImage(backGround, width_screen, height_screen);
         this.title = loadImage(title, width_screen / 3, height_screen / 15);
         this.backGroundWin = loadImage(backGroundWin, width_screen, height_screen);
@@ -86,6 +89,8 @@ public class ImageManager {
      * @param gameData data of the game
      */
     public void initCards(Path cards, Model gameData) {
+        Objects.requireNonNull(cards);
+        Objects.requireNonNull(gameData);
         var length = gameData.getNumberOfDecks();
         var w = Integer.MAX_VALUE;
         var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
@@ -131,6 +136,8 @@ public class ImageManager {
      * @param gameData data of the game
      */
     public void initNoble(Path nobles, Model gameData) {
+        Objects.requireNonNull(nobles);
+        Objects.requireNonNull(gameData);
         var length = gameData.getNumberOfDecks();
         var w = Integer.MAX_VALUE;
         var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
@@ -234,6 +241,7 @@ public class ImageManager {
      * @return image associated to the card
      */
     public BufferedImage get(Development card) {
+        Objects.requireNonNull(card);
         return cards.get(card.name()).get(card.bonus());
     }
 
@@ -243,6 +251,7 @@ public class ImageManager {
      * @return image of the noble
      */
     public BufferedImage get(Noble noble) {
+        Objects.requireNonNull(noble);
         return nobles.get(noble.name());
     }
 
@@ -262,10 +271,18 @@ public class ImageManager {
         return cardBackGround;
     }
 
+    /**
+     * This method return image of background of win
+     * @return image of background of win
+     */
     public BufferedImage backgroundWin() {
         return backGroundWin;
     }
 
+    /**
+     * This method return image of the string of win
+     * @return image of the string of win
+     */
     public BufferedImage stringWin() {
         return winString;
     }
