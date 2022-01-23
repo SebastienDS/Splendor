@@ -164,6 +164,7 @@ public class GraphicsView {
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
+                drawTitle(graphics, images.title());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -232,6 +233,10 @@ public class GraphicsView {
         graphics.drawImage(background, 0, 0, WIDTH_SCREEN, HEIGHT_SCREEN, null);
     }
 
+    private static void drawTitle(Graphics2D graphics, BufferedImage title){
+        graphics.drawImage(title, WIDTH_SCREEN / 3, 0, WIDTH_SCREEN / 3, HEIGHT_SCREEN / 10 + 10, null);
+    }
+
     /**
      * Draw elements of choose player menu with the background
      * @param context display context
@@ -271,6 +276,7 @@ public class GraphicsView {
         var nobles = gameData.getNobles();
         for (int i = 0; i < nobles.size(); i++) {
             drawImage(graphics, length, i, 0, images.get(nobles.get(i)));
+            drawNobleCharacteristic(graphics, nobles.get(i), images.get(nobles.get(i)), i, length);
         }
     }
 
@@ -280,6 +286,7 @@ public class GraphicsView {
             drawImage(graphics, length, i, index, images.get(cards.get(i)));
             drawCardCharacteristic(graphics, cards.get(i), images.get(cards.get(i)), i, index, length);
         }
+
     }
 
     private static void drawCardCharacteristic(Graphics2D graphics, Development card, BufferedImage image,
@@ -291,34 +298,63 @@ public class GraphicsView {
         var font = new Font("Serif", Font.BOLD, 15);
         drawPrestige(graphics, String.valueOf(card.prestige()), image, x, y, font);
         drawBonus(graphics, card.bonus(), x, y, image);
+        var cost = card.cost().tokens();
+        var index = 0;
+        for (var token: cost.keySet()) {
+            drawCost(graphics, token, cost.get(token), x, y, index, image.getWidth(), image.getHeight(), font);
+            index += 1;
+        }
+    }
+
+    private static void drawCost(Graphics2D graphics, Token token, int price, int x, int y,
+                                 int index, int width, int height, Font font) {
+        graphics.setPaint(Color.LIGHT_GRAY);
+        int y1 = y + (6 - index) * height / 7;
+        graphics.fillRect(x, y1, width / 5, height / 7);
+        drawToken(graphics, x, y1, width / 5, height / 7, token);
+        var color = (token == Token.ONYX)? Color.white : Color.black;
+        drawString(graphics, String.valueOf(price), x, y1, width / 5, height / 7, color, font);
     }
 
     private static void drawBonus(Graphics2D graphics, Token bonus, int x, int y, BufferedImage image) {
-        graphics.fillRect(x + image.getWidth() /5, y, image.getWidth() / 5, image.getHeight() / 7);
-        graphics.setPaint(bonus.getColor());
+        graphics.setPaint(Color.LIGHT_GRAY);
+        graphics.fillRect(x + 4 * image.getWidth() /5, y, image.getWidth() / 5, image.getHeight() / 7);
+        drawToken(graphics, x + 4 * image.getWidth() / 5, y, image.getWidth()/5, image.getHeight() / 7, bonus);
+    }
+
+    private static void drawToken(Graphics2D graphics, int x, int y, int width, int height, Token token){
+        graphics.setPaint(token.getColor());
+        graphics.fillOval(x + 1, y + 1, width - 2, height - 2);
     }
 
     private static void drawNobleCharacteristic(Graphics2D graphics, Noble noble, BufferedImage image,
-                                               int indexWidth, int indexHeight, int length) {
+                                               int indexWidth, int length) {
         var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
         var spacingY = HEIGHT_SCREEN / length;
         var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
-        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        var y = spacingY / 2 - image.getHeight() / 2;
         var font = new Font("Serif", Font.BOLD, 15);
         drawPrestige(graphics, String.valueOf(noble.prestige()), image, x, y, font);
+        var index = 0;
+        var cost = noble.cost();
+        for (var token: cost.keySet()) {
+            drawCost(graphics, token, cost.get(token), x, y, index, image.getWidth(), image.getHeight(), font);
+            index += 1;
+        }
     }
 
     private static void drawPrestige(Graphics2D graphics, String prestige, BufferedImage image, int x, int y, Font font) {
         graphics.setPaint(Color.LIGHT_GRAY);
         graphics.fillRect(x, y, image.getWidth() / 5, image.getHeight() / 7);
-        drawString(graphics, prestige, x, y, image.getWidth() / 5, image.getHeight() / 7, font);
+        drawString(graphics, prestige, x, y, image.getWidth() / 5, image.getHeight() / 7, Color.black, font);
     }
 
-    private static void drawString(Graphics2D graphics, String prestige, int x, int y, int width, int height,  Font font) {
+    private static void drawString(Graphics2D graphics, String prestige, int x, int y,
+                                   int width, int height, Color color,  Font font) {
         graphics.setFont(font);
         var metrics = graphics.getFontMetrics(font);
         var bounds = metrics.getStringBounds(prestige, graphics);
-        graphics.setColor(Color.BLACK);
+        graphics.setPaint(color);
         graphics.drawString(prestige, (int)(x + width / 2 - bounds.getCenterX()), (int)(y + height / 2 - bounds.getCenterY()));
     }
 

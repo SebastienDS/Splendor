@@ -13,12 +13,15 @@ import java.util.*;
 
 public class ImageManager {
     private final BufferedImage backGround;
+    private final BufferedImage title;
+    private BufferedImage cardBackGround;
     private final Map<String, Map<Token, BufferedImage>> cards;
     private final Map<String, BufferedImage> nobles;
 
-    public ImageManager(Path backGround, int width_screen, int height_screen) throws IOException {
+    public ImageManager(Path backGround, Path title, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
         this.backGround = loadImage(backGround, width_screen, height_screen);
+        this.title = loadImage(title, width_screen / 3, height_screen / 15);
         this.cards = new HashMap<>();
         this.nobles = new HashMap<>();
     }
@@ -26,46 +29,54 @@ public class ImageManager {
     public ImageManager(int width_screen, int height_screen) throws IOException {
         this(
                 Path.of("resources", "images", "background.jpg"),
+                Path.of("resources", "images", "title.png"),
                 width_screen,
                 height_screen
         );
     }
 
     public void initCards(Path cards, Model gameData) {
+        var length = gameData.getNumberOfDecks();
+        var w = Integer.MAX_VALUE;
+        var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
         try (var paths = Files.walk(cards)) {
             paths.filter(Files::isRegularFile).forEach(
                     path-> {
                         try {
-                            create_image(path, gameData);
+                            create_image(path, w, h);
                         } catch (IOException e) {
                             System.err.println(e.getMessage());
                             System.exit(1);
                         }
                     }
             );
+            cardBackGround = loadImage(Path.of("resources", "images", "cardsBack.png"), w, h);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
     }
 
-    private void create_image(Path path, Model gameData) throws IOException {
+    private void create_image(Path path, int width, int height) throws IOException {
         var token = Token.valueOf(path.getFileName().toString().split("[.]")[0]);
         var nameDirectory = path.getName(path.getNameCount() - 2).toString();
         if(cards.containsKey(nameDirectory)){
-            cards.get(nameDirectory).put(token, loadCard(path, gameData));
+            cards.get(nameDirectory).put(token, loadImage(path, width, height));
             return;
         }
         cards.put(nameDirectory, new HashMap<>());
-        cards.get(nameDirectory).put(token, loadCard(path, gameData));
+        cards.get(nameDirectory).put(token, loadImage(path, width, height));
     }
 
     public void initNoble(Path nobles, Model gameData) {
+        var length = gameData.getNumberOfDecks();
+        var w = Integer.MAX_VALUE;
+        var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
         try (var paths = Files.walk(nobles)) {
             paths.filter(Files::isRegularFile).forEach(
                     path-> {
                         try {
-                            create_noble(path, gameData);
+                            create_noble(path, w, h);
                         } catch (IOException e) {
                             System.err.println(e.getMessage());
                             System.exit(1);
@@ -78,16 +89,9 @@ public class ImageManager {
         }
     }
 
-    private void create_noble(Path path, Model gameData) throws IOException {
+    private void create_noble(Path path, int width, int height) throws IOException {
         var name = path.getFileName().toString().split("[.]")[0];
-        nobles.put(name, loadCard(path, gameData));
-    }
-
-    private BufferedImage loadCard(Path path, Model gameData) throws IOException {
-        var length = gameData.getNumberOfDecks();
-        var w = Integer.MAX_VALUE;
-        var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
-        return loadImage(path, w, h);
+        nobles.put(name, loadImage(path, width, height));
     }
 
     /**
@@ -166,5 +170,9 @@ public class ImageManager {
 
     public BufferedImage get(Noble noble) {
         return nobles.get(noble.name());
+    }
+
+    public BufferedImage title() {
+        return title;
     }
 }
