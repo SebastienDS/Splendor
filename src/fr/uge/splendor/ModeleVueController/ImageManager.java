@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class ImageManager {
+
     private final BufferedImage backGround;
     private final BufferedImage title;
     private BufferedImage cardBackGround;
@@ -174,5 +175,9 @@ public class ImageManager {
 
     public BufferedImage title() {
         return title;
+    }
+
+    public BufferedImage cardBackGround() {
+        return cardBackGround;
     }
 }

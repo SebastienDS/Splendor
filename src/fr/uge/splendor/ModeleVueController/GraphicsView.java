@@ -7,6 +7,8 @@ import fr.umlv.zen5.ApplicationContext;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -258,10 +260,32 @@ public class GraphicsView {
             try {
                 drawBackGround(graphics, images.background());
                 drawDecks(graphics, gameData, images);
+                drawTokens(graphics, gameData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static void drawTokens(Graphics2D graphics, Model gameData) {
+        var tokens = Token.values();
+        var tokensGame = gameData.getGameTokens().tokens();
+        for (int i = 1; i < tokens.length; i++) {
+            drawTokenWithNumber(graphics,
+                    WIDTH_SCREEN / 2,
+                    HEIGHT_SCREEN / 5 + i * HEIGHT_SCREEN / 14,
+                    HEIGHT_SCREEN / 15,
+                    HEIGHT_SCREEN /15,
+                    tokens[i],
+                    tokensGame.get(tokens[i])
+            );
+        }
+    }
+
+    private static void drawTokenWithNumber(Graphics2D graphics, int x, int y, int width, int height, Token token, int number) {
+        drawToken(graphics, x, y, width, height, token);
+        var font = new Font("Serif", Font.BOLD, 35);
+        drawStringOutlined(graphics, String.valueOf(number), x, y, width, height, Color.WHITE, font);
     }
 
     private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images) throws IOException {
@@ -286,7 +310,35 @@ public class GraphicsView {
             drawImage(graphics, length, i, index, images.get(cards.get(i)));
             drawCardCharacteristic(graphics, cards.get(i), images.get(cards.get(i)), i, index, length);
         }
+        drawImage(graphics, length, cards.size(), index, images.cardBackGround());
+        var stringSize = String.valueOf(gameData.getDecks().get(index).size());
+        drawSizeDeck(graphics, stringSize, length, images.get(cards.get(0)), cards.size(), index);
+    }
 
+    private static void drawSizeDeck(Graphics2D graphics, String stringSize, int length, BufferedImage image,
+                                     int indexWidth, int indexHeight) {
+        var font = new Font("Serif", Font.BOLD, 50);
+        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+        var spacingY = HEIGHT_SCREEN / length;
+        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
+        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        drawStringOutlined(graphics, stringSize, x, y, image.getWidth(), image.getHeight(), Color.red, font);
+    }
+
+    private static void drawStringOutlined(Graphics2D graphics, String str, int x, int y, int width,
+                                           int height, Color color, Font font){
+        var metrics = graphics.getFontMetrics(font);
+        var bounds = metrics.getStringBounds(str, graphics);
+        x = (int)(x + width / 2 - bounds.getCenterX());
+        y = (int)(y + height / 2 - bounds.getCenterY());
+        graphics.setFont(font);
+        graphics.setColor(Color.black);
+        graphics.drawString(str, x + 1, y - 1);
+        graphics.drawString(str, x + 1, y + 1);
+        graphics.drawString(str, x - 1, y - 1);
+        graphics.drawString(str, x - 1, y + 1);
+        graphics.setColor(color);
+        graphics.drawString(str, x, y);
     }
 
     private static void drawCardCharacteristic(Graphics2D graphics, Development card, BufferedImage image,
@@ -297,7 +349,7 @@ public class GraphicsView {
         var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
         var font = new Font("Serif", Font.BOLD, 15);
         drawPrestige(graphics, String.valueOf(card.prestige()), image, x, y, font);
-        drawBonus(graphics, card.bonus(), x, y, image);
+        if(!(card.bonus() == Token.NONE)) drawBonus(graphics, card.bonus(), x, y, image);
         var cost = card.cost().tokens();
         var index = 0;
         for (var token: cost.keySet()) {
@@ -349,13 +401,13 @@ public class GraphicsView {
         drawString(graphics, prestige, x, y, image.getWidth() / 5, image.getHeight() / 7, Color.black, font);
     }
 
-    private static void drawString(Graphics2D graphics, String prestige, int x, int y,
+    private static void drawString(Graphics2D graphics, String str, int x, int y,
                                    int width, int height, Color color,  Font font) {
         graphics.setFont(font);
         var metrics = graphics.getFontMetrics(font);
-        var bounds = metrics.getStringBounds(prestige, graphics);
+        var bounds = metrics.getStringBounds(str, graphics);
         graphics.setPaint(color);
-        graphics.drawString(prestige, (int)(x + width / 2 - bounds.getCenterX()), (int)(y + height / 2 - bounds.getCenterY()));
+        graphics.drawString(str, (int)(x + width / 2 - bounds.getCenterX()), (int)(y + height / 2 - bounds.getCenterY()));
     }
 
     private static void drawImage(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image){

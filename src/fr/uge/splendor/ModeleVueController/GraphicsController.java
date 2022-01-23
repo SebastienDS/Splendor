@@ -453,6 +453,6 @@ public class GraphicsController {
     }
 
     private static void haveClickedGameStarted(Point2D.Float location) {
-        System.out.println(location);
+        location.setLocation(5, 5);
     }
 }
