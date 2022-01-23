@@ -1,6 +1,7 @@
 package fr.uge.splendor.ModeleVueController;
 
 import fr.uge.splendor.object.Button;
+import fr.uge.splendor.object.Constants;
 import fr.uge.splendor.object.Player;
 import fr.uge.splendor.object.TextField;
 import fr.umlv.zen5.ApplicationContext;
@@ -11,9 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 public class GraphicsView {
@@ -266,29 +265,31 @@ public class GraphicsView {
         var w = Integer.MAX_VALUE;
         var h = Math.min(HEIGHT_SCREEN / (length + 1), 500);
         var image = loadImage(Path.of("resources", "images", "Alliance Frigate.png"), w, h);
-        for (int i = 0; i < gameData.getDecks().size(); i++) {
-            drawCards(graphics, gameData, image, length, i);
+        for (var key : gameData.getGrounds().keySet()) {
+            drawCards(graphics, gameData, image, length, key);
         }
-        drawCards(graphics, gameData, image, length, gameData.getDecks().size());
+        drawNoble(graphics, gameData, image, length);
+    }
+
+    private static void drawNoble(Graphics2D graphics, Model gameData, BufferedImage image, int length) {
+        var cards = gameData.getNobles();
+        for (int i = 0; i < cards.size(); i++) {
+            drawCard(graphics, length, i, 0, image);
+        }
     }
 
     private static void drawCards(Graphics2D graphics, Model gameData, BufferedImage image, int length, int index) {
         var cards = gameData.getGrounds().get(index);
-        if(cards == null) return;
         for (int i = 0; i < cards.size(); i++) {
-            drawCard(graphics, length, i, index, image, cards.size());
+            drawCard(graphics, length, i, index, image);
         }
     }
 
-    private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image, int size){
-        var w = (2 * HEIGHT_SCREEN / 3) / size;
-        var h = Math.min(HEIGHT_SCREEN / (length + 1), 500);
-        var paddingHeight = (HEIGHT_SCREEN - h * length) / (length + 1);
-        var paddingWidth = (HEIGHT_SCREEN - w * length) / (length + 1);
-        GraphicsView.drawImage(
-                graphics,
-                indexWidth * w + paddingWidth * (indexWidth + 1),
-                h * indexHeight + paddingHeight * (indexHeight + 1),
-                image);
+    private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image){
+        var spacingX = 2 * WIDTH_SCREEN / (3 * Constants.DRAW_NUMBER);
+        var spacingY = HEIGHT_SCREEN / length;
+        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
+        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        GraphicsView.drawImage(graphics, x, y, image);
     }
 }

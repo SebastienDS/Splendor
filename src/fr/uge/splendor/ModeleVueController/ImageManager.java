@@ -18,9 +18,19 @@ public class ImageManager {
 
     public ImageManager(Path backGround, Path cards, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
+        Objects.requireNonNull(cards);
         this.backGround = loadImage(backGround, width_screen, height_screen);
         this.cards = new HashMap<>();
-        if(cards != null) initCards(cards);
+        initCards(cards);
+    }
+
+    public ImageManager(int width_screen, int height_screen) throws IOException {
+        this(
+                Path.of("resources", "images", "background.jpg"),
+                Path.of("resources", "images", "cards"),
+                width_screen,
+                height_screen
+        );
     }
 
     private void initCards(Path cards) {
@@ -29,10 +39,6 @@ public class ImageManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public ImageManager(int width_screen, int height_screen) throws IOException {
-        this(Path.of("resources", "images", "background.jpg"), null, width_screen, height_screen);
     }
 
     /**
@@ -92,6 +98,10 @@ public class ImageManager {
         return result;
     }
 
+    /**
+     * This methode return background image
+     * @return background image
+     */
     public BufferedImage background() {
         return backGround;
     }
