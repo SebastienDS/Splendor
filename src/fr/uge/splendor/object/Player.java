@@ -176,7 +176,7 @@ public class Player {
 
     /**
      * This method add prestige of the noble to the player.
-     * @param card gained by visit of noblee
+     * @param card gained by visit of noble
      */
     public void addNoble(Noble card) {
         prestige += card.prestige();

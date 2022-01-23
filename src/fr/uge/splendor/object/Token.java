@@ -1,7 +1,6 @@
 package fr.uge.splendor.object;
 
 import java.awt.*;
-import java.util.Arrays;
 
 /**
  * Enum representing all the token of the game
@@ -38,6 +37,10 @@ public enum Token {
 
     private final Color color;
 
+    /**
+     *Create instance of token
+     * @param color color of token
+     */
     Token(Color color) {
         this.color = color;
     }
@@ -50,10 +53,10 @@ public enum Token {
         return new Token[] { EMERALD, SAPPHIRE, RUBY, DIAMOND, ONYX };
     }
 
-    public static boolean contains(String name) {
-        return Arrays.stream(values()).anyMatch(token -> token.name().equals(name));
-    }
-
+    /**
+     * This method return the color of the toke,
+     * @return color of the token
+     */
     public Paint getColor() {
         return color;
     }

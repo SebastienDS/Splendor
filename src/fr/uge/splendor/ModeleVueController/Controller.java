@@ -74,7 +74,7 @@ public class Controller {
      */
     private static void startGame(Scanner scanner, Model gameData){
         gameData.startGame();
-        while (!gameData.getLastRound() || !gameData.startNewRound()) {
+        while (gameData.getLastRound() || gameData.startNewRound()) {
             firstChoice(scanner, gameData);
             gameData.endTurn();
         }
@@ -145,33 +145,9 @@ public class Controller {
             if (sizeWithoutGold(wallet) > 10) {
                 removeExcessTokens(scanner, gameData, wallet, 10);
             }
-            manageNoble(gameData);
             return true;
         }
         return false;
-    }
-
-    /**
-     * This method make the noble go to the player that finished playing if he has enough bonus. The noble is removed
-     * from the ground and his prestige are added to the player.
-     * @param gameData data of the game
-     */
-    private static void manageNoble(Model gameData) {
-        if(gameData.getGameMode() == 2){
-            var bonus = gameData.getPlayerPlaying().getBonus();
-            var nobles =   gameData.getNobles();
-            nobles.removeIf(noble -> {
-                        if(noble.cost().keySet()
-                                .stream()
-                                .filter(token -> noble.cost().get(token) > bonus.get(token))
-                                .findAny()
-                                .isEmpty()){
-                            gameData.getPlayerPlaying().addNoble(noble);
-                            return true;
-                        }
-                        return false;
-                    });
-        }
     }
 
     /**
@@ -288,7 +264,7 @@ public class Controller {
      * @param scanner to have the input
      * @param cards list of cards to chose from
      * @param deck deck corresponding to the cards
-     * @param player player currently chosing
+     * @param player player currently choosing
      * @param buy true if player is buying false if he is reserving
      * @return card chosen (null if canceled)
      */

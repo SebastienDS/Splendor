@@ -5,14 +5,10 @@ import fr.uge.splendor.object.TextField;
 import fr.uge.splendor.object.*;
 import fr.umlv.zen5.ApplicationContext;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class represents the view for the graphics version
@@ -27,63 +23,6 @@ public class GraphicsView {
      * Height of the screen
      */
     public static int HEIGHT_SCREEN;
-
-    /**
-     * load an image and return it
-     * @param path of the image
-     * @return image loaded
-     * @throws IOException if an I/O exception occur
-     */
-    public static BufferedImage loadImage(Path path) throws IOException {
-        return load(path);
-    }
-
-    /**
-     * Load an image, resize it and then return it. Targeted width and targeted height can be inferior to
-     * parameter specified because ratio is kept
-     * @param path path of the image
-     * @param targetWidth width of the image
-     * @param targetHeight height of the image
-     * @return image resized
-     * @throws IOException if an I/O exception occur
-     */
-    public static BufferedImage loadImage(Path path, int targetWidth, int targetHeight) throws IOException {
-        return resize(loadImage(path), targetWidth, targetHeight);
-    }
-
-    /**
-     * load an image and return it
-     * @param path Path of image
-     * @return image loaded
-     */
-    private static BufferedImage load(Path path) throws IOException {
-        try (var in = Files.newInputStream(path)) {
-            return ImageIO.read(in);
-        }
-    }
-
-    /**
-     * resize an image and return it. Targeted width and targeted height can be inferior to
-     * parameter specified because ratio is kept.
-     * @param img Image to resize
-     * @param targetWidth new size width with scale
-     * @param targetHeight new size height with scale
-     * @return image resized
-     */
-    public static BufferedImage resize(BufferedImage img, int targetWidth, int targetHeight) {
-        var scaleW = (double) targetWidth / (double) img.getWidth();
-        var scaleH = (double) targetHeight / (double) img.getHeight();
-        var scale = Math.min(scaleW, scaleH);
-
-        var result = new BufferedImage((int) (img.getWidth() * scale),
-                (int) (img.getHeight() * scale), BufferedImage.TYPE_INT_ARGB);
-
-        var g = result.createGraphics();
-        g.drawImage(img, 0, 0, result.getWidth(), result.getHeight(), null);
-        g.dispose();
-
-        return result;
-    }
 
     /**
      * Draw an Image
@@ -168,6 +107,7 @@ public class GraphicsView {
      * Draw elements of starting menu with the background
      * @param context display context
      * @param buttons all buttons of starting menu
+     * @param images all images
      */
     public static void drawStartingMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
         context.renderFrame(graphics -> {
@@ -185,6 +125,7 @@ public class GraphicsView {
      * Draw elements of mode menu with the background
      * @param context display context
      * @param buttons all buttons of mode menu
+     * @param images all images
      */
     public static void drawModeMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
         context.renderFrame(graphics -> {
@@ -201,6 +142,8 @@ public class GraphicsView {
      * Draw elements of player menu with the background
      * @param context display context
      * @param buttons all buttons of player menu
+     * @param gameData data of the game
+     * @param images all images
      */
     public static void drawPlayerMenu(ApplicationContext context, List<Button> buttons,
                                       Model gameData, ImageManager images) {
@@ -218,7 +161,9 @@ public class GraphicsView {
     /**
      * Draw elements of change name menu with the background
      * @param context display context
+     * @param textField text field of change name menu
      * @param buttons all buttons of change name menu
+     * @param images all images
      */
     public static void drawChangeNameMenu(ApplicationContext context, TextField textField, List<Button> buttons,
                                           ImageManager images) {
@@ -250,6 +195,7 @@ public class GraphicsView {
      * Draw elements of choose player menu with the background
      * @param context display context
      * @param buttons all buttons of choose player menu
+     * @param images all images
      */
     public static void drawChoosePlayerMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
         context.renderFrame(graphics -> {

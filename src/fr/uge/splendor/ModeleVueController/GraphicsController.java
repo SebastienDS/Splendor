@@ -24,6 +24,7 @@ public class GraphicsController {
      * He can change the number of player and their name or/and change the game mode
      * @param context for the display
      * @param gameData data of the game
+     * @param images all images
      * @throws IOException if an I/O exception occurs
      */
     public static void startingMenu(ApplicationContext context, Model gameData, ImageManager images) throws IOException {
@@ -31,7 +32,7 @@ public class GraphicsController {
         var buttons = initButtonStartingMenu();
         while (true) {
             GraphicsView.drawStartingMenu(context, buttons, images);
-            var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
+            var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
             var action = event.getAction();
             if (action == Event.Action.POINTER_DOWN) {
@@ -113,7 +114,7 @@ public class GraphicsController {
         var buttons = initButtonModeMenu();
         GraphicsView.drawModeMenu(context, buttons, images);
         while (true) {
-            var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
+            var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
 
             var action = event.getAction();
@@ -178,7 +179,7 @@ public class GraphicsController {
         var players = gameData.getPlayers();
         while (true) {
             GraphicsView.drawPlayerMenu(context, buttons, gameData, images);
-            var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
+            var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
             var action = event.getAction();
             if (action == Event.Action.POINTER_DOWN) {
@@ -300,7 +301,7 @@ public class GraphicsController {
         var buttons = initButtonChangeName();
         while (true) {
             GraphicsView.drawChangeNameMenu(context, textField, buttons, images);
-            var event = context.pollOrWaitEvent(20); // modifier pour avoir un affichage fluide
+            var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
             var action = event.getAction();
             if (action == Event.Action.KEY_PRESSED) keyPressed(event.getKey(), textField);
@@ -418,7 +419,7 @@ public class GraphicsController {
     }
 
     /**
-     * Initialise all buttons for the choose player menu and return them in a list
+     * Initialise all buttons for choose player menu and return them in a list
      * @param players list of all players
      * @return list of buttons created
      */
@@ -448,7 +449,7 @@ public class GraphicsController {
         var actionManager = new ActionManager();
         gameData.startGame();
         GraphicsView.drawGame(context, gameData, images, buttons, actionManager);
-        while (!gameData.getLastRound() || !gameData.startNewRound()) {
+        while (gameData.getLastRound() || gameData.startNewRound()) {
             var event = context.pollOrWaitEvent(20);
             if (event == null) continue;
             GraphicsView.drawGame(context, gameData, images, buttons, actionManager);
@@ -481,15 +482,20 @@ public class GraphicsController {
      * @param gameData data of the game
      * @param images all images
      */
-    // TODO add return
-    private static boolean manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
-        return manageCardAction(location, actionManager, gameData, images)
-                || manageTokenAction(location, actionManager, gameData)
-                || manageDeckAction(location, actionManager, gameData, images)
-                || manageReservedCardAction(location, actionManager, gameData, images);
+    private static void manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
+        if (!manageCardAction(location, actionManager, gameData, images) && !manageTokenAction(location, actionManager, gameData) && !manageDeckAction(location, actionManager, gameData, images)) {
+            manageReservedCardAction(location, actionManager, gameData, images);
+        }
     }
 
-    private static boolean manageReservedCardAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
+    /**
+     * Manage reserve card action
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of game
+     * @param images all images
+     */
+    private static void manageReservedCardAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
         var index = 2;
         var length = gameData.getNumberOfDecks();
         var cards = gameData.getPlayerPlaying().getCardReserved();
@@ -506,14 +512,13 @@ public class GraphicsController {
             if (rect.contains(location)) {
                 actionManager.setAction(ActionManager.Action.RESERVED_CARD);
                 actionManager.selectCard(card, i, 0);
-                return true;
+                return;
             }
         }
-        return false;
     }
 
     /**
-     * verif if a card is clicked on. If that's the case, select it in actionManager and return true
+     * verify if a card is clicked on. If that's the case, select it in actionManager and return true
      * @param location location of click
      * @param actionManager manage action
      * @param gameData data of the game
@@ -542,6 +547,13 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * Manage action click on token and return true if user clicked on token
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of the game
+     * @return true if user clicked on token
+     */
     private static boolean manageTokenAction(Point2D.Float location, ActionManager actionManager, Model gameData) {
         var tokensGame = gameData.getGameTokens().tokens();
         var i = 0;
@@ -563,6 +575,14 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * Manage action of deck and return true if user clicked on deck
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of game
+     * @param images all images
+     * @return
+     */
     private static boolean manageDeckAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
         var length = gameData.getNumberOfDecks();
         for (var index : gameData.getGrounds().keySet()) {
@@ -628,16 +648,16 @@ public class GraphicsController {
      * @param location location of click
      * @param actionManager manage action
      * @param gameData data of the game
-     * @return true if an action is done
      */
-    private static boolean manageButtons(List<Button> buttons, Point2D.Float location, ActionManager actionManager, Model gameData) {
-        return switch (actionManager.getAction()) {
+    private static void manageButtons(List<Button> buttons, Point2D.Float location, ActionManager actionManager, Model gameData) {
+        switch (actionManager.getAction()) {
             case CARD -> manageCardButton(buttons, location, gameData, actionManager);
             case DECK -> manageDeckButton(buttons, location, gameData, actionManager);
             case TOKEN -> manageTokenButton(buttons, location, gameData, actionManager);
             case RESERVED_CARD -> manageReservedCardButton(buttons, location, gameData, actionManager);
-            default -> false;
-        };
+            default -> {
+            }
+        }
     }
 
     /**
@@ -646,9 +666,8 @@ public class GraphicsController {
      * @param location location of click
      * @param gameData data of the game
      * @param actionManager manage action
-     * @return true if an action is done
      */
-    private static boolean manageTokenButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
+    private static void manageTokenButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var selectedTokens = actionManager.getSelectedTokens();
         var tokens = gameData.getGameTokens();
         var takeSelectedTokens = buttons.get(2);
@@ -656,16 +675,13 @@ public class GraphicsController {
         if (takeSelectedTokens.rect().contains(location)) {
             if (selectedTokens.size() == 1 && tokens.get(selectedTokens.get(0)) >= 4) {
                 actionManager.take2Tokens(gameData);
-                return true;
             }
             else if (selectedTokens.size() >= 1 && selectedTokens.size() == Math.min(3, tokens.numbersOfTokensLeft())) {
                 actionManager.takeTokens(gameData);
-                return true;
             }
         }
 
 
-        return false;
     }
 
     /**
@@ -674,9 +690,8 @@ public class GraphicsController {
      * @param location location of click
      * @param gameData data of the game
      * @param actionManager manage action
-     * @return true if an action is done
      */
-    private static boolean manageDeckButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
+    private static void manageDeckButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var reserve = buttons.get(1);
         var selectedDeck = actionManager.getSelectedDeck();
 
@@ -684,9 +699,7 @@ public class GraphicsController {
             var card = gameData.getDecks().get(selectedDeck).draw();
             actionManager.selectCard(card, 0, selectedDeck);
             actionManager.reserveDeck(gameData);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -696,32 +709,33 @@ public class GraphicsController {
      * @param location location of click
      * @param gameData data of the game
      * @param actionManager manage action
-     * @return true if an action is done
      */
-    private static boolean manageCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
+    private static void manageCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var buy = buttons.get(0);
         var reserve = buttons.get(1);
         var card = actionManager.getSelectedCard();
 
         if (gameData.getPlayerPlaying().canBuy(card) && buy.rect().contains(location)) {
             actionManager.buyCard(gameData);
-            return true;
         } else if (gameData.reservePossible() && gameData.getPlayerPlaying().canReserve() && reserve.rect().contains(location)) {
             actionManager.reserveCard(gameData);
-            return true;
         }
-        return false;
     }
 
-    private static boolean manageReservedCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
+    /**
+     * Manage click on reserve card button
+     * @param buttons all buttons
+     * @param location location of click
+     * @param gameData data of game
+     * @param actionManager manage action
+     */
+    private static void manageReservedCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var buy = buttons.get(0);
         var card = actionManager.getSelectedCard();
 
         if (gameData.getPlayerPlaying().canBuy(card) && buy.rect().contains(location)) {
             actionManager.buyReservedCard(gameData);
-            return true;
         }
-        return false;
     }
 
     /**

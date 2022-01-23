@@ -585,6 +585,7 @@ public class View {
 
     /**
      * This method return the string of the display of the deck for the i-th line
+     * @param deck deck to display
      * @param i th line
      * @return string of the display of the deck for the i-th line
      */
@@ -610,6 +611,12 @@ public class View {
         System.out.println(print);
     }
 
+    /**
+     This method return the string of the display of the noble for the i-th line
+     * @param noble noble to display
+     * @param i th line
+     * @return string of the display of the noble for the i-th line
+     */
     public static String getDisplayNoble(Noble noble, int i) {
         var display = stringDisplayNoble(noble);
         return display[i];

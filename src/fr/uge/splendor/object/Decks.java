@@ -134,7 +134,7 @@ public class Decks {
 
     /**
      * Create a token manager from a string
-     * @param string String containing tokenManager informations
+     * @param string String containing tokenManager information
      * @return tokenManager
      */
     private static TokenManager parseTokens(String string) {

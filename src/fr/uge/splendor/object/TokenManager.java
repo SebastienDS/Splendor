@@ -1,7 +1,9 @@
 package fr.uge.splendor.object;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represent an instance of a map with token as key and integer as value.
@@ -31,13 +33,6 @@ public record TokenManager(Map<Token, Integer> tokens) {
     public void addToken(Token token, int value) {
         Objects.requireNonNull(token);
         tokens.merge(token, value, Integer::sum);
-    }
-
-    /**
-     * This method clear all the value of the token manager
-     */
-    public void clear() {
-        tokens.clear();
     }
 
     /**

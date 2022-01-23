@@ -1,7 +1,6 @@
 package fr.uge.splendor.object;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class represents the deck of the game
@@ -49,7 +48,7 @@ public class Deck<T> {
      * This method shuffle all the element of the deck
      */
     public void shuffle() {
-        var list = deck.stream().collect(Collectors.toList());
+        var list = new ArrayList<>(deck);
         Collections.shuffle(list);
         deck.clear();
         deck.addAll(list);
@@ -61,13 +60,6 @@ public class Deck<T> {
      */
     public T draw(){
         return deck.pop();
-    }
-
-    /**
-     * This method clear all the element of the deck
-     */
-    public void clear() {
-        deck.clear();
     }
 
     /**

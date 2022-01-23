@@ -4,7 +4,6 @@ import fr.uge.splendor.object.*;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class represents all data of the game
@@ -56,6 +55,7 @@ public class Model {
      * @param players list of all players
      * @param decks decks of the games
      * @param grounds grounds of the games
+     * @param nobles nobles of the games
      */
     public Model(List<Player> players, Map<Integer, Deck<Development>> decks, Map<Integer, List<Development>> grounds, List<Noble> nobles) {
         Objects.requireNonNull(nobles);
@@ -67,6 +67,11 @@ public class Model {
         Collections.shuffle(nobles);
     }
 
+    /**
+     * Create an instance of model with default value for decks, grounds and nobles
+     * @param players list of all players
+     * @throws IOException if an I/O error occur
+     */
     public Model(List<Player> players) throws IOException {
         this(players, Decks.developmentDecks(), new LinkedHashMap<>(), Decks.nobleDeck());
     }
@@ -134,8 +139,10 @@ public class Model {
      * This method see verify if current round is the last and change the player that play to the next one
      */
     public void endTurn() {
+        manageNoble();
         lastRound = lastRound || players.get(playerPlaying).getPrestige() >= 15;
         playerPlaying = (playerPlaying + 1) % players.size();
+
     }
 
     /**
@@ -143,7 +150,7 @@ public class Model {
      * @return ture if the current round is the last
      */
     public boolean getLastRound(){
-        return lastRound;
+        return !lastRound;
     }
 
     /**
@@ -159,7 +166,7 @@ public class Model {
      * @return true if the current player is the first player
      */
     public boolean startNewRound() {
-        return playerPlaying == 0;
+        return playerPlaying != 0;
     }
 
     /**
@@ -235,7 +242,7 @@ public class Model {
         if(maxPrestigePlayer.size() == 1){
             return maxPrestigePlayer.get(0);
         }
-        return maxPrestigePlayer.stream().min(Comparator.comparingInt(Player::getCardPurchased)).get();
+        return maxPrestigePlayer.stream().min(Comparator.comparingInt(Player::getCardPurchased)).orElse(null);
     }
 
     /**
@@ -258,7 +265,7 @@ public class Model {
     }
 
     /**
-     * Clear nobles if game mode dont have them else let only size of player + 1 noble in list
+     * Clear nobles if game mode don't have them else let only size of player + 1 noble in list
      */
     private void initNobles() {
         if (gameMode == 1) {
@@ -283,5 +290,26 @@ public class Model {
      */
     public boolean isPlaying(int index) {
         return playerPlaying == index;
+    }
+
+    /**
+     * This method make the noble go to the player that finished playing if he has enough bonus. The noble is removed
+     * from the ground and his prestige are added to the player.
+     */
+    private void manageNoble() {
+        if(gameMode == 2){
+            var bonus = getPlayerPlaying().getBonus();
+            nobles.removeIf(noble -> {
+                if(noble.cost().keySet()
+                        .stream()
+                        .filter(token -> noble.cost().get(token) > bonus.get(token))
+                        .findAny()
+                        .isEmpty()){
+                    getPlayerPlaying().addNoble(noble);
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 }
