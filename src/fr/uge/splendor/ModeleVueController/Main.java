@@ -23,8 +23,7 @@ public class Main {
         try (var scanner = new Scanner(System.in)) {
             var gameData = new Model(initPlayer());
             System.out.println("Console ? (y/n)");
-            //var line = scanner.next();
-            var line = "n";
+            var line = scanner.next();
             if (line.toLowerCase(Locale.ROOT).equals("y")) {
                 Controller.startingMenu(scanner, gameData);
                 View.printWinner(gameData.getWinner());

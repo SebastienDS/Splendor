@@ -11,8 +11,8 @@
 
     <target name="clean">
         <delete dir="${out.dir}"/>
+        <mkdir dir="${out.dir}"/>
         <delete dir="${doc.dir}"/>
-        <delete file="Splendor.jar"/>
     </target>
 
     <target name="compile">

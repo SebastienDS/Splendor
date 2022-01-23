@@ -50,6 +50,8 @@ public class ImageManager {
      * Create an instance of image manager
      * @param backGround background image path
      * @param title title image path
+     * @param backGroundWin background winning image path
+     * @param winString string win
      * @param width_screen width screen
      * @param height_screen height screen
      * @throws IOException if an I/O Exception occur

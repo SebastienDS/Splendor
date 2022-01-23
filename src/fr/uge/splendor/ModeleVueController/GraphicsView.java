@@ -267,6 +267,12 @@ public class GraphicsView {
         });
     }
 
+    /**
+     * This method draw menu to remove excess tokens
+     * @param graphics graphics2D
+     * @param gameData data of the game
+     * @param actionManager manage actions
+     */
     private static void drawExcessTokens(Graphics2D graphics, Model gameData, ActionManager actionManager) {
         graphics.setColor(Color.GRAY);
         graphics.fillRect(WIDTH_SCREEN / 2 - WIDTH_SCREEN / 10, HEIGHT_SCREEN / 4, WIDTH_SCREEN / 5, HEIGHT_SCREEN / 2);
