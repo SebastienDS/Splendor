@@ -565,7 +565,7 @@ public class GraphicsController {
                     GraphicsView.HEIGHT_SCREEN / 15,
                     GraphicsView.HEIGHT_SCREEN / 15
             );
-            if (tokensGame.get(token) != 0 && rect.contains(location)) {
+            if (tokensGame.get(token) > 0 && rect.contains(location)) {
                 actionManager.setAction(ActionManager.Action.TOKEN);
                 actionManager.selectToken(token);
                 return true;

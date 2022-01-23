@@ -1,0 +1,30 @@
+<project default="jar">
+
+    <property name="src.dir" value="src"/>
+    <property name="out.dir" value="classes"/>
+    <property name="lib.dir" value="lib"/>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${out.dir}"/>
+        <delete file="Splendor.jar"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${out.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${out.dir}" classpathref="classpath" encoding="UTF-8"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="Splendor.jar" basedir="${out.dir}" manifest="${src.dir}/META-INF/MANIFEST.MF"/>
+    </target>
+
+    <target name="run" depends="jar">
+        <java jar="Splendor.jar" fork="true">
+        </java>
+    </target>
+
+</project>
