@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class represents the view for the graphics version
@@ -32,6 +33,8 @@ public class GraphicsView {
      * @param bufferedImage image to draw
      */
     public static void drawImage(Graphics2D graphics, int x, int y, BufferedImage bufferedImage) {
+        Objects.requireNonNull(graphics);
+        Objects.requireNonNull(bufferedImage);
         graphics.drawImage(bufferedImage, null, x, y);
     }
 
@@ -41,6 +44,8 @@ public class GraphicsView {
      * @param button Button to draw
      */
     public static void drawButton(Graphics2D graphics, Button button) {
+        Objects.requireNonNull(graphics);
+        Objects.requireNonNull(button);
         var rect = button.rect();
         var font = new Font("Serif", Font.PLAIN, 30);
         var labelPos = button.labelPos(graphics, font);
@@ -63,6 +68,8 @@ public class GraphicsView {
      * @param textField TextField to draw
      */
     public static void drawTextField(Graphics2D graphics, TextField textField) {
+        Objects.requireNonNull(graphics);
+        Objects.requireNonNull(textField);
         var rect = textField.rect();
         var font = new Font("Serif", Font.PLAIN, 30);
         var labelPos = textField.labelPos(graphics, font);
@@ -86,6 +93,8 @@ public class GraphicsView {
      * @param height height of screen
      */
     public static void drawPlayers(Graphics2D graphics, List<Player> players, int height) {
+        Objects.requireNonNull(graphics);
+        Objects.requireNonNull(players);
         graphics.setPaint(Color.LIGHT_GRAY);
         graphics.fillRect(25, height / 7 - 25, 350, height / 7 + height / 15 * (players.size() - 1));
         graphics.setColor(Color.BLACK);
@@ -110,6 +119,9 @@ public class GraphicsView {
      * @param images all images
      */
     public static void drawStartingMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(images);
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
@@ -128,6 +140,9 @@ public class GraphicsView {
      * @param images all images
      */
     public static void drawModeMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(images);
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
@@ -147,6 +162,10 @@ public class GraphicsView {
      */
     public static void drawPlayerMenu(ApplicationContext context, List<Button> buttons,
                                       Model gameData, ImageManager images) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(gameData);
+        Objects.requireNonNull(images);
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
@@ -167,6 +186,10 @@ public class GraphicsView {
      */
     public static void drawChangeNameMenu(ApplicationContext context, TextField textField, List<Button> buttons,
                                           ImageManager images) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(textField);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(images);
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
@@ -198,6 +221,9 @@ public class GraphicsView {
      * @param images all images
      */
     public static void drawChoosePlayerMenu(ApplicationContext context, List<Button> buttons, ImageManager images) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(images);
         context.renderFrame(graphics -> {
             try {
                 drawBackGround(graphics, images.background());
@@ -217,6 +243,11 @@ public class GraphicsView {
      * @param actionManager manage action
      */
     public static void drawGame(ApplicationContext context, Model gameData, ImageManager images, List<Button> buttons, ActionManager actionManager) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(gameData);
+        Objects.requireNonNull(buttons);
+        Objects.requireNonNull(images);
+        Objects.requireNonNull(actionManager);
         context.renderFrame(graphics -> {
             try {
                 var length = gameData.getNumberOfDecks();

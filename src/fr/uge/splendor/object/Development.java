@@ -34,6 +34,8 @@ public record Development(TokenManager cost, String name, int prestige, Token bo
      * @return if the card can be bought by the player
      */
     public boolean canBeBought(TokenManager wallet, TokenManager bonus) {
+        Objects.requireNonNull(wallet);
+        Objects.requireNonNull(bonus);
         var gold = 0;
         for(var token: cost.tokens().keySet()){
             if(Player.getTokenPlusBonus(wallet, bonus, token) >= cost.get(token)){

@@ -19,6 +19,7 @@ public class Controller {
      * @return integer chosen
      */
     public static int getInteger(Scanner scanner, int min, int max) {
+        Objects.requireNonNull(scanner);
         int input_integer;
         while (true) {
             try {
@@ -39,6 +40,7 @@ public class Controller {
      * @return integer chosen by the user
      */
     public static int getInteger(Scanner scanner) {
+        Objects.requireNonNull(scanner);
         return getInteger(scanner, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
@@ -50,6 +52,8 @@ public class Controller {
      * @throws IOException if an I/O exception occurs
      */
     public static void startingMenu(Scanner scanner, Model gameData) throws IOException {
+        Objects.requireNonNull(scanner);
+        Objects.requireNonNull(gameData);
         gameData.setGameMode(2);
 
         while (true) {

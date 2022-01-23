@@ -183,6 +183,7 @@ public class Model {
      * @param number number of token to take
      */
     public void takeToken(Token chooseToken, int number) {
+        Objects.requireNonNull(chooseToken);
         gameTokens.addToken(chooseToken, -number);
         players.get(playerPlaying).addToken(chooseToken, number);
     }
@@ -223,6 +224,7 @@ public class Model {
      * @param tokens map containing token as key and integer as value
      */
     public void addTokenUsed(Map<Token, Integer> tokens) {
+        Objects.requireNonNull(tokens);
         for (var token: tokens.keySet()){
             gameTokens.addToken(token, tokens.get(token));
         }

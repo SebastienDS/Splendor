@@ -76,6 +76,7 @@ public class Player {
      * @param number to add
      */
     public void addToken(Token token, int number) {
+        Objects.requireNonNull(token);
         wallet.addToken(token, number);
     }
 
@@ -111,6 +112,7 @@ public class Player {
      * @return true if the card is purchasable false otherwise
      */
     public boolean canBuy(Development card) {
+        Objects.requireNonNull(card);
         return card.canBeBought(wallet, bonus);
     }
 
@@ -121,6 +123,7 @@ public class Player {
      * @return map containing token used. Token as key and number of token used(int) as value.
      */
     public Map<Token, Integer> buy(Development card) {
+        Objects.requireNonNull(card);
         var bonus = card.bonus();
         if (bonus != null) {
             this.bonus.addToken(bonus, 1);
@@ -163,6 +166,9 @@ public class Player {
      * @return sum of the chosen token in wallet and the chosen token in the bonus
      */
     public static int getTokenPlusBonus(TokenManager wallet, TokenManager bonus, Token token) {
+        Objects.requireNonNull(wallet);
+        Objects.requireNonNull(bonus);
+        Objects.requireNonNull(token);
         return wallet.get(token) + bonus.get(token);
     }
 
