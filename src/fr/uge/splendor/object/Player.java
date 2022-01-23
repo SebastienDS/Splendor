@@ -142,6 +142,7 @@ public class Player {
     private Map<Token, Integer> manageTokenPurchase(Development card){
         var tokens = new HashMap<Token, Integer>();
         for (var token : card.cost().keySet()) {
+            if(bonus.get(token) >= card.cost().get(token)) continue;
             if (getTokenPlusBonus(wallet, bonus, token) >= card.cost().get(token)) {
                 var tokenToPay = -(card.cost().get(token) - bonus.get(token));
                 wallet.addToken(token, tokenToPay);

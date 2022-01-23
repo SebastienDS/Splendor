@@ -49,6 +49,10 @@ public class Model {
      * represents all the tokens that player can take
      */
     private final TokenManager gameTokens;
+    /**
+     * numberOfDeck
+     */
+    private int numberOfDeck;
 
     /**
      * Create an instance of model
@@ -126,6 +130,7 @@ public class Model {
         shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
+        numberOfDeck += decks.size() + ((nobles.size() > 0)? 1 : 0);
     }
 
     /**
@@ -282,7 +287,7 @@ public class Model {
      * @return number of decks in game
      */
     public int getNumberOfDecks() {
-        return decks.size() + ((nobles.size() > 0)? 1 : 0);
+        return numberOfDeck;
     }
 
     /**

@@ -447,11 +447,11 @@ public class GraphicsController {
      * @param images all images
      */
     private static void startGame(ApplicationContext context, Model gameData, ImageManager images) {
+        gameData.startGame();
         images.initCards(Path.of("resources", "images", "cards"), gameData);
         images.initNoble(Path.of("resources", "images", "nobles"), gameData);
         var buttons = initGameButtons();
         var actionManager = new ActionManager();
-        gameData.startGame();
         GraphicsView.drawGame(context, gameData, images, buttons, actionManager);
         while (gameData.getLastRound() || gameData.startNewRound()) {
             var event = context.pollOrWaitEvent(20);

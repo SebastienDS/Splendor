@@ -1,5 +1,6 @@
 package fr.uge.splendor.ModeleVueController;
 
+import fr.uge.splendor.object.Constants;
 import fr.uge.splendor.object.Development;
 import fr.uge.splendor.object.Noble;
 import fr.uge.splendor.object.Token;
@@ -92,7 +93,7 @@ public class ImageManager {
         Objects.requireNonNull(cards);
         Objects.requireNonNull(gameData);
         var length = gameData.getNumberOfDecks();
-        var w = Integer.MAX_VALUE;
+        var w = GraphicsView.WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 2));
         var h = Math.min(GraphicsView.HEIGHT_SCREEN / (length + 1), 500);
         try (var paths = Files.walk(cards)) {
             paths.filter(Files::isRegularFile).forEach(
