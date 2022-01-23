@@ -464,12 +464,37 @@ public class GraphicsController {
     }
 
     private static boolean manageEndTurn(List<Button> buttons, Point2D.Float location) {
-        return buttons.get(4).rect().contains(location);
+        return buttons.get(3).rect().contains(location);
     }
 
-    private static void manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
-        var actionUpdated = manageCardAction(location,actionManager, gameData, images);
-        if (actionUpdated) return;
+    private static boolean manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
+        return manageCardAction(location, actionManager, gameData, images)
+                || manageTokenAction(location, actionManager, gameData)
+                || manageDeckAction(location, actionManager, gameData, images)
+                || manageReservedCardAction(location, actionManager, gameData, images);
+    }
+
+    private static boolean manageReservedCardAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
+        var index = 2;
+        var length = gameData.getNumberOfDecks();
+        var cards = gameData.getPlayerPlaying().getCardReserved();
+        for (int i = 0; i < cards.size(); i++) {
+            var e = i + 7;
+            var card = cards.get(i);
+            var image = images.get(card);
+            var spacingX = GraphicsView.WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+            var spacingY = GraphicsView.HEIGHT_SCREEN / length;
+            var x = spacingX * e + spacingX / 2 - image.getWidth() / 2;
+            var y = spacingY * index + spacingY / 2 - image.getHeight() / 2;
+
+            var rect = new Rectangle(x, y, image.getWidth(), image.getHeight());
+            if (rect.contains(location)) {
+                actionManager.setAction(ActionManager.Action.RESERVED_CARD);
+                actionManager.selectCard(card, i, 0);
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean manageCardAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
@@ -495,6 +520,49 @@ public class GraphicsController {
         return false;
     }
 
+    private static boolean manageTokenAction(Point2D.Float location, ActionManager actionManager, Model gameData) {
+        var tokensGame = gameData.getGameTokens().tokens();
+        var i = 0;
+        for (var token : tokensGame.keySet()) {
+            if (token == Token.GOLD) continue;
+            var rect = new Rectangle(
+                    GraphicsView.WIDTH_SCREEN / 2,
+                    GraphicsView.HEIGHT_SCREEN / 3 + i * GraphicsView.HEIGHT_SCREEN / 14,
+                    GraphicsView.HEIGHT_SCREEN / 15,
+                    GraphicsView.HEIGHT_SCREEN / 15
+            );
+            if (tokensGame.get(token) != 0 && rect.contains(location)) {
+                actionManager.setAction(ActionManager.Action.TOKEN);
+                actionManager.selectToken(token);
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    private static boolean manageDeckAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
+        var length = gameData.getNumberOfDecks();
+        for (var index : gameData.getGrounds().keySet()) {
+            var cards = gameData.getGrounds().get(index);
+            var i = cards.size();
+            var card = cards.get(0);
+            var image = images.get(card);
+            var spacingX = GraphicsView.WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+            var spacingY = GraphicsView.HEIGHT_SCREEN / length;
+            var x = spacingX * i + spacingX / 2 - image.getWidth() / 2;
+            var y = spacingY * index + spacingY / 2 - image.getHeight() / 2;
+
+            var rect = new Rectangle(x, y, image.getWidth(), image.getHeight());
+            if (rect.contains(location)) {
+                actionManager.setAction(ActionManager.Action.DECK);
+                actionManager.selectDeck(index);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static List<Button> initGameButtons() {
         return List.of(
                 new Button(
@@ -512,17 +580,10 @@ public class GraphicsController {
                         75
                 ),
                 new Button(
-                        "Prendre 2 jetons",
-                        GraphicsView.WIDTH_SCREEN - GraphicsView.WIDTH_SCREEN / 20 - 50,
+                        "Prendre jetons selectionnés",
+                        GraphicsView.WIDTH_SCREEN - GraphicsView.WIDTH_SCREEN / 8 - 50,
                         (int) (GraphicsView.HEIGHT_SCREEN * 0.9),
-                        GraphicsView.WIDTH_SCREEN / 10,
-                        75
-                ),
-                new Button(
-                        "Prendre 3 jetons",
-                        GraphicsView.WIDTH_SCREEN - GraphicsView.WIDTH_SCREEN / 20 - 50,
-                        (int) (GraphicsView.HEIGHT_SCREEN * 0.9),
-                        GraphicsView.WIDTH_SCREEN / 10,
+                        GraphicsView.WIDTH_SCREEN / 4,
                         75
                 ),
                 new Button(
@@ -540,27 +601,40 @@ public class GraphicsController {
             case CARD -> manageCardButton(buttons, location, gameData, actionManager);
             case DECK -> manageDeckButton(buttons, location, gameData, actionManager);
             case TOKEN -> manageTokenButton(buttons, location, gameData, actionManager);
+            case RESERVED_CARD -> manageReservedCardButton(buttons, location, gameData, actionManager);
             default -> false;
         };
     }
 
     private static boolean manageTokenButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
-        var take2 = buttons.get(2);
-        var take3 = buttons.get(3);
+        var selectedTokens = actionManager.getSelectedTokens();
+        var tokens = gameData.getGameTokens();
+        var takeSelectedTokens = buttons.get(2);
 
-        if (take2.rect().contains(location)) {
-
-        } else if (take3.rect().contains(location)) {
-
+        if (takeSelectedTokens.rect().contains(location)) {
+            if (selectedTokens.size() == 1 && tokens.get(selectedTokens.get(0)) >= 4) {
+                actionManager.take2Tokens(gameData);
+                return true;
+            }
+            else if (selectedTokens.size() >= 1 && selectedTokens.size() == Math.min(3, tokens.numbersOfTokensLeft())) {
+                actionManager.takeTokens(gameData);
+                return true;
+            }
         }
+
+
         return false;
     }
 
     private static boolean manageDeckButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var reserve = buttons.get(1);
+        var selectedDeck = actionManager.getSelectedDeck();
 
-        if (reserve.rect().contains(location)) {
-
+        if (gameData.reservePossible() && gameData.getPlayerPlaying().canReserve() && reserve.rect().contains(location)) {
+            var card = gameData.getDecks().get(selectedDeck).draw();
+            actionManager.selectCard(card, 0, selectedDeck);
+            actionManager.reserveDeck(gameData);
+            return true;
         }
         return false;
     }
@@ -573,8 +647,19 @@ public class GraphicsController {
         if (gameData.getPlayerPlaying().canBuy(card) && buy.rect().contains(location)) {
             actionManager.buyCard(gameData);
             return true;
-        } else if (gameData.getPlayerPlaying().canReserve() && reserve.rect().contains(location)) {
+        } else if (gameData.reservePossible() && gameData.getPlayerPlaying().canReserve() && reserve.rect().contains(location)) {
             actionManager.reserveCard(gameData);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean manageReservedCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
+        var buy = buttons.get(0);
+        var card = actionManager.getSelectedCard();
+
+        if (gameData.getPlayerPlaying().canBuy(card) && buy.rect().contains(location)) {
+            actionManager.buyReservedCard(gameData);
             return true;
         }
         return false;
