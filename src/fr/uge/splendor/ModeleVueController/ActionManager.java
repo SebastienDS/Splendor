@@ -5,9 +5,13 @@ import fr.uge.splendor.object.Token;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This class manage all action
+ */
 public class ActionManager {
 
     /**
@@ -31,6 +35,10 @@ public class ActionManager {
          */
         TOKEN,
         /**
+         * Represents reserved card action
+         */
+        RESERVED_CARD,
+        /**
          * Represents end turn action
          */
         END_TURN
@@ -52,10 +60,11 @@ public class ActionManager {
      * Card selected
      */
     private Development selectedCard;
+
     /**
      * List of token selected
      */
-    private List<Token> tokens;
+    private final List<Token> tokens = new ArrayList<>();
 
     /**
      * Set the new action
@@ -63,6 +72,7 @@ public class ActionManager {
      */
     public void setAction(Action action) {
         Objects.requireNonNull(action);
+        if (action != Action.TOKEN) tokens.clear();
         this.action = action;
     }
 
@@ -82,28 +92,17 @@ public class ActionManager {
      */
     public void selectCard(Development card, int level, int index) {
         Objects.requireNonNull(card);
-        if (action != Action.CARD) throw new IllegalStateException("Cannot select a card with Action: " + action);
         selectedCard = card;
         groundLevel = level;
         indexSelectedCard = index;
     }
 
-    /**
-     * Select a token
-     * @param token to select
-     */
-    public void selectToken(Token token) {
-        Objects.requireNonNull(token);
-
-        tokens.add(token);
-    }
 
     /**
      * This method return card selected
      * @return card selected
      */
     public Development getSelectedCard() {
-        if (action != Action.CARD) throw new IllegalStateException("Cannot get selected card with Action: " + action);
         return selectedCard;
     }
 
@@ -112,7 +111,6 @@ public class ActionManager {
      * @return position of the card selected
      */
     public Point2D getSelectedCardPosition() {
-        if (action != Action.CARD) throw new IllegalStateException("Cannot get selected card with Action: " + action);
         return new Point(indexSelectedCard, groundLevel);
     }
 
@@ -127,6 +125,18 @@ public class ActionManager {
         endTurn();
     }
 
+
+    /**
+     * Thi method buy a card reserved
+     * @param gameData data of the game
+     */
+    public void buyReservedCard(Model gameData) {
+        var tokens = gameData.getPlayerPlaying().buy(selectedCard);
+        gameData.addTokenUsed(tokens);
+        gameData.getPlayerPlaying().getCardReserved().remove(selectedCard);
+        endTurn();
+    }
+
     /**
      * This method reserve a card
      * @param gameData data of the game
@@ -136,6 +146,18 @@ public class ActionManager {
         gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
         gameData.getGameTokens().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? -1: 0);
         replaceCard(gameData);
+        endTurn();
+    }
+
+
+    /**
+     * Thi method reserve a deck
+     * @param gameData data of the game
+     */
+    public void reserveDeck(Model gameData) {
+        gameData.getPlayerPlaying().reserve(selectedCard);
+        gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
+        gameData.getGameTokens().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? -1: 0);
         endTurn();
     }
 
@@ -156,4 +178,61 @@ public class ActionManager {
     private void endTurn() {
         action = Action.END_TURN;
     }
+
+    /**
+     * Select a token
+     * @param token to select
+     */
+    public void selectToken(Token token) {
+        Objects.requireNonNull(token);
+
+        if (tokens.remove(token)) return;
+        if (tokens.size() < 3) tokens.add(token);
+    }
+
+    /**
+     * This method return the list of selected tokens
+     * @return list of selected tokens
+     */
+    public List<Token> getSelectedTokens() {
+        return tokens;
+    }
+
+    /**
+     * This method take 2 identical token
+     * @param gameData data of the game
+     */
+    public void take2Tokens(Model gameData) {
+        var token = tokens.get(0);
+        gameData.takeToken(token, 2);
+        tokens.clear();
+        endTurn();
+    }
+
+    /**
+     * This method take one token of all tokens selected
+     * @param gameData data of the game
+     */
+    public void takeTokens(Model gameData) {
+        tokens.forEach(t -> gameData.takeToken(t, 1));
+        tokens.clear();
+        endTurn();
+    }
+
+    /**
+     * This method select level of the deck
+     * @param level level of the deck
+     */
+    public void selectDeck(int level) {
+        groundLevel = level;
+    }
+
+    /**
+     * This method return the level of the deck selected
+     * @return the level of the deck selected
+     */
+    public int getSelectedDeck() {
+        return groundLevel;
+    }
+
 }

@@ -58,4 +58,15 @@ public record TokenManager(Map<Token, Integer> tokens) {
         return tokens.getOrDefault(token, 0);
     }
 
+    /**
+     * This method return the numbers of tokens left which is not GOLD token
+     * @return sum of tokens left without golds
+     */
+    public int numbersOfTokensLeft() {
+        return tokens.entrySet()
+                .stream()
+                .filter(e -> e.getKey() != Token.GOLD && e.getValue() != 0)
+                .map(Map.Entry::getValue)
+                .reduce(0, (a, b) -> a + 1);
+    }
 }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents the view for the graphics version
@@ -275,7 +276,7 @@ public class GraphicsView {
                 var length = gameData.getNumberOfDecks();
                 drawBackGround(graphics, images.background());
                 drawDecks(graphics, gameData, images, length, actionManager);
-                drawTokens(graphics, gameData);
+                drawTokens(graphics, gameData, actionManager);
                 drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images, actionManager);
                 drawPlayers(graphics, gameData);
                 drawButtons(graphics, buttons, actionManager, gameData);
@@ -350,9 +351,10 @@ public class GraphicsView {
             }
             int x1 = x + (i - indexAdjustment) * sizeToken + padding * (i - indexAdjustment);
             drawTokenWithNumber(graphics, x1, y + height / 3,
-                    sizeToken, sizeToken, tokens[i], player.getWallet().get(tokens[i]));
+                    sizeToken, sizeToken, tokens[i], player.getWallet().get(tokens[i]), false);
             if(tokens[i] != Token.GOLD) drawTokenWithNumber(graphics, x1, y + 2 * height / 3,
-                    sizeToken, sizeToken, tokens[i], player.getBonus().get(tokens[i]));
+                    sizeToken, sizeToken, tokens[i], player.getBonus().get(tokens[i]), false);
+
         }
     }
 
@@ -366,28 +368,40 @@ public class GraphicsView {
      */
     private static void drawReservedCard(Graphics2D graphics, List<Development> cards, int length, ImageManager images, ActionManager actionManager){
         for (int i = 0; i < cards.size(); i++) {
-            // TODO
-            drawCard(graphics, length, 7 + i, 2, images, cards.get(i), false);
+            var card = cards.get(i);
+            var isSelected = isReservedCardSelected(actionManager, card);
+            drawCard(graphics, length, 7 + i, 2, images, card, isSelected);
         }
+    }
+
+    private static boolean isReservedCardSelected(ActionManager actionManager, Development card) {
+        if (actionManager.getAction() == ActionManager.Action.RESERVED_CARD) {
+            return actionManager.getSelectedCard().equals(card);
+        }
+        return false;
     }
 
     /**
      * draw all tokens of banks
      * @param graphics graphics2D
      * @param gameData data of the game
+     * @param actionManager actionManager
      */
-    private static void drawTokens(Graphics2D graphics, Model gameData) {
+    private static void drawTokens(Graphics2D graphics, Model gameData, ActionManager actionManager) {
+        var selectedTokens = actionManager.getSelectedTokens();
         var tokensGame = gameData.getGameTokens().tokens();
         var i = 0;
         for (var token : tokensGame.keySet()) {
             if(token == Token.GOLD && gameData.getGameMode() == 1) continue;
+            var isSelected = selectedTokens.contains(token);
             drawTokenWithNumber(graphics,
                     WIDTH_SCREEN / 2,
                     HEIGHT_SCREEN / 3 + i * HEIGHT_SCREEN / 14,
                     HEIGHT_SCREEN / 15,
                     HEIGHT_SCREEN /15,
                     token,
-                    tokensGame.get(token)
+                    tokensGame.get(token),
+                    isSelected
             );
             i++;
         }
@@ -403,10 +417,16 @@ public class GraphicsView {
      * @param token token to draw
      * @param number quantity
      */
-    private static void drawTokenWithNumber(Graphics2D graphics, int x, int y, int width, int height, Token token, int number) {
+    private static void drawTokenWithNumber(Graphics2D graphics, int x, int y, int width, int height, Token token, int number, boolean isSelected) {
         drawToken(graphics, x, y, width, height, token);
         var font = new Font("Serif", Font.BOLD, 35);
         drawStringOutlined(graphics, String.valueOf(number), x, y, width, height, Color.WHITE, font);
+
+        if (isSelected) {
+            graphics.setColor(Color.MAGENTA);
+            graphics.setStroke(new BasicStroke(5));
+            graphics.drawOval(x + 1, y + 1, width - 2, height - 2);
+        }
     }
 
     /**
@@ -420,14 +440,27 @@ public class GraphicsView {
         switch (actionManager.getAction()) {
             case CARD -> {
                 if (gameData.getPlayerPlaying().canBuy(actionManager.getSelectedCard())) GraphicsView.drawButton(graphics, buttons.get(0));
-                if (gameData.getPlayerPlaying().canReserve()) GraphicsView.drawButton(graphics, buttons.get(1));
+                if (gameData.reservePossible() && gameData.getPlayerPlaying().canReserve()) GraphicsView.drawButton(graphics, buttons.get(1));
             }
-            case DECK -> GraphicsView.drawButton(graphics, buttons.get(1));
-            case TOKEN -> {
-                GraphicsView.drawButton(graphics, buttons.get(2));
-                GraphicsView.drawButton(graphics, buttons.get(3));
+            case DECK -> {
+                if (gameData.reservePossible() && gameData.getPlayerPlaying().canReserve()) GraphicsView.drawButton(graphics, buttons.get(1));
             }
-            case END_TURN -> GraphicsView.drawButton(graphics, buttons.get(4));
+            case TOKEN -> drawTokenButton(graphics, actionManager, buttons, gameData);
+            case END_TURN -> GraphicsView.drawButton(graphics, buttons.get(3));
+            case RESERVED_CARD -> {
+                if (gameData.getPlayerPlaying().canBuy(actionManager.getSelectedCard())) GraphicsView.drawButton(graphics, buttons.get(0));
+            }
+        }
+    }
+
+    private static void drawTokenButton(Graphics2D graphics, ActionManager actionManager, List<Button> buttons, Model gameData) {
+        var selectedTokens = actionManager.getSelectedTokens();
+        var tokens = gameData.getGameTokens();
+        if (selectedTokens.size() == 1 && tokens.get(selectedTokens.get(0)) >= 4) {
+            GraphicsView.drawButton(graphics, buttons.get(2));
+        }
+        else if (selectedTokens.size() >= 1 && selectedTokens.size() == Math.min(3, tokens.numbersOfTokensLeft())) {
+            GraphicsView.drawButton(graphics, buttons.get(2));
         }
     }
 
@@ -477,9 +510,21 @@ public class GraphicsView {
             var isSelected = isCardSelected(actionManager, i, index);
             drawCard(graphics, length, i, index, images, cards.get(i), isSelected);
         }
-        drawImage(graphics, length, cards.size(), index, images.cardBackGround());
+        drawDeck(graphics, gameData, length, cards, index, images, actionManager);
+    }
+
+    private static void drawDeck(Graphics2D graphics, Model gameData, int length, List<Development> cards, int index, ImageManager images, ActionManager actionManager) {
+        var isSelected = isDeckSelected(actionManager, index);
+        drawImage(graphics, length, cards.size(), index, images.cardBackGround(), isSelected);
         var stringSize = String.valueOf(gameData.getDecks().get(index).size());
         drawSizeDeck(graphics, stringSize, length, images.get(cards.get(0)), cards.size(), index);
+    }
+
+    private static boolean isDeckSelected(ActionManager actionManager, int index) {
+        if (actionManager.getAction() == ActionManager.Action.DECK) {
+            return actionManager.getSelectedDeck() == index;
+        }
+        return false;
     }
 
     /**
