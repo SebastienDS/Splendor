@@ -1,26 +1,28 @@
 package fr.uge.splendor.ModeleVueController;
 
-import fr.uge.splendor.object.*;
 import fr.uge.splendor.object.Button;
 import fr.uge.splendor.object.TextField;
+import fr.uge.splendor.object.*;
 import fr.umlv.zen5.ApplicationContext;
 
 import javax.imageio.ImageIO;
-import javax.swing.border.StrokeBorder;
 import java.awt.*;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class GraphicsView {
 
+    /**
+     * Width of the screen
+     */
     public static int WIDTH_SCREEN;
+    /**
+     * Height of the screen
+     */
     public static int HEIGHT_SCREEN;
 
     /**
@@ -257,6 +259,14 @@ public class GraphicsView {
         });
     }
 
+    /**
+     * Draw all the game in the context
+     * @param context display context
+     * @param gameData data of the game
+     * @param images all images
+     * @param buttons all buttons
+     * @param actionManager manage action
+     */
     public static void drawGame(ApplicationContext context, Model gameData, ImageManager images, List<Button> buttons, ActionManager actionManager) {
         context.renderFrame(graphics -> {
             try {
@@ -273,6 +283,11 @@ public class GraphicsView {
         });
     }
 
+    /**
+     * Draw all player information
+     * @param graphics graphics2D
+     * @param gameData data of the game
+     */
     private static void drawPlayers(Graphics2D graphics, Model gameData) {
         var players = gameData.getPlayers();
         var font = new Font("Serif", Font.BOLD, 25);
@@ -285,6 +300,18 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * Draw one player information
+     * @param graphics graphics2D
+     * @param player player to draw
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param font font of police
+     * @param gameMode mode of game
+     * @param isPlaying player currently playing
+     */
     private static void drawPlayer(Graphics2D graphics, Player player, int x, int y, int width, int height,
                                    Font font, int gameMode, boolean isPlaying) {
         graphics.setColor(Color.LIGHT_GRAY);
@@ -298,6 +325,16 @@ public class GraphicsView {
         if(isPlaying) graphics.fillPolygon(xPoint, yPoint, 3);
     }
 
+    /**
+     * Draw wallets and bonus of player
+     * @param graphics graphics2D
+     * @param player player to draw
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param gameMode mode of game
+     */
     private static void drawTokensPlayer(Graphics2D graphics, Player player, int x, int y, int width, int height, int gameMode) {
         var tokens = Token.values();
         int indexAdjustment = 0;
@@ -317,6 +354,14 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * Draw cards reserved by the player playing
+     * @param graphics graphics2D
+     * @param cards list cards reserved
+     * @param length number of decks (noble included)
+     * @param images all images
+     * @param actionManager manage action
+     */
     private static void drawReservedCard(Graphics2D graphics, List<Development> cards, int length, ImageManager images, ActionManager actionManager){
         for (int i = 0; i < cards.size(); i++) {
             // TODO
@@ -324,6 +369,11 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * draw all tokens of banks
+     * @param graphics graphics2D
+     * @param gameData data of the game
+     */
     private static void drawTokens(Graphics2D graphics, Model gameData) {
         var tokensGame = gameData.getGameTokens().tokens();
         var i = 0;
@@ -341,12 +391,29 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * draw a token with his quantity
+     * @param graphics graphics2D
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param token token to draw
+     * @param number quantity
+     */
     private static void drawTokenWithNumber(Graphics2D graphics, int x, int y, int width, int height, Token token, int number) {
         drawToken(graphics, x, y, width, height, token);
         var font = new Font("Serif", Font.BOLD, 35);
         drawStringOutlined(graphics, String.valueOf(number), x, y, width, height, Color.WHITE, font);
     }
 
+    /**
+     * draw possible action button
+     * @param graphics graphics2D
+     * @param buttons all buttons
+     * @param actionManager manage action
+     * @param gameData data of the game
+     */
     private static void drawButtons(Graphics2D graphics,  List<Button> buttons, ActionManager actionManager, Model gameData) {
         switch (actionManager.getAction()) {
             case CARD -> {
@@ -362,6 +429,15 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * draw all decks (noble included) with their grounds(card visible)
+     * @param graphics graphics2D
+     * @param gameData data of game
+     * @param images all images
+     * @param length number of deck(noble included)
+     * @param actionManager manage action
+     * @throws IOException if an I/O exception occur
+     */
     private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images, int length, ActionManager actionManager) throws IOException {
         for (var key : gameData.getGrounds().keySet()) {
             drawGrounds(graphics, gameData, images, length, key, actionManager);
@@ -369,6 +445,13 @@ public class GraphicsView {
         drawNobles(graphics, gameData, images, length);
     }
 
+    /**
+     * draw all nobles
+     * @param graphics graphics2D
+     * @param gameData data of the game
+     * @param images all images
+     * @param length number of deck(noble included)
+     */
     private static void drawNobles(Graphics2D graphics, Model gameData, ImageManager images, int length) {
         var nobles = gameData.getNobles();
         for (int i = 0; i < nobles.size(); i++) {
@@ -377,6 +460,15 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * draw grounds(card visible)
+     * @param graphics graphics2D
+     * @param gameData data of the game
+     * @param images all images
+     * @param length number of decks(nobles included)
+     * @param index index in height
+     * @param actionManager manage action
+     */
     private static void drawGrounds(Graphics2D graphics, Model gameData, ImageManager images, int length, int index, ActionManager actionManager) {
         var cards = gameData.getGrounds().get(index);
         for (int i = 0; i < cards.size(); i++) {
@@ -388,12 +480,29 @@ public class GraphicsView {
         drawSizeDeck(graphics, stringSize, length, images.get(cards.get(0)), cards.size(), index);
     }
 
+    /**
+     * draw a card
+     * @param graphics graphics2D
+     * @param length number of decks(noble included)
+     * @param indexWidth index width
+     * @param indexHeight index height
+     * @param images all images
+     * @param card card to draw
+     * @param isSelected is card selected
+     */
     private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, ImageManager images,
                                     Development card, boolean isSelected) {
             drawImage(graphics, length, indexWidth, indexHeight, images.get(card), isSelected);
             drawCardCharacteristic(graphics, card, images.get(card), indexWidth, indexHeight, length);
     }
 
+    /**
+     * This method return true if the card is selected
+     * @param actionManager manage action
+     * @param i index width
+     * @param index index height
+     * @return true if the card is selected
+     */
     private static boolean isCardSelected(ActionManager actionManager, int i, int index) {
         if (actionManager.getAction() == ActionManager.Action.CARD) {
             var selectedCardPosition = actionManager.getSelectedCardPosition();
@@ -402,6 +511,15 @@ public class GraphicsView {
         return false;
     }
 
+    /**
+     * Draw number of cards in the decks
+     * @param graphics graphics2D
+     * @param stringSize string to draw
+     * @param length number of deck(noble included)
+     * @param image image of deck
+     * @param indexWidth index width
+     * @param indexHeight index height
+     */
     private static void drawSizeDeck(Graphics2D graphics, String stringSize, int length, BufferedImage image,
                                      int indexWidth, int indexHeight) {
         var font = new Font("Serif", Font.BOLD, 50);
@@ -412,6 +530,17 @@ public class GraphicsView {
         drawStringOutlined(graphics, stringSize, x, y, image.getWidth(), image.getHeight(), Color.red, font);
     }
 
+    /**
+     * Draw a string outlined at the center
+     * @param graphics graphics2D
+     * @param str string to draw
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param color color of text
+     * @param font font of text
+     */
     private static void drawStringOutlined(Graphics2D graphics, String str, int x, int y, int width,
                                            int height, Color color, Font font){
         var metrics = graphics.getFontMetrics(font);
@@ -428,6 +557,15 @@ public class GraphicsView {
         graphics.drawString(str, x, y);
     }
 
+    /**
+     * Draw all characteristic of card
+     * @param graphics graphics2D
+     * @param card card with all characteristic
+     * @param image image of card
+     * @param indexWidth index width
+     * @param indexHeight index height
+     * @param length number of deck (noble included)
+     */
     private static void drawCardCharacteristic(Graphics2D graphics, Development card, BufferedImage image,
                                                 int indexWidth, int indexHeight, int length) {
         var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
@@ -445,6 +583,18 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * Draw one of the token cost of the card with price
+     * @param graphics graphics2D
+     * @param token token cost
+     * @param price of card for token
+     * @param x x axis
+     * @param y y axis
+     * @param index index height
+     * @param width width of card
+     * @param height height of card
+     * @param font font of text
+     */
     private static void drawCost(Graphics2D graphics, Token token, int price, int x, int y,
                                  int index, int width, int height, Font font) {
         graphics.setPaint(Color.LIGHT_GRAY);
@@ -455,17 +605,42 @@ public class GraphicsView {
         drawString(graphics, String.valueOf(price), x, y1, width / 5, height / 7, color, font);
     }
 
+    /**
+     * Draw token bonus of the card
+     * @param graphics graphics2D
+     * @param bonus token bonus
+     * @param x x axis
+     * @param y y axis
+     * @param image image of the card
+     */
     private static void drawBonus(Graphics2D graphics, Token bonus, int x, int y, BufferedImage image) {
         graphics.setPaint(Color.LIGHT_GRAY);
         graphics.fillRect(x + 4 * image.getWidth() /5, y, image.getWidth() / 5, image.getHeight() / 7);
         drawToken(graphics, x + 4 * image.getWidth() / 5, y, image.getWidth()/5, image.getHeight() / 7, bonus);
     }
 
+    /**
+     * draw a token
+     * @param graphics graphics2D
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param token token to draw
+     */
     private static void drawToken(Graphics2D graphics, int x, int y, int width, int height, Token token){
         graphics.setPaint(token.getColor());
         graphics.fillOval(x + 1, y + 1, width - 2, height - 2);
     }
 
+    /**
+     * Draw characteristic(prestige and cost) for noble card
+     * @param graphics graphics2D
+     * @param noble noble card
+     * @param image image of noble
+     * @param indexWidth index width
+     * @param length number of decks(noble included)
+     */
     private static void drawNobleCharacteristic(Graphics2D graphics, Noble noble, BufferedImage image,
                                                int indexWidth, int length) {
         var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
@@ -482,12 +657,32 @@ public class GraphicsView {
         }
     }
 
+    /**
+     * Draw prestige of card
+     * @param graphics graphics2D
+     * @param prestige prestige of the card
+     * @param image image of the card
+     * @param x x axis
+     * @param y y axis
+     * @param font font of the text
+     */
     private static void drawPrestige(Graphics2D graphics, String prestige, BufferedImage image, int x, int y, Font font) {
         graphics.setPaint(Color.LIGHT_GRAY);
         graphics.fillRect(x, y, image.getWidth() / 5, image.getHeight() / 7);
         drawString(graphics, prestige, x, y, image.getWidth() / 5, image.getHeight() / 7, Color.black, font);
     }
 
+    /**
+     * Draw string at the center
+     * @param graphics graphics2D
+     * @param str str to draw
+     * @param x x axis
+     * @param y y axis
+     * @param width width of rectangle
+     * @param height height of rectangle
+     * @param color color of text
+     * @param font font of text
+     */
     private static void drawString(Graphics2D graphics, String str, int x, int y,
                                    int width, int height, Color color,  Font font) {
         graphics.setFont(font);
@@ -497,14 +692,27 @@ public class GraphicsView {
         graphics.drawString(str, (int)(x + width / 2 - bounds.getCenterX()), (int)(y + height / 2 - bounds.getCenterY()));
     }
 
+    /**
+     * Draw an image for cards
+     * @param graphics graphics2D
+     * @param length number of decks(noble included)
+     * @param indexWidth index width
+     * @param indexHeight index height
+     * @param image image to draw
+     */
     private static void drawImage(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image){
-        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
-        var spacingY = HEIGHT_SCREEN / length;
-        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
-        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
-        GraphicsView.drawImage(graphics, x, y, image);
+        drawImage(graphics, length, indexWidth, indexHeight, image, false);
     }
 
+    /**
+     * draw an image and add outline if selected
+     * @param graphics graphics2D
+     * @param length number of decks (noble included)
+     * @param indexWidth index Width
+     * @param indexHeight index Height
+     * @param image image of card
+     * @param isSelected is card selected
+     */
     private static void drawImage(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image, boolean isSelected){
         var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
         var spacingY = HEIGHT_SCREEN / length;
