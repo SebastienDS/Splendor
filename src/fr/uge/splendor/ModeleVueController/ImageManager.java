@@ -25,6 +25,14 @@ public class ImageManager {
      */
     private final BufferedImage title;
     /**
+     * Background win
+     */
+    private final BufferedImage backGroundWin;
+    /**
+     * String winner
+     */
+    private final BufferedImage winString;
+    /**
      * Card background Image
      */
     private BufferedImage cardBackGround;
@@ -45,10 +53,12 @@ public class ImageManager {
      * @param height_screen height screen
      * @throws IOException if an I/O Exception occur
      */
-    public ImageManager(Path backGround, Path title, int width_screen, int height_screen) throws IOException {
+    public ImageManager(Path backGround, Path title, Path backGroundWin, Path winString, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
         this.backGround = loadImage(backGround, width_screen, height_screen);
         this.title = loadImage(title, width_screen / 3, height_screen / 15);
+        this.backGroundWin = loadImage(backGroundWin, width_screen, height_screen);
+        this.winString = loadImage(winString, 2 * width_screen / 3, height_screen / 3);
         this.cards = new HashMap<>();
         this.nobles = new HashMap<>();
     }
@@ -63,6 +73,8 @@ public class ImageManager {
         this(
                 Path.of("resources", "images", "background.jpg"),
                 Path.of("resources", "images", "title.png"),
+                Path.of("resources", "images", "winner.jpg"),
+                Path.of("resources", "images", "winString.png"),
                 width_screen,
                 height_screen
         );
@@ -248,5 +260,13 @@ public class ImageManager {
      */
     public BufferedImage cardBackGround() {
         return cardBackGround;
+    }
+
+    public BufferedImage backgroundWin() {
+        return backGroundWin;
+    }
+
+    public BufferedImage stringWin() {
+        return winString;
     }
 }
