@@ -1,10 +1,10 @@
-1;Noble;Catherine de Medici;EMERALD:3,SAPPHIRE:3,RUBY:3;3;no-image
-1;Noble;Elisabeth Of Austria;ONYX:3,SAPPHIRE:3,DIAMOND:3;3;no-image
-1;Noble;Isabella I Of Castille;ONYX:4,DIAMOND:4;3;no-image
-1;Noble;Niccolò Machiavelli;SAPPHIRE:4,DIAMOND:4;3;no-image
-1;Noble;Suleiman The Magnificent;EMERALD:4,SAPPHIRE:4;3;no-image
-1;Noble;Anne Of Brittany;EMERALD:3,SAPPHIRE:3,DIAMOND:3;3;no-image
-1;Noble;Charles V;ONYX:3,RUBY:3,DIAMOND:3;3;no-image
-1;Noble;Francis I Of France;ONYX:3,RUBY:3,EMERALD:3;3;no-image
-1;Noble;Henry VII;ONYX:4,RUBY:4;3;no-image
-1;Noble;Mary Stuart;RUBY:4,EMERALD:4;3;no-image
+1;Noble;Catherine de Medici;EMERALD:3,SAPPHIRE:3,RUBY:3;3
+1;Noble;Elisabeth Of Austria;ONYX:3,SAPPHIRE:3,DIAMOND:3;3
+1;Noble;Isabella I Of Castille;ONYX:4,DIAMOND:4;3
+1;Noble;Niccolò Machiavelli;SAPPHIRE:4,DIAMOND:4;3
+1;Noble;Suleiman The Magnificent;EMERALD:4,SAPPHIRE:4;3
+1;Noble;Anne Of Brittany;EMERALD:3,SAPPHIRE:3,DIAMOND:3;3
+1;Noble;Charles V;ONYX:3,RUBY:3,DIAMOND:3;3
+1;Noble;Francis I Of France;ONYX:3,RUBY:3,EMERALD:3;3
+1;Noble;Henry VII;ONYX:4,RUBY:4;3
+1;Noble;Mary Stuart;RUBY:4,EMERALD:4;3
