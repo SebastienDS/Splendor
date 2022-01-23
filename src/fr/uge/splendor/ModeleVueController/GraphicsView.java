@@ -6,6 +6,7 @@ import fr.uge.splendor.object.TextField;
 import fr.umlv.zen5.ApplicationContext;
 
 import javax.imageio.ImageIO;
+import javax.swing.border.StrokeBorder;
 import java.awt.*;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
@@ -261,9 +262,9 @@ public class GraphicsView {
             try {
                 var length = gameData.getNumberOfDecks();
                 drawBackGround(graphics, images.background());
-                drawDecks(graphics, gameData, images, length);
+                drawDecks(graphics, gameData, images, length, actionManager);
                 drawTokens(graphics, gameData);
-                drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images);
+                drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images, actionManager);
                 drawPlayers(graphics, gameData);
                 drawButtons(graphics, buttons, actionManager, gameData);
             } catch (IOException e) {
@@ -316,9 +317,10 @@ public class GraphicsView {
         }
     }
 
-    private static void drawReservedCard(Graphics2D graphics, List<Development> cards, int length, ImageManager images){
+    private static void drawReservedCard(Graphics2D graphics, List<Development> cards, int length, ImageManager images, ActionManager actionManager){
         for (int i = 0; i < cards.size(); i++) {
-            drawCard(graphics, length, 7 + i, 2, images, cards.get(i));
+            // TODO
+            drawCard(graphics, length, 7 + i, 2, images, cards.get(i), false);
         }
     }
 
@@ -356,17 +358,18 @@ public class GraphicsView {
                 GraphicsView.drawButton(graphics, buttons.get(2));
                 GraphicsView.drawButton(graphics, buttons.get(3));
             }
+            case END_TURN -> GraphicsView.drawButton(graphics, buttons.get(4));
         }
     }
 
-    private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images, int length) throws IOException {
+    private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images, int length, ActionManager actionManager) throws IOException {
         for (var key : gameData.getGrounds().keySet()) {
-            drawGrounds(graphics, gameData, images, length, key);
+            drawGrounds(graphics, gameData, images, length, key, actionManager);
         }
         drawNobles(graphics, gameData, images, length);
     }
 
-    private static void drawNobles(Graphics2D graphics, Model gameData, ImageManager images, int length) throws IOException {
+    private static void drawNobles(Graphics2D graphics, Model gameData, ImageManager images, int length) {
         var nobles = gameData.getNobles();
         for (int i = 0; i < nobles.size(); i++) {
             drawImage(graphics, length, i, 0, images.get(nobles.get(i)));
@@ -374,10 +377,11 @@ public class GraphicsView {
         }
     }
 
-    private static void drawGrounds(Graphics2D graphics, Model gameData, ImageManager images, int length, int index) {
+    private static void drawGrounds(Graphics2D graphics, Model gameData, ImageManager images, int length, int index, ActionManager actionManager) {
         var cards = gameData.getGrounds().get(index);
         for (int i = 0; i < cards.size(); i++) {
-            drawCard(graphics, length, i, index, images, cards.get(i));
+            var isSelected = isCardSelected(actionManager, i, index);
+            drawCard(graphics, length, i, index, images, cards.get(i), isSelected);
         }
         drawImage(graphics, length, cards.size(), index, images.cardBackGround());
         var stringSize = String.valueOf(gameData.getDecks().get(index).size());
@@ -385,9 +389,17 @@ public class GraphicsView {
     }
 
     private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, ImageManager images,
-                                    Development card) {
-        drawImage(graphics, length, indexWidth, indexHeight, images.get(card));
-        drawCardCharacteristic(graphics, card, images.get(card), indexWidth, indexHeight, length);
+                                    Development card, boolean isSelected) {
+            drawImage(graphics, length, indexWidth, indexHeight, images.get(card), isSelected);
+            drawCardCharacteristic(graphics, card, images.get(card), indexWidth, indexHeight, length);
+    }
+
+    private static boolean isCardSelected(ActionManager actionManager, int i, int index) {
+        if (actionManager.getAction() == ActionManager.Action.CARD) {
+            var selectedCardPosition = actionManager.getSelectedCardPosition();
+            return selectedCardPosition.getX() == i && selectedCardPosition.getY() == index;
+        }
+        return false;
     }
 
     private static void drawSizeDeck(Graphics2D graphics, String stringSize, int length, BufferedImage image,
@@ -491,5 +503,19 @@ public class GraphicsView {
         var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
         var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
         GraphicsView.drawImage(graphics, x, y, image);
+    }
+
+    private static void drawImage(Graphics2D graphics, int length, int indexWidth, int indexHeight, BufferedImage image, boolean isSelected){
+        var spacingX = WIDTH_SCREEN / (2 * (Constants.DRAW_NUMBER + 1));
+        var spacingY = HEIGHT_SCREEN / length;
+        var x = spacingX * indexWidth + spacingX / 2 - image.getWidth() / 2;
+        var y = spacingY * indexHeight + spacingY / 2 - image.getHeight() / 2;
+        GraphicsView.drawImage(graphics, x, y, image);
+
+        if (isSelected) {
+            graphics.setColor(Color.YELLOW);
+            graphics.setStroke(new BasicStroke(5));
+            graphics.drawRect(x, y, image.getWidth(), image.getHeight());
+        }
     }
 }

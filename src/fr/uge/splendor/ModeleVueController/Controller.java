@@ -278,6 +278,7 @@ public class Controller {
         if(card == null) return false;
         gameData.getPlayerPlaying().reserve(card);
         gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
+        gameData.getGameTokens().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? -1: 0);
         return true;
     }
 

@@ -118,9 +118,6 @@ public class Model {
     public void startGame() {
         initDecks();
         initNobles();
-        players.forEach(player -> player.reserve(decks.get(1).draw()));
-        players.forEach(player -> player.reserve(decks.get(1).draw()));
-        players.forEach(player -> player.reserve(decks.get(1).draw()));
         shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
