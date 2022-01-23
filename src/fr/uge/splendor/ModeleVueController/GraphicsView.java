@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -258,27 +259,82 @@ public class GraphicsView {
     public static void drawGame(ApplicationContext context, Model gameData, ImageManager images) {
         context.renderFrame(graphics -> {
             try {
+                var length = gameData.getNumberOfDecks();
                 drawBackGround(graphics, images.background());
-                drawDecks(graphics, gameData, images);
+                drawDecks(graphics, gameData, images, length);
                 drawTokens(graphics, gameData);
+                drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images);
+                drawPlayers(graphics, gameData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static void drawTokens(Graphics2D graphics, Model gameData) {
+    private static void drawPlayers(Graphics2D graphics, Model gameData) {
+        var players = gameData.getPlayers();
+        var font = new Font("Serif", Font.BOLD, 25);
+        graphics.setFont(font);
+        var width = WIDTH_SCREEN / 5;
+        var height = HEIGHT_SCREEN / (2 * players.size());
+        for (int i = 0; i < players.size(); i++) {
+            drawPlayer(graphics, players.get(i), 4 * width, i * height, width, height, font,
+                    gameData.getGameMode(), gameData.isPlaying(i));
+        }
+    }
+
+    private static void drawPlayer(Graphics2D graphics, Player player, int x, int y, int width, int height,
+                                   Font font, int gameMode, boolean isPlaying) {
+        graphics.setColor(Color.LIGHT_GRAY);
+        graphics.fillRect(x, y, width, height - 5);
+        drawString(graphics, player.getName(), x, y, width, height / 3, Color.black, font);
+        drawTokensPlayer(graphics, player, x, y, width, height, gameMode);
+        drawString(graphics, String.valueOf(player.getPrestige()), x, y, width / 5, height / 4, Color.black, font);
+        graphics.setPaint(Color.red);
+        int[] xPoint = {x - 10, x -50, x - 50};
+        int[] yPoint = {y + height / 2, y + height / 3, y + 2 * height / 3};
+        if(isPlaying) graphics.fillPolygon(xPoint, yPoint, 3);
+    }
+
+    private static void drawTokensPlayer(Graphics2D graphics, Player player, int x, int y, int width, int height, int gameMode) {
         var tokens = Token.values();
+        int indexAdjustment = 0;
+        var sizeToken = width / (tokens.length - 1);
+        if(sizeToken >= height / 4) sizeToken -= sizeToken - height / 4 - 5;
+        var padding = (width - (sizeToken * (tokens.length - 1)))/ (tokens.length - 1);
+        for (int i = 0; i < tokens.length; i++) {
+            if(tokens[i] == Token.NONE || tokens[i] == Token.GOLD && gameMode == 1){
+                indexAdjustment++;
+                continue;
+            }
+            int x1 = x + (i - indexAdjustment) * sizeToken + padding * (i - indexAdjustment);
+            drawTokenWithNumber(graphics, x1, y + height / 3,
+                    sizeToken, sizeToken, tokens[i], player.getWallet().get(tokens[i]));
+            drawTokenWithNumber(graphics, x1, y + 2 * height / 3,
+                    sizeToken, sizeToken, tokens[i], player.getBonus().get(tokens[i]));
+        }
+    }
+
+    private static void drawReservedCard(Graphics2D graphics, List<Development> cards, int length, ImageManager images){
+        for (int i = 0; i < cards.size(); i++) {
+            drawCard(graphics, length, 7 + i, 2, images, cards.get(i));
+        }
+    }
+
+    private static void drawTokens(Graphics2D graphics, Model gameData) {
         var tokensGame = gameData.getGameTokens().tokens();
-        for (int i = 1; i < tokens.length; i++) {
+        var i = 0;
+        for (var token : tokensGame.keySet()) {
+            if(token == Token.GOLD && gameData.getGameMode() == 1) continue;
             drawTokenWithNumber(graphics,
                     WIDTH_SCREEN / 2,
-                    HEIGHT_SCREEN / 5 + i * HEIGHT_SCREEN / 14,
+                    HEIGHT_SCREEN / 3 + i * HEIGHT_SCREEN / 14,
                     HEIGHT_SCREEN / 15,
                     HEIGHT_SCREEN /15,
-                    tokens[i],
-                    tokensGame.get(tokens[i])
+                    token,
+                    tokensGame.get(token)
             );
+            i++;
         }
     }
 
@@ -288,10 +344,9 @@ public class GraphicsView {
         drawStringOutlined(graphics, String.valueOf(number), x, y, width, height, Color.WHITE, font);
     }
 
-    private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images) throws IOException {
-        var length = gameData.getNumberOfDecks();
+    private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images, int length) throws IOException {
         for (var key : gameData.getGrounds().keySet()) {
-            drawCards(graphics, gameData, images, length, key);
+            drawGrounds(graphics, gameData, images, length, key);
         }
         drawNobles(graphics, gameData, images, length);
     }
@@ -304,15 +359,20 @@ public class GraphicsView {
         }
     }
 
-    private static void drawCards(Graphics2D graphics, Model gameData, ImageManager images, int length, int index) {
+    private static void drawGrounds(Graphics2D graphics, Model gameData, ImageManager images, int length, int index) {
         var cards = gameData.getGrounds().get(index);
         for (int i = 0; i < cards.size(); i++) {
-            drawImage(graphics, length, i, index, images.get(cards.get(i)));
-            drawCardCharacteristic(graphics, cards.get(i), images.get(cards.get(i)), i, index, length);
+            drawCard(graphics, length, i, index, images, cards.get(i));
         }
         drawImage(graphics, length, cards.size(), index, images.cardBackGround());
         var stringSize = String.valueOf(gameData.getDecks().get(index).size());
         drawSizeDeck(graphics, stringSize, length, images.get(cards.get(0)), cards.size(), index);
+    }
+
+    private static void drawCard(Graphics2D graphics, int length, int indexWidth, int indexHeight, ImageManager images,
+                                    Development card) {
+        drawImage(graphics, length, indexWidth, indexHeight, images.get(card));
+        drawCardCharacteristic(graphics, card, images.get(card), indexWidth, indexHeight, length);
     }
 
     private static void drawSizeDeck(Graphics2D graphics, String stringSize, int length, BufferedImage image,

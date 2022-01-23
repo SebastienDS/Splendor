@@ -118,6 +118,9 @@ public class Model {
     public void startGame() {
         initDecks();
         initNobles();
+        players.forEach(player -> player.reserve(decks.get(1).draw()));
+        players.forEach(player -> player.reserve(decks.get(1).draw()));
+        players.forEach(player -> player.reserve(decks.get(1).draw()));
         shuffleDecks();
         initGrounds();
         initGameTokens(players.size());
@@ -274,5 +277,9 @@ public class Model {
      */
     public int getNumberOfDecks() {
         return decks.size() + ((nobles.size() > 0)? 1 : 0);
+    }
+
+    public boolean isPlaying(int index) {
+        return playerPlaying == index;
     }
 }
