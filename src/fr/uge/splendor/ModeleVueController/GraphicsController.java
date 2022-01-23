@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -28,6 +29,9 @@ public class GraphicsController {
      * @throws IOException if an I/O exception occurs
      */
     public static void startingMenu(ApplicationContext context, Model gameData, ImageManager images) throws IOException {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(gameData);
+        Objects.requireNonNull(images);
         gameData.setGameMode(2);
         var buttons = initButtonStartingMenu();
         while (true) {

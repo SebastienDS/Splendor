@@ -4,10 +4,7 @@ import fr.uge.splendor.object.*;
 
 import static fr.uge.splendor.object.Utils.space;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -91,6 +88,7 @@ public class View {
      * @param players list of all players
      */
     public static void printChoosePlayer(List<Player> players) {
+        Objects.requireNonNull(players);
         var text = new StringBuilder();
         text.append("Qui choisissez vous?");
         for (int i = 0; i < players.size(); i++) {
@@ -111,6 +109,7 @@ public class View {
      * @param player player playing
      */
     public static void printPlayerPlaying(Player player) {
+        Objects.requireNonNull(player);
         System.out.println("C'est au tour du joueur: \"" + player.getName() + "\" de jouer! ");
     }
 
@@ -120,6 +119,7 @@ public class View {
      * @param gameMode game mode
      */
     public static void printPlayerResource(Player playerPlaying, int gameMode) {
+        Objects.requireNonNull(playerPlaying);
         var keySet = getKeySet(playerPlaying.getWallet());
         if(gameMode == 2) keySet = playerPlaying.getWallet().keySet();
         System.out.println(playerPlaying.getName() + ' ' + printTokenManager(playerPlaying.getWallet(), keySet));
@@ -131,6 +131,7 @@ public class View {
      * @param gameData data of the game
      */
     public static void printFirstChoicePlayer(Model gameData) {
+        Objects.requireNonNull(gameData);
         var text = new StringBuilder();
         text.append("Que voulez vous faire ?\n")
             .append("1: Prendre 2 jetons de la même couleur\n")
@@ -150,6 +151,7 @@ public class View {
      * @param gameData data of the game
      */
     public static void printTokens(Model gameData) {
+        Objects.requireNonNull(gameData);
         var text = new StringBuilder();
         text.append("Quel jeton ?(0 pour annuler)");
         var gameTokens = gameData.getGameTokens();
@@ -192,6 +194,7 @@ public class View {
      * @param tokenName name of token chosen
      */
     public static void printTokenAlreadyChosen(String tokenName) {
+        Objects.requireNonNull(tokenName);
         System.out.println("Jeton déjà séléctionné: " + tokenName);
     }
 
@@ -200,6 +203,7 @@ public class View {
      * @param tokenChosen list of all token chosen
      */
     public static void printTokenChosen(List<Token> tokenChosen) {
+        Objects.requireNonNull(tokenChosen);
         var text = new StringBuilder();
         var separator = "";
         text.append("Jeton(s) Choisis: [");
@@ -226,6 +230,7 @@ public class View {
      * @param tokenChosen  list of token chosen
      */
     public static void printTokenChosenWithIndex(List<Token> tokenChosen) {
+        Objects.requireNonNull(tokenChosen);
         var text = new StringBuilder();
         text.append("Jeton(s) Choisis: [");
         for (int i = 0; i < tokenChosen.size(); i++) {
@@ -248,6 +253,8 @@ public class View {
      * @param decks decks of the corresponding grounds
      */
     public static void printGround(Map<Integer, List<Development>> grounds, Map<Integer, Deck<Development>> decks){
+        Objects.requireNonNull(grounds);
+        Objects.requireNonNull(decks);
         var print = new StringBuilder();
         for (var deck: grounds.keySet()) {
             printCardLeftToRight(grounds.get(deck), print, decks.get(deck), true, false);
@@ -287,6 +294,8 @@ public class View {
      * @param reserve string to add after the question (need at least a parenthesis)
      */
     public static void printCards(List<Development> cards, String reserve) {
+        Objects.requireNonNull(cards);
+        Objects.requireNonNull(reserve);
         var print = new StringBuilder();
         print.append("Choisissez la carte ?").append(reserve);
         print.append("0 pour annuler)\n");
@@ -321,6 +330,7 @@ public class View {
      * @param index index of the list
      */
     public static void printCardsWithIndex(List<Development> cards, int index) {
+        Objects.requireNonNull(cards);
         System.out.println(index + ":");
         printCardsGround(cards);
     }
@@ -330,6 +340,7 @@ public class View {
      * @param display string representing purchase or reserve
      */
     public static void printChooseGround(String display) {
+        Objects.requireNonNull(display);
         System.out.println("Choisissez sur quel terrain vous voulez " + display + " la carte ?(0 pour annuler)");
     }
 
@@ -379,6 +390,8 @@ public class View {
      * @param tokens list of token that need to be printed
      */
     public static void printTokens(TokenManager tokenManager, List<Token> tokens) {
+        Objects.requireNonNull(tokenManager);
+        Objects.requireNonNull(tokens);
         var string = IntStream.range(0, tokens.size())
                 .mapToObj(i -> "" + (i + 1) + " : " + tokens.get(i) + " [" + tokenManager.get(tokens.get(i)) + "]")
                 .collect(Collectors.joining("\n"));
@@ -398,6 +411,7 @@ public class View {
      * @param cards list of cards to print
      */
     public static void printCardsGround(List<Development> cards) {
+        Objects.requireNonNull(cards);
         var print = new StringBuilder();
         printCardLeftToRight(cards, print, null, false, false);
         System.out.print(print);
@@ -419,6 +433,7 @@ public class View {
      * @param bonus of the player
      */
     public static void printPlayerBonus(TokenManager bonus) {
+        Objects.requireNonNull(bonus);
         var keySet = getKeySet(bonus);
         System.out.println("Bonus : " + printTokenManager(bonus, keySet) + "\n");
     }
@@ -435,6 +450,7 @@ public class View {
      * @param winner winner of the game
      */
     public static void printWinner(Player winner) {
+        Objects.requireNonNull(winner);
         System.out.println("Le joueur : \"" + winner.getName() + "\" a gagné ! Bien joué à toi !");
     }
 
@@ -444,6 +460,7 @@ public class View {
      * @param gameMode game mode
      */
     public static void printBank(TokenManager gameTokens, int gameMode) {
+        Objects.requireNonNull(gameTokens);
         StringBuilder text = new StringBuilder();
         String separator = "";
         text.append("Banque : [");
@@ -464,6 +481,8 @@ public class View {
      * @return the string corresponding of the values of the specified Set with the form [key: value, ...]
      */
     private static String printTokenManager(TokenManager tokenManager, Set<Token> keySet) {
+        Objects.requireNonNull(tokenManager);
+        Objects.requireNonNull(keySet);
         StringBuilder text = new StringBuilder();
         String separator = "";
         text.append("[");
@@ -590,6 +609,7 @@ public class View {
      * @return string of the display of the deck for the i-th line
      */
     public static String getDisplayDeck(Deck<Development> deck, int i) {
+        Objects.requireNonNull(deck);
         var display = refreshDisplay(deck);
         return display[i];
     }
@@ -599,6 +619,7 @@ public class View {
      * @param nobles nobles
      */
     public static void printNoble(List<Noble> nobles) {
+        Objects.requireNonNull(nobles);
         if (nobles.isEmpty()) return;
 
         var print = new StringBuilder();
@@ -618,6 +639,7 @@ public class View {
      * @return string of the display of the noble for the i-th line
      */
     public static String getDisplayNoble(Noble noble, int i) {
+        Objects.requireNonNull(noble);
         var display = stringDisplayNoble(noble);
         return display[i];
     }

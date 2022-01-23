@@ -35,6 +35,8 @@ public record Button(String label, int x, int y, int w, int h) {
      * @return pos of label
      */
     public Point labelPos(Graphics2D g, Font font) {
+        Objects.requireNonNull(g);
+        Objects.requireNonNull(font);
         var rect = rect();
         var metrics = g.getFontMetrics(font);
         var bounds = metrics.getStringBounds(label, g);

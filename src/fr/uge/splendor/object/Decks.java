@@ -138,6 +138,7 @@ public class Decks {
      * @return tokenManager
      */
     private static TokenManager parseTokens(String string) {
+        Objects.requireNonNull(string);
         var tokens = new TokenManager();
 
         for (var tokenFormat : string.split(TOKEN_SEPARATOR)) {

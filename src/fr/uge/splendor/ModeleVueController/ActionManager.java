@@ -119,6 +119,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void buyCard(Model gameData) {
+        Objects.requireNonNull(gameData);
         var tokens = gameData.getPlayerPlaying().buy(selectedCard);
         gameData.addTokenUsed(tokens);
         replaceCard(gameData);
@@ -131,6 +132,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void buyReservedCard(Model gameData) {
+        Objects.requireNonNull(gameData);
         var tokens = gameData.getPlayerPlaying().buy(selectedCard);
         gameData.addTokenUsed(tokens);
         gameData.getPlayerPlaying().getCardReserved().remove(selectedCard);
@@ -142,6 +144,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void reserveCard(Model gameData) {
+        Objects.requireNonNull(gameData);
         gameData.getPlayerPlaying().reserve(selectedCard);
         gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
         gameData.getGameTokens().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? -1: 0);
@@ -155,6 +158,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void reserveDeck(Model gameData) {
+        Objects.requireNonNull(gameData);
         gameData.getPlayerPlaying().reserve(selectedCard);
         gameData.getPlayerPlaying().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? 1: 0);
         gameData.getGameTokens().addToken(Token.GOLD, (gameData.getGameTokens().get(Token.GOLD) > 0)? -1: 0);
@@ -166,6 +170,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     private void replaceCard(Model gameData) {
+        Objects.requireNonNull(gameData);
         var selectedGround = gameData.getGrounds().get(groundLevel);
         selectedGround.remove(indexSelectedCard);
         var card = gameData.getDecks().get(groundLevel).draw();
@@ -203,6 +208,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void take2Tokens(Model gameData) {
+        Objects.requireNonNull(gameData);
         var token = tokens.get(0);
         gameData.takeToken(token, 2);
         tokens.clear();
@@ -214,6 +220,7 @@ public class ActionManager {
      * @param gameData data of the game
      */
     public void takeTokens(Model gameData) {
+        Objects.requireNonNull(gameData);
         tokens.forEach(t -> gameData.takeToken(t, 1));
         tokens.clear();
         endTurn();
