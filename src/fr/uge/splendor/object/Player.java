@@ -44,7 +44,6 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
-        List.of(Token.values()).forEach(t -> bonus.addToken(t, 10));
     }
 
     /**

@@ -256,7 +256,7 @@ public class GraphicsView {
         });
     }
 
-    public static void drawGame(ApplicationContext context, Model gameData, ImageManager images) {
+    public static void drawGame(ApplicationContext context, Model gameData, ImageManager images, List<Button> buttons, ActionManager actionManager) {
         context.renderFrame(graphics -> {
             try {
                 var length = gameData.getNumberOfDecks();
@@ -265,6 +265,7 @@ public class GraphicsView {
                 drawTokens(graphics, gameData);
                 drawReservedCard(graphics, gameData.getPlayerPlaying().getCardReserved(), length, images);
                 drawPlayers(graphics, gameData);
+                drawButtons(graphics, buttons, actionManager, gameData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -342,6 +343,20 @@ public class GraphicsView {
         drawToken(graphics, x, y, width, height, token);
         var font = new Font("Serif", Font.BOLD, 35);
         drawStringOutlined(graphics, String.valueOf(number), x, y, width, height, Color.WHITE, font);
+    }
+
+    private static void drawButtons(Graphics2D graphics,  List<Button> buttons, ActionManager actionManager, Model gameData) {
+        switch (actionManager.getAction()) {
+            case CARD -> {
+                if (gameData.getPlayerPlaying().canBuy(actionManager.getSelectedCard())) GraphicsView.drawButton(graphics, buttons.get(0));
+                if (gameData.getPlayerPlaying().canReserve()) GraphicsView.drawButton(graphics, buttons.get(1));
+            }
+            case DECK -> GraphicsView.drawButton(graphics, buttons.get(1));
+            case TOKEN -> {
+                GraphicsView.drawButton(graphics, buttons.get(2));
+                GraphicsView.drawButton(graphics, buttons.get(3));
+            }
+        }
     }
 
     private static void drawDecks(Graphics2D graphics, Model gameData, ImageManager images, int length) throws IOException {
