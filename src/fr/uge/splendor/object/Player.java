@@ -44,7 +44,6 @@ public class Player {
         cardBuy = new ArrayList<>();
         bonus = new TokenManager();
         cardReserved = new ArrayList<>();
-        if(name.endsWith("1"))prestige = 15;
     }
 
     /**
