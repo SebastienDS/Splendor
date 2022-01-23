@@ -311,7 +311,7 @@ public class GraphicsView {
             int x1 = x + (i - indexAdjustment) * sizeToken + padding * (i - indexAdjustment);
             drawTokenWithNumber(graphics, x1, y + height / 3,
                     sizeToken, sizeToken, tokens[i], player.getWallet().get(tokens[i]));
-            drawTokenWithNumber(graphics, x1, y + 2 * height / 3,
+            if(tokens[i] != Token.GOLD) drawTokenWithNumber(graphics, x1, y + 2 * height / 3,
                     sizeToken, sizeToken, tokens[i], player.getBonus().get(tokens[i]));
         }
     }
