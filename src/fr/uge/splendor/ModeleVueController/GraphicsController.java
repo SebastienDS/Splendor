@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * This class represents the controller for the graphics version
+ */
 public class GraphicsController {
 
     /**

@@ -276,6 +276,11 @@ public class Model {
         return decks.size() + ((nobles.size() > 0)? 1 : 0);
     }
 
+    /**
+     * This method return true if index is equals to index of player playing
+     * @param index index of player
+     * @return true if index is equals to index of player playing
+     */
     public boolean isPlaying(int index) {
         return playerPlaying == index;
     }

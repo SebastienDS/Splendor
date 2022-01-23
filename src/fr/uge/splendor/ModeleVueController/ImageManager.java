@@ -11,14 +11,40 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * This class manage all images of the games
+ */
 public class ImageManager {
 
+    /**
+     * Background image
+     */
     private final BufferedImage backGround;
+    /**
+     * Title image
+     */
     private final BufferedImage title;
+    /**
+     * Card background Image
+     */
     private BufferedImage cardBackGround;
+    /**
+     * All cards images mapped by name and token
+     */
     private final Map<String, Map<Token, BufferedImage>> cards;
+    /**
+     * All nobles image mapped by name
+     */
     private final Map<String, BufferedImage> nobles;
 
+    /**
+     * Create an instance of image manager
+     * @param backGround background image path
+     * @param title title image path
+     * @param width_screen width screen
+     * @param height_screen height screen
+     * @throws IOException if an I/O Exception occur
+     */
     public ImageManager(Path backGround, Path title, int width_screen, int height_screen) throws IOException {
         Objects.requireNonNull(backGround);
         this.backGround = loadImage(backGround, width_screen, height_screen);
@@ -27,6 +53,12 @@ public class ImageManager {
         this.nobles = new HashMap<>();
     }
 
+    /**
+     * Create an instance of image manager with default background and title path value
+     * @param width_screen width of screen
+     * @param height_screen height of screen
+     * @throws IOException if an I/O Exception occur
+     */
     public ImageManager(int width_screen, int height_screen) throws IOException {
         this(
                 Path.of("resources", "images", "background.jpg"),
@@ -36,6 +68,11 @@ public class ImageManager {
         );
     }
 
+    /**
+     * Initialise all cards of the game with cards the directory with all the cards
+     * @param cards directory with all the cards
+     * @param gameData data of the game
+     */
     public void initCards(Path cards, Model gameData) {
         var length = gameData.getNumberOfDecks();
         var w = Integer.MAX_VALUE;
@@ -58,6 +95,13 @@ public class ImageManager {
         }
     }
 
+    /**
+     * Create an image of the path with width and height value and add it to cards map
+     * @param path path of image
+     * @param width width of image
+     * @param height height of image
+     * @throws IOException if an I/O Exception occur
+     */
     private void create_image(Path path, int width, int height) throws IOException {
         var token = Token.valueOf(path.getFileName().toString().split("[.]")[0]);
         var nameDirectory = path.getName(path.getNameCount() - 2).toString();
@@ -69,6 +113,11 @@ public class ImageManager {
         cards.get(nameDirectory).put(token, loadImage(path, width, height));
     }
 
+    /**
+     * Initialise all nobles of the game with nobles the directory with all images
+     * @param nobles directory with all nobles images
+     * @param gameData data of the game
+     */
     public void initNoble(Path nobles, Model gameData) {
         var length = gameData.getNumberOfDecks();
         var w = Integer.MAX_VALUE;
@@ -90,6 +139,13 @@ public class ImageManager {
         }
     }
 
+    /**
+     * Create and put image of noble in nobles list
+     * @param path path of image
+     * @param width width of image
+     * @param height height of image
+     * @throws IOException if an I/O Exception occur
+     */
     private void create_noble(Path path, int width, int height) throws IOException {
         var name = path.getFileName().toString().split("[.]")[0];
         nobles.put(name, loadImage(path, width, height));
@@ -169,14 +225,27 @@ public class ImageManager {
         return cards.get(card.name()).get(card.bonus());
     }
 
+    /**
+     * This methode return the image of the noble
+     * @param noble noble associated to the image
+     * @return image of the noble
+     */
     public BufferedImage get(Noble noble) {
         return nobles.get(noble.name());
     }
 
+    /**
+     * this method return the title image
+     * @return title image
+     */
     public BufferedImage title() {
         return title;
     }
 
+    /**
+     * This method return the card background image
+     * @return the card background image
+     */
     public BufferedImage cardBackGround() {
         return cardBackGround;
     }

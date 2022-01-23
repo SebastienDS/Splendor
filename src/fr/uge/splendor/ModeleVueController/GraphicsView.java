@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-
+/**
+ * This class represents the view for the graphics version
+ */
 public class GraphicsView {
 
     /**
