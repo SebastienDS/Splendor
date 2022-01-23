@@ -432,6 +432,12 @@ public class GraphicsController {
                 .toList();
     }
 
+    /**
+     * Function managing all the game
+     * @param context application context
+     * @param gameData data of the game
+     * @param images all images
+     */
     private static void startGame(ApplicationContext context, Model gameData, ImageManager images) {
         images.initCards(Path.of("resources", "images", "cards"), gameData);
         images.initNoble(Path.of("resources", "images", "nobles"), gameData);
@@ -450,23 +456,29 @@ public class GraphicsController {
                     context.exit(0);
                 }
             } else if (action == Event.Action.POINTER_DOWN) {
-                haveClickedGameStarted(event.getLocation()); // todo
-                if (actionManager.getAction() != ActionManager.Action.END_TURN) {
-                    manageAction(event.getLocation(), actionManager, gameData, images);
-                    manageButtons(buttons, event.getLocation(), actionManager, gameData);
-                }
-                else if (manageEndTurn(buttons, event.getLocation())) {
-                    gameData.endTurn();
-                    actionManager.setAction(ActionManager.Action.NONE);
-                }
+                haveClickedGameStarted(event.getLocation(), actionManager, gameData, images, buttons);
             }
         }
     }
 
+    /**
+     * manage click on button endTurn
+     * @param buttons all buttons
+     * @param location location of click
+     * @return true if button is clicked on
+     */
     private static boolean manageEndTurn(List<Button> buttons, Point2D.Float location) {
         return buttons.get(3).rect().contains(location);
     }
 
+    /**
+     * manage all action to select object
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of the game
+     * @param images all images
+     */
+    // TODO add return
     private static boolean manageAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
         return manageCardAction(location, actionManager, gameData, images)
                 || manageTokenAction(location, actionManager, gameData)
@@ -497,6 +509,14 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * verif if a card is clicked on. If that's the case, select it in actionManager and return true
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of the game
+     * @param images all images
+     * @return true if user clicked on card
+     */
     private static boolean manageCardAction(Point2D.Float location, ActionManager actionManager, Model gameData, ImageManager images) {
         var length = gameData.getNumberOfDecks();
         for (var index : gameData.getGrounds().keySet()) {
@@ -508,7 +528,6 @@ public class GraphicsController {
                 var spacingY = GraphicsView.HEIGHT_SCREEN / length;
                 var x = spacingX * i + spacingX / 2 - image.getWidth() / 2;
                 var y = spacingY * index + spacingY / 2 - image.getHeight() / 2;
-
                 var rect = new Rectangle(x, y, image.getWidth(), image.getHeight());
                 if (rect.contains(location)) {
                     actionManager.setAction(ActionManager.Action.CARD);
@@ -563,6 +582,10 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * Initialise all buttons of game and return them in a list
+     * @return list of button created
+     */
     private static List<Button> initGameButtons() {
         return List.of(
                 new Button(
@@ -596,6 +619,14 @@ public class GraphicsController {
         );
     }
 
+    /**
+     * Manage button to activate depending on object selected and return true if an action is done
+     * @param buttons all buttons
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of the game
+     * @return true if an action is done
+     */
     private static boolean manageButtons(List<Button> buttons, Point2D.Float location, ActionManager actionManager, Model gameData) {
         return switch (actionManager.getAction()) {
             case CARD -> manageCardButton(buttons, location, gameData, actionManager);
@@ -606,6 +637,14 @@ public class GraphicsController {
         };
     }
 
+    /**
+     * Manage action token if tokens are selected. Return true if an action is done
+     * @param buttons all buttons
+     * @param location location of click
+     * @param gameData data of the game
+     * @param actionManager manage action
+     * @return true if an action is done
+     */
     private static boolean manageTokenButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var selectedTokens = actionManager.getSelectedTokens();
         var tokens = gameData.getGameTokens();
@@ -626,6 +665,14 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * Manage action click when deck is selected to reserve card of deck. Return true if an action is done.
+     * @param buttons all buttons
+     * @param location location of click
+     * @param gameData data of the game
+     * @param actionManager manage action
+     * @return true if an action is done
+     */
     private static boolean manageDeckButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var reserve = buttons.get(1);
         var selectedDeck = actionManager.getSelectedDeck();
@@ -639,6 +686,15 @@ public class GraphicsController {
         return false;
     }
 
+    /**
+     * Manage action click when card is selected to buy or reserve if user click on button and return true if an action
+     * is done
+     * @param buttons all buttons
+     * @param location location of click
+     * @param gameData data of the game
+     * @param actionManager manage action
+     * @return true if an action is done
+     */
     private static boolean manageCardButton(List<Button> buttons, Point2D.Float location, Model gameData, ActionManager actionManager) {
         var buy = buttons.get(0);
         var reserve = buttons.get(1);
@@ -665,7 +721,23 @@ public class GraphicsController {
         return false;
     }
 
-    private static void haveClickedGameStarted(Point2D.Float location) {
-        System.out.println(location);
+    /**
+     * Manage event when user clicked
+     * @param location location of click
+     * @param actionManager manage action
+     * @param gameData data of the game
+     * @param images all images
+     * @param buttons all buttons
+     */
+    private static void haveClickedGameStarted(Point2D.Float location, ActionManager actionManager,
+                                               Model gameData, ImageManager images, List<Button> buttons) {
+        if (actionManager.getAction() != ActionManager.Action.END_TURN) {
+            manageAction(location, actionManager, gameData, images);
+            manageButtons(buttons, location, actionManager, gameData);
+        }
+        else if (manageEndTurn(buttons, location)) {
+            gameData.endTurn();
+            actionManager.setAction(ActionManager.Action.NONE);
+        }
     }
 }
